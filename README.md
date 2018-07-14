@@ -79,6 +79,20 @@ RELEASE_REPOSITORY_URL (defaults to Maven Central's staging server)
 SNAPSHOT_REPOSITORY_URL (defaults to Maven Central's snapshot server)
 ```
 
+## Already in use in following libraries
+
+* [AndroidRate library](https://github.com/Vorlonsoft/AndroidRate)
+
+* ...
+
+## Contribute
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Added some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
+
 ## License
 
     Copyright 2018 Vorlonsoft LLC
@@ -87,7 +101,7 @@ SNAPSHOT_REPOSITORY_URL (defaults to Maven Central's snapshot server)
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
