@@ -41,6 +41,9 @@ POM_LICENCE_URL        = https://opensource.org/licenses/MIT
 POM_LICENCE_DIST       = repo
 POM_DEVELOPER_ID       = AlexanderLS
 POM_DEVELOPER_NAME     = Alexander Savin
+POM_DEVELOPER_EMAIL    = info@vorlonsoft.com
+POM_DEVELOPER_ORG      = Vorlonsoft LLC
+POM_DEVELOPER_ORG_URL  = https://www.vorlonsoft.com/
 ```
 
 The `VERSION_NAME` value is important. If it contains the keyword `SNAPSHOT` then the build will upload to the snapshot server, if not then to the release server.
