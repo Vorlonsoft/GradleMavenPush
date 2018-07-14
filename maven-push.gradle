@@ -41,6 +41,14 @@ def getDoclintCheck() {
     return hasProperty('DOCLINT_CHECK') ? DOCLINT_CHECK.equalsIgnoreCase('true') : false
 }
 
+def getJavadocEncoding() {
+    return hasProperty('JAVADOC_ENCODING') ? JAVADOC_ENCODING : "UTF-8"
+}
+
+def getJavadocCharSet() {
+    return hasProperty('JAVADOC_CHARSET') ? JAVADOC_CHARSET : "UTF-8"
+}
+
 afterEvaluate { project ->
     uploadArchives {
         repositories {
@@ -96,8 +104,8 @@ afterEvaluate { project ->
 
     task androidJavadocs(type: Javadoc) {
         options {
-            encoding 'UTF-8'
-            charSet 'UTF-8'
+            encoding getJavadocEncoding()
+            charSet getJavadocCharSet()
             author true
             version true
         }
@@ -124,8 +132,8 @@ afterEvaluate { project ->
     }
 
     tasks.withType(Javadoc).all {
-        options.encoding = 'UTF-8'
-        options.charSet = 'UTF-8'
+        options.encoding = getJavadocEncoding()
+        options.charSet = getJavadocCharSet()
         options.author = true
         options.version = true
     }

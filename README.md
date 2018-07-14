@@ -78,6 +78,8 @@ There are other properties which can be set:
 RELEASE_REPOSITORY_URL (defaults to Maven Central's staging server)
 SNAPSHOT_REPOSITORY_URL (defaults to Maven Central's snapshot server)
 DOCLINT_CHECK (default false)
+JAVADOC_ENCODING (default UTF-8)
+JAVADOC_CHARSET (default UTF-8)
 ```
 
 ## Already in use in following libraries
