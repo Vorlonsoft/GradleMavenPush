@@ -37,6 +37,10 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 
+def getDoclintCheck() {
+    return hasProperty('DOCLINT_CHECK') ? DOCLINT_CHECK.equalsIgnoreCase('true') : false
+}
+
 afterEvaluate { project ->
     uploadArchives {
         repositories {
@@ -96,6 +100,9 @@ afterEvaluate { project ->
             charSet 'UTF-8'
             author true
             version true
+        }
+        if (!getDoclintCheck() && JavaVersion.current().isJava8Compatible()) {
+            options.addStringOption('Xdoclint:none', '-quiet')
         }
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))

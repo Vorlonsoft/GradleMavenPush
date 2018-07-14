@@ -77,6 +77,7 @@ There are other properties which can be set:
 ```
 RELEASE_REPOSITORY_URL (defaults to Maven Central's staging server)
 SNAPSHOT_REPOSITORY_URL (defaults to Maven Central's snapshot server)
+DOCLINT_CHECK (default false)
 ```
 
 ## Already in use in following libraries
