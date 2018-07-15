@@ -257,7 +257,7 @@ afterEvaluate { project ->
                             id pomDeveloperId
                             name pomDeveloperName
                             email pomDeveloperEmail
-                            organization pomDeveloperOrg
+                            organization = pomDeveloperOrg
                             organizationUrl pomDeveloperOrgUrl
                         }
                     }
