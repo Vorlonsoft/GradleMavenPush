@@ -75,6 +75,7 @@ There are other properties which can be set:
 ```
 RELEASE_REPOSITORY_URL (defaults to Maven Central's staging server)
 SNAPSHOT_REPOSITORY_URL (defaults to Maven Central's snapshot server)
+POM_GENERATE_UNIQUE_SNAPSHOTS (default is "true")
 POM_SCM_URL (default is POM_URL value)
 POM_SCM_DEV_CONNECTION (default is POM_SCM_CONNECTION value)
 POM_LICENCE_DIST (default is "repo")

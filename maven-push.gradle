@@ -38,7 +38,7 @@ def getRepositoryPassword() {
 }
 
 def getDoclintCheck() {
-    return hasProperty('DOCLINT_CHECK') ? DOCLINT_CHECK.equalsIgnoreCase('true') : false
+    return hasProperty('DOCLINT_CHECK') ? 'true'.equalsIgnoreCase(DOCLINT_CHECK) : false
 }
 
 def getJavadocEncoding() {
@@ -101,6 +101,10 @@ def getPomDescription() {
     } else {
         throw new InvalidUserDataException('You must set POM_DESCRIPTION in gradle.properties file.')
     }
+}
+
+def getPomUniqueVersion() {
+    return hasProperty('POM_GENERATE_UNIQUE_SNAPSHOTS') ? 'true'.equalsIgnoreCase(POM_GENERATE_UNIQUE_SNAPSHOTS) : true
 }
 
 def getPomUrl() {
@@ -243,6 +247,7 @@ afterEvaluate { project ->
                 def pomName = getPomName()
                 def pomPackaging = getPomPackaging()
                 def pomDescription = getPomDescription()
+                def pomUniqueVersion = getPomUniqueVersion()
                 def pomUrl = getPomUrl()
                 def pomScmUrl = getPomScmUrl()
                 def pomScmConnection = getPomScmConnection()
@@ -263,6 +268,7 @@ afterEvaluate { project ->
                     name pomName
                     packaging pomPackaging
                     description pomDescription
+                    uniqueVersion pomUniqueVersion
                     url pomUrl
 
                     scm {
