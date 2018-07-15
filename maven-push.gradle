@@ -159,6 +159,22 @@ def getPomLicenseDist() {
     }
 }
 
+def getOrg() {
+    if (hasProperty('POM_ORG')){
+        return POM_ORG
+    } else {
+        return ''
+    }
+}
+
+def getOrgUrl() {
+    if (hasProperty('POM_ORG_URL')){
+        return POM_ORG_URL
+    } else {
+        return ''
+    }
+}
+
 def getDeveloperId() {
     if (hasProperty('POM_DEVELOPER_ID')){
         return POM_DEVELOPER_ID
@@ -177,7 +193,7 @@ def getDeveloperName() {
 
 def getDeveloperEmail() {
     if (hasProperty('POM_DEVELOPER_EMAIL')){
-        return POM_DEVELOPER_NAME
+        return POM_DEVELOPER_EMAIL
     } else {
         throw new InvalidUserDataException('You must set POM_DEVELOPER_NAME in gradle.properties file.')
     }
@@ -185,17 +201,25 @@ def getDeveloperEmail() {
 
 def getDeveloperOrg() {
     if (hasProperty('POM_DEVELOPER_ORG')){
-        return POM_DEVELOPER_NAME
+        return POM_DEVELOPER_ORG
     } else {
-        return ''
+        return getOrg()
     }
 }
 
 def getDeveloperOrgUrl() {
     if (hasProperty('POM_DEVELOPER_ORG_URL')){
-        return POM_DEVELOPER_NAME
+        return POM_DEVELOPER_ORG_URL
     } else {
-        return ''
+        return getOrgUrl()
+    }
+}
+
+def getDeveloperRole() {
+    if (hasProperty('POM_DEVELOPER_ROLE')){
+        return POM_DEVELOPER_ROLE
+    } else {
+        return 'developer'
     }
 }
 
@@ -226,11 +250,14 @@ afterEvaluate { project ->
                 def pomLicenseName = getPomLicenseName()
                 def pomLicenseUrl = getPomLicenseUrl()
                 def pomDistribution = getPomLicenseDist()
+                def pomOrg = getOrg()
+                def pomOrgUrl = getOrgUrl()
                 def pomDeveloperId = getDeveloperId()
                 def pomDeveloperName = getDeveloperName()
                 def pomDeveloperEmail = getDeveloperEmail()
                 def pomDeveloperOrg = getDeveloperOrg()
                 def pomDeveloperOrgUrl = getDeveloperOrgUrl()
+                def pomDeveloperRole = getDeveloperRole()
 
                 pom.project {
                     name pomName
@@ -252,13 +279,21 @@ afterEvaluate { project ->
                         }
                     }
 
+                    organization {
+                        name pomOrg
+                        url pomOrgUrl
+                    }
+
                     developers {
                         developer {
                             id pomDeveloperId
                             name pomDeveloperName
                             email pomDeveloperEmail
-                            organization = pomDeveloperOrg
+                            organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
                             organizationUrl pomDeveloperOrgUrl
+                            roles {
+                                role pomDeveloperRole
+                            }
                         }
                     }
                 }
