@@ -27,23 +27,19 @@ signing.secretKeyRingFile = ./secring.gpg
 You may already have this file, in which case just edit the original. This file should contain the POM values which are common to all of your sub-project (if you have any). For instance, here's [AndroidRate's](https://github.com/Vorlonsoft/AndroidRate):
 
 ```properties
+# VERSION_NAME (default is build.gradle versionName)
 VERSION_NAME           = 1.2.0-SNAPSHOT
-VERSION_CODE           = 43
+# GROUP (default is packageName)
 GROUP                  = com.vorlonsoft
 
 POM_DESCRIPTION        = Library for Android applications, which provides rating dialog.
 POM_URL                = https://github.com/Vorlonsoft/AndroidRate
-POM_SCM_URL            = https://github.com/Vorlonsoft/AndroidRate
 POM_SCM_CONNECTION     = scm:git@github.com:Vorlonsoft/AndroidRate.git
-POM_SCM_DEV_CONNECTION = scm:git@github.com:Vorlonsoft/AndroidRate.git
 POM_LICENCE_NAME       = The MIT License (MIT)
 POM_LICENCE_URL        = https://opensource.org/licenses/MIT
-POM_LICENCE_DIST       = repo
 POM_DEVELOPER_ID       = AlexanderLS
 POM_DEVELOPER_NAME     = Alexander Savin
 POM_DEVELOPER_EMAIL    = info@vorlonsoft.com
-POM_DEVELOPER_ORG      = Vorlonsoft LLC
-POM_DEVELOPER_ORG_URL  = https://www.vorlonsoft.com/
 ```
 
 The `VERSION_NAME` value is important. If it contains the keyword `SNAPSHOT` then the build will upload to the snapshot server, if not then to the release server.
@@ -54,7 +50,6 @@ The values in this file are specific to the sub-project (and override those in t
 ```properties
 POM_NAME        = AndroidRate Library
 POM_ARTIFACT_ID = androidrate
-POM_PACKAGING   = aar
 ```
 
 ### 5. Call the script from each sub-modules build.gradle
@@ -80,9 +75,15 @@ There are other properties which can be set:
 ```
 RELEASE_REPOSITORY_URL (defaults to Maven Central's staging server)
 SNAPSHOT_REPOSITORY_URL (defaults to Maven Central's snapshot server)
-DOCLINT_CHECK (default false)
-JAVADOC_ENCODING (default UTF-8)
-JAVADOC_CHARSET (default UTF-8)
+POM_SCM_URL (default is POM_URL value)
+POM_SCM_DEV_CONNECTION (default is POM_SCM_CONNECTION value)
+POM_LICENCE_DIST (default is "repo")
+POM_DEVELOPER_ORG (default is "")
+POM_DEVELOPER_ORG_URL (default is "")
+POM_PACKAGING (default is "aar")
+DOCLINT_CHECK (default is "false")
+JAVADOC_ENCODING (default is "UTF-8")
+JAVADOC_CHARSET (default is "UTF-8")
 ```
 
 ## Already in use in following libraries
