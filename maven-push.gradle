@@ -314,6 +314,19 @@ afterEvaluate { project ->
         sign configurations.archives
     }
 
+    task installArchives(type: Upload) {
+        description 'Installs the artifacts to the local Maven repository.'
+        configuration = configurations['archives']
+        repositories {
+            mavenDeployer {
+                pom.groupId = getPomGroupId()
+                pom.artifactId = getPomArtifactId()
+                pom.version = getPomVersionName()
+                repository url: "file://${System.properties['user.home']}/.m2/repository"
+            }
+        }
+    }
+
     task androidJavadocs(type: Javadoc) {
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))

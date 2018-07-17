@@ -67,7 +67,13 @@ You can now build and push:
 ```bash
 $ gradle clean build uploadArchives
 ```
-	
+
+Build and install on local Maven (~/.m2/repository/):
+
+```bash
+$ gradle clean build installArchives
+```
+
 ### Other Properties
 
 There are other properties which can be set:
