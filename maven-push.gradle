@@ -268,7 +268,7 @@ afterEvaluate { project ->
                     name pomName
                     packaging pomPackaging
                     description pomDescription
-                    uniqueVersion pomUniqueVersion
+                    uniqueVersion = pomUniqueVersion
                     url pomUrl
 
                     scm {
