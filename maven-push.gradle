@@ -18,7 +18,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 def isReleaseBuild() {
-    return (getPomVersionName().contains('SNAPSHOT') == false)
+    return !getPomVersionName().contains('SNAPSHOT')
 }
 
 def getReleaseRepositoryUrl() {
@@ -119,7 +119,7 @@ def getPomScmUrl() {
     if (hasProperty('POM_SCM_URL')){
         return POM_SCM_URL
     } else {
-        return getPomUrl();
+        return getPomUrl()
     }
 }
 
@@ -135,7 +135,7 @@ def getPomScmDevConnection() {
     if (hasProperty('POM_SCM_DEV_CONNECTION')){
         return POM_SCM_DEV_CONNECTION
     } else {
-        return getPomScmConnection();
+        return getPomScmConnection()
     }
 }
 
