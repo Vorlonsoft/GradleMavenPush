@@ -199,7 +199,7 @@ def getDeveloperEmail() {
     if (hasProperty('POM_DEVELOPER_EMAIL')){
         return POM_DEVELOPER_EMAIL
     } else {
-        throw new InvalidUserDataException('You must set POM_DEVELOPER_NAME in gradle.properties file.')
+        return 'lazy-developer-who-does-not-read-readme@example.com'
     }
 }
 
