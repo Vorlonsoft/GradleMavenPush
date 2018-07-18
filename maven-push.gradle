@@ -228,10 +228,40 @@ def getDeveloperRole() {
 }
 
 afterEvaluate { project ->
+    def pomName = getPomName()
+    def pomPackaging = getPomPackaging()
+    def pomDescription = getPomDescription()
+    def pomUniqueVersion = getPomUniqueVersion()
+    def pomUrl = getPomUrl()
+    def pomScmUrl = getPomScmUrl()
+    def pomScmConnection = getPomScmConnection()
+    def pomScmDevConnection = getPomScmDevConnection()
+    def pomLicenseName = getPomLicenseName()
+    def pomLicenseUrl = getPomLicenseUrl()
+    def pomDistribution = getPomLicenseDist()
+    def pomOrg = getOrg()
+    def pomOrgUrl = getOrgUrl()
+    def pomDeveloperId = getDeveloperId()
+    def pomDeveloperName = getDeveloperName()
+    def pomDeveloperEmail = getDeveloperEmail()
+    def pomDeveloperOrg = getDeveloperOrg()
+    def pomDeveloperOrgUrl = getDeveloperOrgUrl()
+    def pomDeveloperRole = getDeveloperRole()
+
+    signing {
+        required {
+            isReleaseBuild() && gradle.taskGraph.hasTask('uploadArchives')
+        }
+        sign configurations.archives
+    }
+
     uploadArchives {
+        description 'Deploys the artifacts to the Maven Central repository.'
         repositories {
             mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                beforeDeployment {
+                    MavenDeployment deployment -> signing.signPom(deployment)
+                }
 
                 pom.groupId = getPomGroupId()
                 pom.artifactId = getPomArtifactId()
@@ -243,26 +273,6 @@ afterEvaluate { project ->
                 snapshotRepository(url: getSnapshotRepositoryUrl()) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                 }
-
-                def pomName = getPomName()
-                def pomPackaging = getPomPackaging()
-                def pomDescription = getPomDescription()
-                def pomUniqueVersion = getPomUniqueVersion()
-                def pomUrl = getPomUrl()
-                def pomScmUrl = getPomScmUrl()
-                def pomScmConnection = getPomScmConnection()
-                def pomScmDevConnection = getPomScmDevConnection()
-                def pomLicenseName = getPomLicenseName()
-                def pomLicenseUrl = getPomLicenseUrl()
-                def pomDistribution = getPomLicenseDist()
-                def pomOrg = getOrg()
-                def pomOrgUrl = getOrgUrl()
-                def pomDeveloperId = getDeveloperId()
-                def pomDeveloperName = getDeveloperName()
-                def pomDeveloperEmail = getDeveloperEmail()
-                def pomDeveloperOrg = getDeveloperOrg()
-                def pomDeveloperOrgUrl = getDeveloperOrgUrl()
-                def pomDeveloperRole = getDeveloperRole()
 
                 pom.project {
                     name pomName
@@ -307,45 +317,204 @@ afterEvaluate { project ->
         }
     }
 
-    signing {
-        required {
-            isReleaseBuild() && gradle.taskGraph.hasTask('uploadArchives')
-        }
-        sign configurations.archives
-    }
-
     task installArchives(type: Upload) {
-        description 'Installs the artifacts to the local Maven repository.'
-        configuration = configurations['archives']
+        description 'Deploys the artifacts to the local Maven repository.'
+        configuration = configurations.archives
         repositories {
             mavenDeployer {
                 pom.groupId = getPomGroupId()
                 pom.artifactId = getPomArtifactId()
                 pom.version = getPomVersionName()
+
                 repository url: "file://${System.properties['user.home']}/.m2/repository"
+
+                pom.project {
+                    name pomName
+                    packaging pomPackaging
+                    description pomDescription
+                    uniqueVersion = pomUniqueVersion
+                    url pomUrl
+
+                    scm {
+                        url pomScmUrl
+                        connection pomScmConnection
+                        developerConnection pomScmDevConnection
+                    }
+
+                    licenses {
+                        license {
+                            name pomLicenseName
+                            url pomLicenseUrl
+                            distribution pomDistribution
+                        }
+                    }
+
+                    organization {
+                        name pomOrg
+                        url pomOrgUrl
+                    }
+
+                    developers {
+                        developer {
+                            id pomDeveloperId
+                            name pomDeveloperName
+                            email pomDeveloperEmail
+                            organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
+                            organizationUrl pomDeveloperOrgUrl
+                            roles {
+                                role pomDeveloperRole
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
-    task androidJavadocs(type: Javadoc) {
-        failOnError = false
-        source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    }
+    if (project.getPlugins().hasPlugin('com.android.application') ||
+            project.getPlugins().hasPlugin('com.android.library')     ||
+            project.getPlugins().hasPlugin('android')                 ||
+            project.getPlugins().hasPlugin('android-library')) {
+        task install(type: Upload, dependsOn: assemble) {
+            description 'Installs the artifacts to the local Maven repository.'
+            repositories {
+                mavenInstaller {
+                    configuration = configurations.archives
 
-    task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-        classifier = 'javadoc'
-        from androidJavadocs.destinationDir
-    }
+                    pom.groupId = getPomGroupId()
+                    pom.artifactId = getPomArtifactId()
+                    pom.version = getPomVersionName()
 
-    task androidSourcesJar(type: Jar) {
-        classifier = 'sources'
-        from android.sourceSets.main.java.sourceFiles
+                    pom.project {
+                        name pomName
+                        packaging pomPackaging
+                        description pomDescription
+                        url pomUrl
+
+                        scm {
+                            url pomScmUrl
+                            connection pomScmConnection
+                            developerConnection pomScmDevConnection
+                        }
+
+                        licenses {
+                            license {
+                                name pomLicenseName
+                                url pomLicenseUrl
+                                distribution pomDistribution
+                            }
+                        }
+
+                        organization {
+                            name pomOrg
+                            url pomOrgUrl
+                        }
+
+                        developers {
+                            developer {
+                                id pomDeveloperId
+                                name pomDeveloperName
+                                email pomDeveloperEmail
+                                organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
+                                organizationUrl pomDeveloperOrgUrl
+                                roles {
+                                    role pomDeveloperRole
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        task androidJavadocs(type: Javadoc) {
+            failOnError = false
+            source = android.sourceSets.main.java.srcDirs
+            classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        }
+
+        task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+            classifier = 'javadoc'
+            from androidJavadocs.destinationDir
+        }
+
+        task androidSourcesJar(type: Jar) {
+            classifier = 'sources'
+            from android.sourceSets.main.java.sourceFiles
+        }
+    } else {
+        install {
+            description 'Installs the artifacts to the local Maven repository.'
+            repositories {
+                mavenInstaller {
+                    pom.groupId = getPomGroupId()
+                    pom.artifactId = getPomArtifactId()
+                    pom.version = getPomVersionName()
+
+                    pom.project {
+                        name pomName
+                        packaging pomPackaging
+                        description pomDescription
+                        url pomUrl
+
+                        scm {
+                            url pomScmUrl
+                            connection pomScmConnection
+                            developerConnection pomScmDevConnection
+                        }
+
+                        licenses {
+                            license {
+                                name pomLicenseName
+                                url pomLicenseUrl
+                                distribution pomDistribution
+                            }
+                        }
+
+                        organization {
+                            name pomOrg
+                            url pomOrgUrl
+                        }
+
+                        developers {
+                            developer {
+                                id pomDeveloperId
+                                name pomDeveloperName
+                                email pomDeveloperEmail
+                                organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
+                                organizationUrl pomDeveloperOrgUrl
+                                roles {
+                                    role pomDeveloperRole
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        task javadocJar(type: Jar, dependsOn:javadoc) {
+            classifier = 'javadoc'
+            from javadoc.destinationDir
+        }
+
+        task sourcesJar(type: Jar, dependsOn:classes) {
+            classifier = 'sources'
+            from sourceSets.main.java.sourceFiles
+        }
     }
 
     artifacts {
-        archives androidSourcesJar
-        archives androidJavadocsJar
+        if (project.getPlugins().hasPlugin('com.android.application') ||
+            project.getPlugins().hasPlugin('com.android.library')     ||
+            project.getPlugins().hasPlugin('android')                 ||
+            project.getPlugins().hasPlugin('android-library')) {
+            archives androidSourcesJar
+            archives androidJavadocsJar
+        } else {
+            archives sourcesJar
+            archives javadocJar
+        }
     }
 
     tasks.withType(Javadoc).all {

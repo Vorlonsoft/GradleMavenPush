@@ -62,13 +62,19 @@ apply from: 'https://raw.github.com/Vorlonsoft/GradleMavenPush/master/maven-push
 
 ### 6. Build and Push
 
-You can now build and push:
+You can now build and *deploy* on Maven Central or corporate staging/snapshot server:
 
 ```bash
 $ gradle clean build uploadArchives
 ```
 
-Build and install on local Maven (~/.m2/repository/):
+Build and *install* on local Maven (~/.m2/repository/):
+
+```bash
+$ gradle clean build install
+```
+
+Build and *deploy* on local Maven (~/.m2/repository/):
 
 ```bash
 $ gradle clean build installArchives
