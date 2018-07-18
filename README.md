@@ -1,7 +1,7 @@
 GradleMavenPush
 ===============
 
-Helper to upload Gradle Android Artifacts to Maven repositories
+Helper to upload Gradle Android Artifacts and Gradle Java Artifacts to Maven repositories (Maven Central, Corporate staging/snapshot servers and local Maven repositories)
 
 ## Usage
 
@@ -60,9 +60,9 @@ Add the following at the end of each `build.gradle` that you wish to upload:
 apply from: 'https://raw.github.com/Vorlonsoft/GradleMavenPush/master/maven-push.gradle'
 ```
 
-### 6. Build and Push
+### 6. Build and Deploy/Install
 
-You can now build and *deploy* on Maven Central or corporate staging/snapshot server:
+You can now build and *deploy* on Maven Central or Corporate staging/snapshot servers:
 
 ```bash
 $ gradle clean build uploadArchives
