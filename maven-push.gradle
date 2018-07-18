@@ -219,11 +219,13 @@ def getDeveloperOrgUrl() {
     }
 }
 
-def getDeveloperRole() {
-    if (hasProperty('POM_DEVELOPER_ROLE')){
-        return POM_DEVELOPER_ROLE
+def getDeveloperRoles() {
+    if (hasProperty('POM_DEVELOPER_ROLES')){
+        return getProperty('POM_DEVELOPER_ROLES').split(",")
+    } else if (hasProperty('POM_DEVELOPER_ROLE')){
+        return [POM_DEVELOPER_ROLE]
     } else {
-        return 'developer'
+        return ['developer']
     }
 }
 
@@ -246,7 +248,7 @@ afterEvaluate { project ->
     def pomDeveloperEmail = getDeveloperEmail()
     def pomDeveloperOrg = getDeveloperOrg()
     def pomDeveloperOrgUrl = getDeveloperOrgUrl()
-    def pomDeveloperRole = getDeveloperRole()
+    def pomDeveloperRoles = getDeveloperRoles()
 
     signing {
         required {
@@ -308,7 +310,9 @@ afterEvaluate { project ->
                             organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
                             organizationUrl pomDeveloperOrgUrl
                             roles {
-                                role pomDeveloperRole
+                                for (int i = 0; i < pomDeveloperRoles.size(); i++) {
+                                    role pomDeveloperRoles[i]
+                                }
                             }
                         }
                     }
@@ -362,7 +366,9 @@ afterEvaluate { project ->
                             organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
                             organizationUrl pomDeveloperOrgUrl
                             roles {
-                                role pomDeveloperRole
+                                for (int i = 0; i < pomDeveloperRoles.size(); i++) {
+                                    role pomDeveloperRoles[i]
+                                }
                             }
                         }
                     }
@@ -418,7 +424,9 @@ afterEvaluate { project ->
                                 organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
                                 organizationUrl pomDeveloperOrgUrl
                                 roles {
-                                    role pomDeveloperRole
+                                    for (int i = 0; i < pomDeveloperRoles.size(); i++) {
+                                        role pomDeveloperRoles[i]
+                                    }
                                 }
                             }
                         }
@@ -484,7 +492,9 @@ afterEvaluate { project ->
                                 organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
                                 organizationUrl pomDeveloperOrgUrl
                                 roles {
-                                    role pomDeveloperRole
+                                    for (int i = 0; i < pomDeveloperRoles.size(); i++) {
+                                        role pomDeveloperRoles[i]
+                                    }
                                 }
                             }
                         }
