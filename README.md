@@ -103,6 +103,26 @@ Build and *deploy* on local Maven (~/.m2/repository/):
 $ gradle clean build installArchives
 ```
 
+### 8. Inter-module dependency
+
+If your modules have dependencies on each other (e.g. implementation project(':other_module')), then you should do one of the following for proper POM generation
+
+- **option A**: add to top level build.gradle:
+
+```groovy
+allprojects {
+    version = VERSION_NAME
+    group = GROUP
+}
+```
+
+- **option B**: add to top level gradle.properties:
+
+```properties
+version = 1.2.0
+group   = com.vorlonsoft
+```
+
 ### Other Properties
 
 There are other properties which can be set:
