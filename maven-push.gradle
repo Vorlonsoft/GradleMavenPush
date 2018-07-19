@@ -259,7 +259,7 @@ def getDeveloperRoles() {
     } else if (hasProperty('POM_DEVELOPER_ROLE')){
         return [POM_DEVELOPER_ROLE]
     } else {
-        return ['developer']
+        return ['Software Developer']
     }
 }
 
