@@ -17,24 +17,53 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+def isJCenter() {
+    return (hasProperty('IS_JCENTER') && 'true'.equalsIgnoreCase(IS_JCENTER))
+}
+
 def isReleaseBuild() {
     return !getPomVersionName().contains('SNAPSHOT')
 }
 
 def getReleaseRepositoryUrl() {
-    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    if (hasProperty('RELEASE_REPOSITORY_URL')) {
+        return RELEASE_REPOSITORY_URL
+    } else if (isJCenter()) {
+        // https://bintray.com/api/v1/maven/{NEXUS_USERNAME}/maven/{POM_ARTIFACT_ID}/;publish=1
+        return 'https://bintray.com/api/v1/maven/' +
+                getRepositoryUsername() +
+               '/maven/' +
+                getPomArtifactUrl() +
+               '/;publish=1'
+    } else {
+        return 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    }
 }
 
 def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL : 'https://oss.sonatype.org/content/repositories/snapshots/'
+    if (hasProperty('SNAPSHOT_REPOSITORY_URL')) {
+        return SNAPSHOT_REPOSITORY_URL
+    } else if (isJCenter()) {
+        return 'https://oss.jfrog.org/artifactory/oss-snapshot-local/'
+    } else {
+        return 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
 }
 
 def getRepositoryUsername() {
-    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ''
+    if (System.getenv().containsKey('NEXUS_USERNAME')) {
+        return System.getenv('NEXUS_USERNAME')
+    } else {
+        return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ''
+    }
 }
 
 def getRepositoryPassword() {
-    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ''
+    if (System.getenv().containsKey('NEXUS_PASSWORD')) {
+        return System.getenv('NEXUS_PASSWORD')
+    } else {
+        return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ''
+    }
 }
 
 def getDoclintCheck() {
@@ -69,11 +98,16 @@ def getPomArtifactId() {
     }
 }
 
+def getPomArtifactUrl() {
+    return hasProperty('POM_ARTIFACT_URL') ? POM_ARTIFACT_URL : getPomArtifactId()
+}
+
 def getPomVersionName() {
+    def versionNameExtras = (System.getenv().containsKey('VERSION_NAME_EXTRAS')) ? System.getenv('VERSION_NAME_EXTRAS') : ''
     if (hasProperty('VERSION_NAME')){
-        return VERSION_NAME
-    } else if ( android.defaultConfig.versionName != null){
-        return android.defaultConfig.versionName
+        return VERSION_NAME + versionNameExtras
+    } else if (android.defaultConfig.versionName != null){
+        return android.defaultConfig.versionName + versionNameExtras
     } else {
         throw new InvalidUserDataException('You must set VERSION_NAME in gradle.properties file.')
     }
