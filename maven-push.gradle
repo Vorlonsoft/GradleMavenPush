@@ -263,6 +263,22 @@ def getDeveloperRoles() {
     }
 }
 
+def getIssueSystem() {
+    if (hasProperty('POM_ISSUE_SYSTEM')){
+        return POM_ISSUE_SYSTEM
+    } else {
+        return ''
+    }
+}
+
+def getIssueSystemUrl() {
+    if (hasProperty('POM_ISSUE_SYSTEM_URL')){
+        return POM_ISSUE_SYSTEM_URL
+    } else {
+        return ''
+    }
+}
+
 afterEvaluate { project ->
     def pomName = getPomName()
     def pomPackaging = getPomPackaging()
@@ -283,6 +299,8 @@ afterEvaluate { project ->
     def pomDeveloperOrg = getDeveloperOrg()
     def pomDeveloperOrgUrl = getDeveloperOrgUrl()
     def pomDeveloperRoles = getDeveloperRoles()
+    def pomIssueSystem = getIssueSystem()
+    def pomIssueSystemUrl = getIssueSystemUrl()
 
     signing {
         required {
@@ -362,6 +380,17 @@ afterEvaluate { project ->
                             }
                         }
                     }
+
+                    if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
+                        issueManagement {
+                            if (!''.equals(pomIssueSystem)) {
+                                system pomIssueSystem
+                            }
+                            if (!''.equals(pomIssueSystemUrl)) {
+                                url pomIssueSystemUrl
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -427,6 +456,17 @@ afterEvaluate { project ->
                                         role pomDeveloperRoles[i]
                                     }
                                 }
+                            }
+                        }
+                    }
+
+                    if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
+                        issueManagement {
+                            if (!''.equals(pomIssueSystem)) {
+                                system pomIssueSystem
+                            }
+                            if (!''.equals(pomIssueSystemUrl)) {
+                                url pomIssueSystemUrl
                             }
                         }
                     }
@@ -497,6 +537,17 @@ afterEvaluate { project ->
                                             role pomDeveloperRoles[i]
                                         }
                                     }
+                                }
+                            }
+                        }
+
+                        if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
+                            issueManagement {
+                                if (!''.equals(pomIssueSystem)) {
+                                    system pomIssueSystem
+                                }
+                                if (!''.equals(pomIssueSystemUrl)) {
+                                    url pomIssueSystemUrl
                                 }
                             }
                         }
@@ -582,6 +633,17 @@ afterEvaluate { project ->
                                             role pomDeveloperRoles[i]
                                         }
                                     }
+                                }
+                            }
+                        }
+
+                        if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
+                            issueManagement {
+                                if (!''.equals(pomIssueSystem)) {
+                                    system pomIssueSystem
+                                }
+                                if (!''.equals(pomIssueSystemUrl)) {
+                                    url pomIssueSystemUrl
                                 }
                             }
                         }
