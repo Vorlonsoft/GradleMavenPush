@@ -310,6 +310,8 @@ afterEvaluate { project ->
     def pomDeveloperRoles = getDeveloperRoles()
     def pomIssueSystem = getIssueSystem()
     def pomIssueSystemUrl = getIssueSystemUrl()
+    def javadocEncoding = getJavadocEncoding()
+    def javadocCharSet = getJavadocCharSet()
 
     signing {
         required {
@@ -678,12 +680,21 @@ afterEvaluate { project ->
             }
         }
 
-        task javadocJar(type: Jar, dependsOn:javadoc) {
+        task javadocJar(type: Jar, dependsOn: javadoc) {
+            options {
+                encoding javadocEncoding
+                charSet javadocCharSet
+                author true
+                version true
+            }
+            if (!getDoclintCheck() && JavaVersion.current().isJava8Compatible()) {
+                options.addStringOption('Xdoclint:none', '-quiet')
+            }
             classifier = 'javadoc'
             from javadoc.destinationDir
         }
 
-        task sourcesJar(type: Jar, dependsOn:classes) {
+        task sourcesJar(type: Jar, dependsOn: classes) {
             classifier = 'sources'
             from sourceSets.main.java.sourceFiles
         }
@@ -699,8 +710,8 @@ afterEvaluate { project ->
     }
 
     tasks.withType(Javadoc).all {
-        options.encoding = getJavadocEncoding()
-        options.charSet = getJavadocCharSet()
+        options.encoding = javadocEncoding
+        options.charSet = javadocCharSet
         options.author = true
         options.version = true
         if (!getDoclintCheck() && JavaVersion.current().isJava8Compatible()) {
