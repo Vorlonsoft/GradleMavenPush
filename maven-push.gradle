@@ -349,12 +349,12 @@ afterEvaluate { project ->
                         }
                     }
 
-                    if ((project.hasProperty('POM_ORG')) || (project.hasProperty('POM_ORG_URL'))) {
+                    if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
                         organization {
-                            if (project.hasProperty('POM_ORG')) {
+                            if (!''.equals(pomOrg)) {
                                 name pomOrg
                             }
-                            if (project.hasProperty('POM_ORG_URL')) {
+                            if (!''.equals(pomOrgUrl)) {
                                 url pomOrgUrl
                             }
                         }
@@ -365,13 +365,13 @@ afterEvaluate { project ->
                             id pomDeveloperId
                             name pomDeveloperName
                             email pomDeveloperEmail
-                            if ((project.hasProperty('POM_ORG')) || (project.hasProperty('POM_DEVELOPER_ORG'))) {
+                            if (!''.equals(pomDeveloperOrg)) {
                                 organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
                             }
-                            if ((project.hasProperty('POM_ORG_URL')) || (project.hasProperty('POM_DEVELOPER_ORG_URL'))) {
+                            if (!''.equals(pomDeveloperOrgUrl)) {
                                 organizationUrl pomDeveloperOrgUrl
                             }
-                            if ((project.hasProperty('POM_DEVELOPER_ROLE')) || (project.hasProperty('POM_DEVELOPER_ROLES'))) {
+                            if (pomDeveloperRoles.size() > 0) {
                                 roles {
                                     for (int i = 0; i < pomDeveloperRoles.size(); i++) {
                                         role pomDeveloperRoles[i]
@@ -428,12 +428,12 @@ afterEvaluate { project ->
                         }
                     }
 
-                    if ((project.hasProperty('POM_ORG')) || (project.hasProperty('POM_ORG_URL'))) {
+                    if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
                         organization {
-                            if (project.hasProperty('POM_ORG')) {
+                            if (!''.equals(pomOrg)) {
                                 name pomOrg
                             }
-                            if (project.hasProperty('POM_ORG_URL')) {
+                            if (!''.equals(pomOrgUrl)) {
                                 url pomOrgUrl
                             }
                         }
@@ -444,13 +444,13 @@ afterEvaluate { project ->
                             id pomDeveloperId
                             name pomDeveloperName
                             email pomDeveloperEmail
-                            if ((project.hasProperty('POM_ORG')) || (project.hasProperty('POM_DEVELOPER_ORG'))) {
+                            if (!''.equals(pomDeveloperOrg)) {
                                 organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
                             }
-                            if ((project.hasProperty('POM_ORG_URL')) || (project.hasProperty('POM_DEVELOPER_ORG_URL'))) {
+                            if (!''.equals(pomDeveloperOrgUrl)) {
                                 organizationUrl pomDeveloperOrgUrl
                             }
-                            if ((project.hasProperty('POM_DEVELOPER_ROLE')) || (project.hasProperty('POM_DEVELOPER_ROLES'))) {
+                            if (pomDeveloperRoles.size() > 0) {
                                 roles {
                                     for (int i = 0; i < pomDeveloperRoles.size(); i++) {
                                         role pomDeveloperRoles[i]
@@ -509,12 +509,12 @@ afterEvaluate { project ->
                             }
                         }
 
-                        if ((project.hasProperty('POM_ORG')) || (project.hasProperty('POM_ORG_URL'))) {
+                        if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
                             organization {
-                                if (project.hasProperty('POM_ORG')) {
+                                if (!''.equals(pomOrg)) {
                                     name pomOrg
                                 }
-                                if (project.hasProperty('POM_ORG_URL')) {
+                                if (!''.equals(pomOrgUrl)) {
                                     url pomOrgUrl
                                 }
                             }
@@ -525,13 +525,13 @@ afterEvaluate { project ->
                                 id pomDeveloperId
                                 name pomDeveloperName
                                 email pomDeveloperEmail
-                                if ((project.hasProperty('POM_ORG')) || (project.hasProperty('POM_DEVELOPER_ORG'))) {
+                                if (!''.equals(pomDeveloperOrg)) {
                                     organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
                                 }
-                                if ((project.hasProperty('POM_ORG_URL')) || (project.hasProperty('POM_DEVELOPER_ORG_URL'))) {
+                                if (!''.equals(pomDeveloperOrgUrl)) {
                                     organizationUrl pomDeveloperOrgUrl
                                 }
-                                if ((project.hasProperty('POM_DEVELOPER_ROLE')) || (project.hasProperty('POM_DEVELOPER_ROLES'))) {
+                                if (pomDeveloperRoles.size() > 0) {
                                     roles {
                                         for (int i = 0; i < pomDeveloperRoles.size(); i++) {
                                             role pomDeveloperRoles[i]
@@ -605,12 +605,12 @@ afterEvaluate { project ->
                             }
                         }
 
-                        if ((project.hasProperty('POM_ORG')) || (project.hasProperty('POM_ORG_URL'))) {
+                        if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
                             organization {
-                                if (project.hasProperty('POM_ORG')) {
+                                if (!''.equals(pomOrg)) {
                                     name pomOrg
                                 }
-                                if (project.hasProperty('POM_ORG_URL')) {
+                                if (!''.equals(pomOrgUrl)) {
                                     url pomOrgUrl
                                 }
                             }
@@ -621,13 +621,13 @@ afterEvaluate { project ->
                                 id pomDeveloperId
                                 name pomDeveloperName
                                 email pomDeveloperEmail
-                                if ((project.hasProperty('POM_ORG')) || (project.hasProperty('POM_DEVELOPER_ORG'))) {
+                                if (!''.equals(pomDeveloperOrg)) {
                                     organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
                                 }
-                                if ((project.hasProperty('POM_ORG_URL')) || (project.hasProperty('POM_DEVELOPER_ORG_URL'))) {
+                                if (!''.equals(pomDeveloperOrgUrl)) {
                                     organizationUrl pomDeveloperOrgUrl
                                 }
-                                if ((project.hasProperty('POM_DEVELOPER_ROLE')) || (project.hasProperty('POM_DEVELOPER_ROLES'))) {
+                                if (pomDeveloperRoles.size() > 0) {
                                     roles {
                                         for (int i = 0; i < pomDeveloperRoles.size(); i++) {
                                             role pomDeveloperRoles[i]
