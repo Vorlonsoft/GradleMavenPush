@@ -66,14 +66,18 @@ export VERSION_NAME_EXTRAS = -master-SNAPSHOT
 in this case it will be uploaded to the snapshot server and indicates it's from the master branch.
 
 ### 5. Create gradle.properties in each sub-project
-The values in this file are specific to the sub-project (and override those in the root `gradle.properties`). In this example, this is just the name, artifactId and packaging type:
+The values in this file are specific to the sub-project (and override those in the root `gradle.properties`). In this example, this is just the name and artifactId:
 
 ```properties
 POM_NAME        = AndroidRate Library
 POM_ARTIFACT_ID = androidrate
 ```
 
-Also you can set `POM_ARTIFACT_URL`, this is makes to easier to have an artifact with one artifactId but the name on JCenter something else.
+You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts) and change it's value.
+
+Add `APKLIB_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact apklib. You'll get both `POM_PACKAGING` value and "apklib" artifacts. apklib is a way to bundle an Android library project.
+
+Also you can set `POM_ARTIFACT_URL` (default is `POM_ARTIFACT_ID` value), this is makes to easier to have an artifact with one artifactId but the name on JCenter something else.
 
 ### 6. Call the script from each sub-modules build.gradle
 
@@ -131,7 +135,6 @@ There are other properties which can be set:
 RELEASE_REPOSITORY_URL (defaults to Maven Central's or JCenter's staging server (depends on IS_JCENTER))
 SNAPSHOT_REPOSITORY_URL (defaults to Maven Central's or JCenter's snapshot server (depends on IS_JCENTER))
 POM_GENERATE_UNIQUE_SNAPSHOTS (default is "true")
-POM_PACKAGING (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts)
 POM_ORG (default is "")
 POM_ORG_URL (default is "")
 POM_LICENCE_DIST (default is "repo")

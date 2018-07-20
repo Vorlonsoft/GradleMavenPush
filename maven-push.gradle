@@ -66,6 +66,10 @@ def getRepositoryPassword() {
     }
 }
 
+def getApklibArtifact() {
+    return hasProperty('APKLIB_ARTIFACT') ? 'true'.equalsIgnoreCase(APKLIB_ARTIFACT) : false
+}
+
 def getDoclintCheck() {
     return hasProperty('DOCLINT_CHECK') ? 'true'.equalsIgnoreCase(DOCLINT_CHECK) : false
 }
@@ -561,6 +565,20 @@ afterEvaluate { project ->
             }
         }
 
+        if (getApklibArtifact()) {
+            task apklib(type: Zip) {
+                appendix = extension = 'apklib'
+
+                from 'AndroidManifest.xml'
+                into('res') {
+                    from 'res'
+                }
+                into('src') {
+                    from 'src'
+                }
+            }
+        }
+
         task androidJavadocs(type: Javadoc) {
             failOnError = false
             source = android.sourceSets.main.java.srcDirs
@@ -578,8 +596,11 @@ afterEvaluate { project ->
         }
 
         artifacts {
-            archives androidSourcesJar
+            if (getApklibArtifact()) {
+                archives apklib
+            }
             archives androidJavadocsJar
+            archives androidSourcesJar
         }
     } else {
         install {
@@ -668,8 +689,8 @@ afterEvaluate { project ->
         }
 
         artifacts {
-            archives sourcesJar
             archives javadocJar
+            archives sourcesJar
         }
 
         configurations {
