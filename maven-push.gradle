@@ -116,8 +116,13 @@ def getPomVersionName() {
 def getPomPackaging() {
     if (hasProperty('POM_PACKAGING')){
         return POM_PACKAGING
-    } else {
+    } else if (project.getPlugins().hasPlugin('com.android.application') ||
+            project.getPlugins().hasPlugin('com.android.library')     ||
+            project.getPlugins().hasPlugin('android')                 ||
+            project.getPlugins().hasPlugin('android-library')) {
         return 'aar'
+    } else {
+        return 'jar'
     }
 }
 

@@ -131,7 +131,7 @@ There are other properties which can be set:
 RELEASE_REPOSITORY_URL (defaults to Maven Central's or JCenter's staging server (depends on IS_JCENTER))
 SNAPSHOT_REPOSITORY_URL (defaults to Maven Central's or JCenter's snapshot server (depends on IS_JCENTER))
 POM_GENERATE_UNIQUE_SNAPSHOTS (default is "true")
-POM_PACKAGING (default is "aar")
+POM_PACKAGING (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts)
 POM_ORG (default is "")
 POM_ORG_URL (default is "")
 POM_LICENCE_DIST (default is "repo")
