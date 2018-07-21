@@ -312,6 +312,69 @@ afterEvaluate { project ->
     def pomIssueSystemUrl = getIssueSystemUrl()
     def javadocEncoding = getJavadocEncoding()
     def javadocCharSet = getJavadocCharSet()
+    def pomConfig = {
+        packaging pomPackaging
+        name pomName
+        description pomDescription
+        url pomUrl
+
+        if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
+            organization {
+                if (!''.equals(pomOrg)) {
+                    name pomOrg
+                }
+                if (!''.equals(pomOrgUrl)) {
+                    url pomOrgUrl
+                }
+            }
+        }
+
+        licenses {
+            license {
+                name pomLicenseName
+                url pomLicenseUrl
+                distribution pomDistribution
+            }
+        }
+
+        developers {
+            developer {
+                id pomDeveloperId
+                name pomDeveloperName
+                email pomDeveloperEmail
+                if (!''.equals(pomDeveloperOrg)) {
+                    organization pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
+                }
+                if (!''.equals(pomDeveloperOrgUrl)) {
+                    organizationUrl pomDeveloperOrgUrl
+                }
+                if (pomDeveloperRoles.size() > 0) {
+                    roles {
+                        for (int i = 0; i < pomDeveloperRoles.size(); i++) {
+                            role pomDeveloperRoles[i]
+                        }
+                    }
+                }
+            }
+        }
+
+        scm {
+            connection pomScmConnection
+            developerConnection pomScmDevConnection
+            url pomScmUrl
+        }
+
+        if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
+            issueManagement {
+                if (!''.equals(pomIssueSystem)) {
+                    system pomIssueSystem
+                }
+                if (!''.equals(pomIssueSystemUrl)) {
+                    url pomIssueSystemUrl
+                }
+            }
+        }
+    }
 
     signing {
         required {
@@ -340,68 +403,12 @@ afterEvaluate { project ->
                 }
 
                 pom.project {
-                    name pomName
-                    packaging pomPackaging
-                    description pomDescription
                     uniqueVersion = pomUniqueVersion
-                    url pomUrl
+                }
 
-                    scm {
-                        url pomScmUrl
-                        connection pomScmConnection
-                        developerConnection pomScmDevConnection
-                    }
-
-                    licenses {
-                        license {
-                            name pomLicenseName
-                            url pomLicenseUrl
-                            distribution pomDistribution
-                        }
-                    }
-
-                    if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
-                        organization {
-                            if (!''.equals(pomOrg)) {
-                                name pomOrg
-                            }
-                            if (!''.equals(pomOrgUrl)) {
-                                url pomOrgUrl
-                            }
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id pomDeveloperId
-                            name pomDeveloperName
-                            email pomDeveloperEmail
-                            if (!''.equals(pomDeveloperOrg)) {
-                                organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
-                            }
-                            if (!''.equals(pomDeveloperOrgUrl)) {
-                                organizationUrl pomDeveloperOrgUrl
-                            }
-                            if (pomDeveloperRoles.size() > 0) {
-                                roles {
-                                    for (int i = 0; i < pomDeveloperRoles.size(); i++) {
-                                        role pomDeveloperRoles[i]
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
-                        issueManagement {
-                            if (!''.equals(pomIssueSystem)) {
-                                system pomIssueSystem
-                            }
-                            if (!''.equals(pomIssueSystemUrl)) {
-                                url pomIssueSystemUrl
-                            }
-                        }
-                    }
+                pom.withXml {
+                    def root = asNode()
+                    root.children().last() + pomConfig
                 }
             }
         }
@@ -419,68 +426,12 @@ afterEvaluate { project ->
                 repository url: "file://${System.properties['user.home']}/.m2/repository"
 
                 pom.project {
-                    name pomName
-                    packaging pomPackaging
-                    description pomDescription
                     uniqueVersion = pomUniqueVersion
-                    url pomUrl
+                }
 
-                    scm {
-                        url pomScmUrl
-                        connection pomScmConnection
-                        developerConnection pomScmDevConnection
-                    }
-
-                    licenses {
-                        license {
-                            name pomLicenseName
-                            url pomLicenseUrl
-                            distribution pomDistribution
-                        }
-                    }
-
-                    if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
-                        organization {
-                            if (!''.equals(pomOrg)) {
-                                name pomOrg
-                            }
-                            if (!''.equals(pomOrgUrl)) {
-                                url pomOrgUrl
-                            }
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id pomDeveloperId
-                            name pomDeveloperName
-                            email pomDeveloperEmail
-                            if (!''.equals(pomDeveloperOrg)) {
-                                organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
-                            }
-                            if (!''.equals(pomDeveloperOrgUrl)) {
-                                organizationUrl pomDeveloperOrgUrl
-                            }
-                            if (pomDeveloperRoles.size() > 0) {
-                                roles {
-                                    for (int i = 0; i < pomDeveloperRoles.size(); i++) {
-                                        role pomDeveloperRoles[i]
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
-                        issueManagement {
-                            if (!''.equals(pomIssueSystem)) {
-                                system pomIssueSystem
-                            }
-                            if (!''.equals(pomIssueSystemUrl)) {
-                                url pomIssueSystemUrl
-                            }
-                        }
-                    }
+                pom.withXml {
+                    def root = asNode()
+                    root.children().last() + pomConfig
                 }
             }
         }
@@ -500,68 +451,9 @@ afterEvaluate { project ->
                     pom.artifactId = getPomArtifactId()
                     pom.version = getPomVersionName()
 
-                    pom.project {
-                        name pomName
-                        packaging pomPackaging
-                        description pomDescription
-                        url pomUrl
-
-                        scm {
-                            url pomScmUrl
-                            connection pomScmConnection
-                            developerConnection pomScmDevConnection
-                        }
-
-                        licenses {
-                            license {
-                                name pomLicenseName
-                                url pomLicenseUrl
-                                distribution pomDistribution
-                            }
-                        }
-
-                        if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
-                            organization {
-                                if (!''.equals(pomOrg)) {
-                                    name pomOrg
-                                }
-                                if (!''.equals(pomOrgUrl)) {
-                                    url pomOrgUrl
-                                }
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id pomDeveloperId
-                                name pomDeveloperName
-                                email pomDeveloperEmail
-                                if (!''.equals(pomDeveloperOrg)) {
-                                    organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
-                                }
-                                if (!''.equals(pomDeveloperOrgUrl)) {
-                                    organizationUrl pomDeveloperOrgUrl
-                                }
-                                if (pomDeveloperRoles.size() > 0) {
-                                    roles {
-                                        for (int i = 0; i < pomDeveloperRoles.size(); i++) {
-                                            role pomDeveloperRoles[i]
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
-                            issueManagement {
-                                if (!''.equals(pomIssueSystem)) {
-                                    system pomIssueSystem
-                                }
-                                if (!''.equals(pomIssueSystemUrl)) {
-                                    url pomIssueSystemUrl
-                                }
-                            }
-                        }
+                    pom.withXml {
+                        def root = asNode()
+                        root.children().last() + pomConfig
                     }
                 }
             }
@@ -613,68 +505,9 @@ afterEvaluate { project ->
                     pom.artifactId = getPomArtifactId()
                     pom.version = getPomVersionName()
 
-                    pom.project {
-                        name pomName
-                        packaging pomPackaging
-                        description pomDescription
-                        url pomUrl
-
-                        scm {
-                            url pomScmUrl
-                            connection pomScmConnection
-                            developerConnection pomScmDevConnection
-                        }
-
-                        licenses {
-                            license {
-                                name pomLicenseName
-                                url pomLicenseUrl
-                                distribution pomDistribution
-                            }
-                        }
-
-                        if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
-                            organization {
-                                if (!''.equals(pomOrg)) {
-                                    name pomOrg
-                                }
-                                if (!''.equals(pomOrgUrl)) {
-                                    url pomOrgUrl
-                                }
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id pomDeveloperId
-                                name pomDeveloperName
-                                email pomDeveloperEmail
-                                if (!''.equals(pomDeveloperOrg)) {
-                                    organization = pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
-                                }
-                                if (!''.equals(pomDeveloperOrgUrl)) {
-                                    organizationUrl pomDeveloperOrgUrl
-                                }
-                                if (pomDeveloperRoles.size() > 0) {
-                                    roles {
-                                        for (int i = 0; i < pomDeveloperRoles.size(); i++) {
-                                            role pomDeveloperRoles[i]
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
-                            issueManagement {
-                                if (!''.equals(pomIssueSystem)) {
-                                    system pomIssueSystem
-                                }
-                                if (!''.equals(pomIssueSystemUrl)) {
-                                    url pomIssueSystemUrl
-                                }
-                            }
-                        }
+                    pom.withXml {
+                        def root = asNode()
+                        root.children().last() + pomConfig
                     }
                 }
             }
