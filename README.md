@@ -148,6 +148,7 @@ POM_ISSUE_SYSTEM (default is "")
 POM_ISSUE_SYSTEM_URL (default is "")
 DOCLINT_CHECK (default is "false")
 JAVADOC_ENCODING (default is "UTF-8")
+JAVADOC_DOC_ENCODING (default is "UTF-8")
 JAVADOC_CHARSET (default is "UTF-8")
 ```
 

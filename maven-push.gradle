@@ -89,6 +89,10 @@ def getJavadocEncoding() {
     return hasProperty('JAVADOC_ENCODING') ? JAVADOC_ENCODING : 'UTF-8'
 }
 
+def getJavadocDocEncoding() {
+    return hasProperty('JAVADOC_DOC_ENCODING') ? JAVADOC_DOC_ENCODING : 'UTF-8'
+}
+
 def getJavadocCharSet() {
     return hasProperty('JAVADOC_CHARSET') ? JAVADOC_CHARSET : 'UTF-8'
 }
@@ -340,6 +344,7 @@ afterEvaluate { project ->
     def pomIssueSystem = getIssueSystem()
     def pomIssueSystemUrl = getIssueSystemUrl()
     def javadocEncoding = getJavadocEncoding()
+    def javadocDocEncoding = getJavadocDocEncoding()
     def javadocCharSet = getJavadocCharSet()
     def javaAPISpecificationLink = getJavaAPISpecificationLink()
     def pomConfig = {
@@ -568,6 +573,7 @@ afterEvaluate { project ->
 
     tasks.withType(Javadoc).all {
         options.encoding = javadocEncoding
+        options.docEncoding = javadocDocEncoding
         options.charSet = javadocCharSet
         options.author = true
         options.version = true
