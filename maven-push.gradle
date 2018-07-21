@@ -275,7 +275,7 @@ def getDeveloperOrgUrl() {
 
 def getDeveloperRoles() {
     if (hasProperty('POM_DEVELOPER_ROLES')){
-        return getProperty('POM_DEVELOPER_ROLES').split(",")
+        return getProperty('POM_DEVELOPER_ROLES').split(',')
     } else if (hasProperty('POM_DEVELOPER_ROLE')){
         return [POM_DEVELOPER_ROLE]
     } else {
@@ -571,7 +571,7 @@ afterEvaluate { project ->
         options.charSet = javadocCharSet
         options.author = true
         options.version = true
-        options.links = javaAPISpecificationLink
+        options.addStringOption('link', javaAPISpecificationLink)
         if (JavaVersion.current().isJava8Compatible()) {
             if (isAndroid()) {
                 /* JDK 1.8 has a bug that requires the rt.jar file to be
