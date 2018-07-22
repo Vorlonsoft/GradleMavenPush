@@ -148,7 +148,7 @@ POM_DEVELOPER_URL (default is "")
 POM_DEVELOPER_ORG (default is POM_ORG value)
 POM_DEVELOPER_ORG_URL (default is POM_ORG_URL value)
 POM_DEVELOPER_ROLE (default is "Software Developer")
-POM_DEVELOPER_ROLES (example "Software Architect,Software Developer", default is "")
+POM_DEVELOPER_ROLES (example "Software Architect,Software Developer", default is POM_DEVELOPER_ROLE value)
 POM_DEVELOPER_TIMEZONE (default is "")
 # 2nd, 3rd, etc developers, only id, name and email separated by comma
 POM_DEVELOPERS (example "BillG,Bill Gates,bill@example.com,SteveJ,Steve Jobs,steve@example.com", default is "")

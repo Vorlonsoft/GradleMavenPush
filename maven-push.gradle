@@ -311,7 +311,12 @@ def getDeveloperOrgUrl() {
 
 def getDeveloperRoles() {
     if (hasProperty('POM_DEVELOPER_ROLES')){
-        return getProperty('POM_DEVELOPER_ROLES').split(',')
+        if (hasProperty('POM_DEVELOPER_ROLE')){
+            def developerRoles = getProperty('POM_DEVELOPER_ROLE') + ',' + getProperty('POM_DEVELOPER_ROLES')
+            return developerRoles.split(',')
+        } else {
+            return getProperty('POM_DEVELOPER_ROLES').split(',')
+        }
     } else if (hasProperty('POM_DEVELOPER_ROLE')){
         return [POM_DEVELOPER_ROLE]
     } else {
