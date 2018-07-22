@@ -205,6 +205,14 @@ def getPomScmDevConnection() {
     }
 }
 
+def getPomScmTag() {
+    if (hasProperty('POM_SCM_TAG')){
+        return POM_SCM_TAG
+    } else {
+        return 'HEAD'
+    }
+}
+
 def getPomLicenseName() {
     if (hasProperty('POM_LICENCE_NAME')){
         return POM_LICENCE_NAME
@@ -403,6 +411,7 @@ afterEvaluate { project ->
     def pomScmUrl = getPomScmUrl()
     def pomScmConnection = getPomScmConnection()
     def pomScmDevConnection = getPomScmDevConnection()
+    def pomScmTag = getPomScmTag()
     def pomLicenseName = getPomLicenseName()
     def pomLicenseUrl = getPomLicenseUrl()
     def pomDistribution = getPomLicenseDist()
@@ -480,13 +489,11 @@ afterEvaluate { project ->
                     timezone pomDeveloperTimezone
                 }
             }
-            if (pomDevelopers.size() > 2) {
-                for (int i = 0; i + 2 < pomContributors.size(); i+=3) {
-                    developer {
-                        id pomDevelopers[i]
-                        name pomDevelopers[i+1]
-                        email pomDevelopers[i+2]
-                    }
+            for (int i = 0; i + 2 < pomDevelopers.size(); i+=3) {
+                developer {
+                    id pomDevelopers[i]
+                    name pomDevelopers[i+1]
+                    email pomDevelopers[i+2]
                 }
             }
         }
@@ -500,12 +507,6 @@ afterEvaluate { project ->
                     }
                 }
             }
-        }
-
-        scm {
-            connection pomScmConnection
-            developerConnection pomScmDevConnection
-            url pomScmUrl
         }
 
         if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
@@ -540,6 +541,13 @@ afterEvaluate { project ->
                     }
                 }
             }
+        }
+
+        scm {
+            connection pomScmConnection
+            developerConnection pomScmDevConnection
+            tag pomScmTag
+            url pomScmUrl
         }
     }
 

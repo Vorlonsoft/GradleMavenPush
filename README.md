@@ -37,19 +37,19 @@ export NEXUS_PASSWORD      = $tr0ngP@55w0rd
 You may already have this file, in which case just edit the original. This file should contain the POM values which are common to all of your sub-project (if you have any). For instance, here's [AndroidRate's](https://github.com/Vorlonsoft/AndroidRate):
 
 ```properties
-# VERSION_NAME (default is build.gradle versionName)
-VERSION_NAME           = 1.2.0-SNAPSHOT
 # GROUP (default is packageName)
 GROUP                  = com.vorlonsoft
+# VERSION_NAME (default is build.gradle versionName)
+VERSION_NAME           = 1.2.0-SNAPSHOT
 
 POM_DESCRIPTION        = Library for Android applications, which provides rating dialog.
 POM_URL                = https://github.com/Vorlonsoft/AndroidRate
-POM_SCM_CONNECTION     = scm:git@github.com:Vorlonsoft/AndroidRate.git
 POM_LICENCE_NAME       = The MIT License (MIT)
 POM_LICENCE_URL        = https://opensource.org/licenses/MIT
 POM_DEVELOPER_ID       = AlexanderLS
 POM_DEVELOPER_NAME     = Alexander Savin
 POM_DEVELOPER_EMAIL    = info@vorlonsoft.com
+POM_SCM_CONNECTION     = scm:git@github.com:Vorlonsoft/AndroidRate.git
 ```
 
 The `VERSION_NAME` value is important. If it contains the keyword `SNAPSHOT` then the build will upload to the snapshot server, if not then to the release server.
@@ -69,8 +69,8 @@ in this case it will be uploaded to the snapshot server and indicates it's from 
 The values in this file are specific to the sub-project (and override those in the root `gradle.properties`). In this example, this is just the name and artifactId:
 
 ```properties
-POM_NAME        = AndroidRate Library
 POM_ARTIFACT_ID = androidrate
+POM_NAME        = AndroidRate Library
 ```
 
 You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts) and change it's value.
@@ -115,16 +115,16 @@ If your modules have dependencies on each other (e.g. implementation project(':o
 
 ```groovy
 allprojects {
-    version = VERSION_NAME
     group = GROUP
+    version = VERSION_NAME
 }
 ```
 
 - **option B**: add to top level gradle.properties:
 
 ```properties
-version = 1.2.0
 group   = com.vorlonsoft
+version = 1.2.0
 ```
 
 ### Other Properties
@@ -134,6 +134,10 @@ There are other properties which can be set:
 ```properties
 RELEASE_REPOSITORY_URL (defaults to Maven Central's or JCenter's staging server (depends on IS_JCENTER))
 SNAPSHOT_REPOSITORY_URL (defaults to Maven Central's or JCenter's snapshot server (depends on IS_JCENTER))
+DOCLINT_CHECK (default is "false")
+JAVADOC_ENCODING (default is "UTF-8")
+JAVADOC_DOC_ENCODING (default is "UTF-8")
+JAVADOC_CHARSET (default is "UTF-8")
 POM_GENERATE_UNIQUE_SNAPSHOTS (default is "true")
 POM_INCEPTION_YEAR (default is "")
 POM_ORG (default is "")
@@ -150,18 +154,15 @@ POM_DEVELOPER_TIMEZONE (default is "")
 POM_DEVELOPERS (example "BillG,Bill Gates,bill@example.com,SteveJ,Steve Jobs,steve@example.com", default is "")
 # Contributors, only name and email separated by comma
 POM_CONTRIBUTORS (example "Bill Gates,bill@example.com,Steve Jobs,steve@example.com", default is "")
-POM_SCM_DEV_CONNECTION (default is POM_SCM_CONNECTION value)
-POM_SCM_URL (default is POM_URL value)
 POM_ISSUE_SYSTEM (default is "")
 POM_ISSUE_SYSTEM_URL (default is "")
 POM_CI_SYSTEM (default is "")
 POM_CI_SYSTEM_URL (default is "")
 # Mailing Lists, only name, subscribe email and unsubscribe email separated by comma
 POM_MAILING_LISTS (example "Main,s@example.com,u@example.com,Support,ss@example.com,us@example.com", default is "")
-DOCLINT_CHECK (default is "false")
-JAVADOC_ENCODING (default is "UTF-8")
-JAVADOC_DOC_ENCODING (default is "UTF-8")
-JAVADOC_CHARSET (default is "UTF-8")
+POM_SCM_DEV_CONNECTION (default is POM_SCM_CONNECTION value)
+POM_SCM_TAG (default is "HEAD")
+POM_SCM_URL (default is POM_URL value)
 ```
 
 ## Already in use in following libraries
