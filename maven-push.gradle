@@ -173,6 +173,14 @@ def getPomUrl() {
     }
 }
 
+def getPomInceptionYear() {
+    if (hasProperty('POM_INCEPTION_YEAR')){
+        return POM_INCEPTION_YEAR
+    } else {
+        return ''
+    }
+}
+
 def getPomScmUrl() {
     if (hasProperty('POM_SCM_URL')){
         return POM_SCM_URL
@@ -221,6 +229,14 @@ def getPomLicenseDist() {
     }
 }
 
+def getPomLicenseComments() {
+    if (hasProperty('POM_LICENCE_COMMENTS')){
+        return POM_LICENCE_COMMENTS
+    } else {
+        return ''
+    }
+}
+
 def getOrg() {
     if (hasProperty('POM_ORG')){
         return POM_ORG
@@ -261,6 +277,14 @@ def getDeveloperEmail() {
     }
 }
 
+def getDeveloperUrl() {
+    if (hasProperty('POM_DEVELOPER_URL')){
+        return POM_DEVELOPER_URL
+    } else {
+        return ''
+    }
+}
+
 def getDeveloperOrg() {
     if (hasProperty('POM_DEVELOPER_ORG')){
         return POM_DEVELOPER_ORG
@@ -287,6 +311,30 @@ def getDeveloperRoles() {
     }
 }
 
+def getDeveloperTimezone() {
+    if (hasProperty('POM_DEVELOPER_TIMEZONE')){
+        return POM_DEVELOPER_TIMEZONE
+    } else {
+        return ''
+    }
+}
+
+def getDevelopers() {
+    if (hasProperty('POM_DEVELOPERS')){
+        return getProperty('POM_DEVELOPERS').split(',')
+    } else {
+        return ['']
+    }
+}
+
+def getContributors() {
+    if (hasProperty('POM_CONTRIBUTORS')){
+        return getProperty('POM_CONTRIBUTORS').split(',')
+    } else {
+        return ['']
+    }
+}
+
 def getIssueSystem() {
     if (hasProperty('POM_ISSUE_SYSTEM')){
         return POM_ISSUE_SYSTEM
@@ -300,6 +348,30 @@ def getIssueSystemUrl() {
         return POM_ISSUE_SYSTEM_URL
     } else {
         return ''
+    }
+}
+
+def getCiSystem() {
+    if (hasProperty('POM_CI_SYSTEM')){
+        return POM_CI_SYSTEM
+    } else {
+        return ''
+    }
+}
+
+def getCiSystemUrl() {
+    if (hasProperty('POM_CI_SYSTEM_URL')){
+        return POM_CI_SYSTEM_URL
+    } else {
+        return ''
+    }
+}
+
+def getMailingLists() {
+    if (hasProperty('POM_MAILING_LISTS')){
+        return getProperty('POM_MAILING_LISTS').split(',')
+    } else {
+        return ['']
     }
 }
 
@@ -327,31 +399,39 @@ afterEvaluate { project ->
     def pomDescription = getPomDescription()
     def pomUniqueVersion = getPomUniqueVersion()
     def pomUrl = getPomUrl()
+    def pomInceptionYear = getPomInceptionYear()
     def pomScmUrl = getPomScmUrl()
     def pomScmConnection = getPomScmConnection()
     def pomScmDevConnection = getPomScmDevConnection()
     def pomLicenseName = getPomLicenseName()
     def pomLicenseUrl = getPomLicenseUrl()
     def pomDistribution = getPomLicenseDist()
+    def pomLicenseComments = getPomLicenseComments()
     def pomOrg = getOrg()
     def pomOrgUrl = getOrgUrl()
     def pomDeveloperId = getDeveloperId()
     def pomDeveloperName = getDeveloperName()
     def pomDeveloperEmail = getDeveloperEmail()
+    def pomDeveloperUrl = getDeveloperUrl()
     def pomDeveloperOrg = getDeveloperOrg()
     def pomDeveloperOrgUrl = getDeveloperOrgUrl()
     def pomDeveloperRoles = getDeveloperRoles()
+    def pomDeveloperTimezone = getDeveloperTimezone()
+    def pomDevelopers = getDevelopers()
+    def pomContributors = getContributors()
     def pomIssueSystem = getIssueSystem()
     def pomIssueSystemUrl = getIssueSystemUrl()
-    def javadocEncoding = getJavadocEncoding()
-    def javadocDocEncoding = getJavadocDocEncoding()
-    def javadocCharSet = getJavadocCharSet()
-    def javaAPISpecificationLink = getJavaAPISpecificationLink()
+    def pomCiSystem = getCiSystem()
+    def pomCiSystemUrl = getCiSystemUrl()
+    def pomMailingLists = getMailingLists()
     def pomConfig = {
         packaging pomPackaging
         name pomName
         description pomDescription
         url pomUrl
+        if (!''.equals(pomInceptionYear)) {
+            inceptionYear pomInceptionYear
+        }
 
         if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
             organization {
@@ -369,6 +449,9 @@ afterEvaluate { project ->
                 name pomLicenseName
                 url pomLicenseUrl
                 distribution pomDistribution
+                if (!''.equals(pomLicenseComments)) {
+                    comments pomLicenseComments
+                }
             }
         }
 
@@ -377,6 +460,9 @@ afterEvaluate { project ->
                 id pomDeveloperId
                 name pomDeveloperName
                 email pomDeveloperEmail
+                if (!''.equals(pomDeveloperUrl)) {
+                    url pomDeveloperUrl
+                }
                 if (!''.equals(pomDeveloperOrg)) {
                     organization pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
                 }
@@ -388,6 +474,29 @@ afterEvaluate { project ->
                         for (int i = 0; i < pomDeveloperRoles.size(); i++) {
                             role pomDeveloperRoles[i]
                         }
+                    }
+                }
+                if (!''.equals(pomDeveloperTimezone)) {
+                    timezone pomDeveloperTimezone
+                }
+            }
+            if (pomDevelopers.size() > 2) {
+                for (int i = 0; i + 2 < pomContributors.size(); i+=3) {
+                    developer {
+                        id pomDevelopers[i]
+                        name pomDevelopers[i+1]
+                        email pomDevelopers[i+2]
+                    }
+                }
+            }
+        }
+
+        if (pomContributors.size() > 1) {
+            contributors {
+                for (int i = 0; i + 1 < pomContributors.size(); i+=2) {
+                    contributor {
+                        name pomContributors[i]
+                        email pomContributors[i+1]
                     }
                 }
             }
@@ -406,6 +515,29 @@ afterEvaluate { project ->
                 }
                 if (!''.equals(pomIssueSystemUrl)) {
                     url pomIssueSystemUrl
+                }
+            }
+        }
+
+        if (!''.equals(pomCiSystem) || !''.equals(pomCiSystemUrl)) {
+            ciManagement {
+                if (!''.equals(pomCiSystem)) {
+                    system pomCiSystem
+                }
+                if (!''.equals(pomCiSystemUrl)) {
+                    url pomCiSystemUrl
+                }
+            }
+        }
+
+        if (pomMailingLists.size() > 2) {
+            mailingLists {
+                for (int i = 0; i + 2 < pomMailingLists.size(); i+=3) {
+                    mailingList {
+                        name pomMailingLists[i]
+                        subscribe pomMailingLists[i+1]
+                        unsubscribe pomMailingLists[i+2]
+                    }
                 }
             }
         }
@@ -572,12 +704,12 @@ afterEvaluate { project ->
     }
 
     tasks.withType(Javadoc).all {
-        options.encoding = javadocEncoding
-        options.docEncoding = javadocDocEncoding
-        options.charSet = javadocCharSet
+        options.encoding = getJavadocEncoding()
+        options.docEncoding = getJavadocDocEncoding()
+        options.charSet = getJavadocCharSet()
         options.author = true
         options.version = true
-        options.addStringOption('link', javaAPISpecificationLink)
+        options.addStringOption('link', getJavaAPISpecificationLink())
         if (JavaVersion.current().isJava8Compatible()) {
             if (isAndroid()) {
                 /* JDK 1.8 has a bug that requires the rt.jar file to be
