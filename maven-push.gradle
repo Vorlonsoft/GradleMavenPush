@@ -441,7 +441,6 @@ afterEvaluate { project ->
     def pomConfig = {
         packaging pomPackaging
         name pomName
-        description pomDescription
         url pomUrl
         if (!''.equals(pomInceptionYear)) {
             inceptionYear pomInceptionYear
@@ -584,10 +583,14 @@ afterEvaluate { project ->
 
                 pom.project {
                     uniqueVersion = pomUniqueVersion
+                    description pomDescription
                 }
 
                 pom.withXml {
                     def root = asNode()
+                    if (isAndroid()) {
+                        root.remove(root.packaging)
+                    }
                     root.children().last() + pomConfig
                 }
             }
@@ -607,10 +610,14 @@ afterEvaluate { project ->
 
                 pom.project {
                     uniqueVersion = pomUniqueVersion
+                    description pomDescription
                 }
 
                 pom.withXml {
                     def root = asNode()
+                    if (isAndroid()) {
+                        root.remove(root.packaging)
+                    }
                     root.children().last() + pomConfig
                 }
             }
@@ -628,8 +635,13 @@ afterEvaluate { project ->
                     pom.artifactId = getPomArtifactId()
                     pom.version = getPomVersionName()
 
+                    pom.project {
+                        description pomDescription
+                    }
+
                     pom.withXml {
                         def root = asNode()
+                        root.remove(root.packaging)
                         root.children().last() + pomConfig
                     }
                 }
@@ -685,6 +697,10 @@ afterEvaluate { project ->
                     pom.groupId = getPomGroupId()
                     pom.artifactId = getPomArtifactId()
                     pom.version = getPomVersionName()
+
+                    pom.project {
+                        description pomDescription
+                    }
 
                     pom.withXml {
                         def root = asNode()
