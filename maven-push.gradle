@@ -588,7 +588,7 @@ afterEvaluate { project ->
 
                 pom.withXml {
                     def root = asNode()
-                    if (isAndroid()) {
+                    if (root.packaging.size() == 1) {
                         root.remove(root.packaging)
                     }
                     root.children().last() + pomConfig
@@ -615,7 +615,7 @@ afterEvaluate { project ->
 
                 pom.withXml {
                     def root = asNode()
-                    if (isAndroid()) {
+                    if (root.packaging.size() == 1) {
                         root.remove(root.packaging)
                     }
                     root.children().last() + pomConfig
@@ -641,7 +641,9 @@ afterEvaluate { project ->
 
                     pom.withXml {
                         def root = asNode()
-                        root.remove(root.packaging)
+                        if (root.packaging.size() == 1) {
+                            root.remove(root.packaging)
+                        }
                         root.children().last() + pomConfig
                     }
                 }
@@ -704,6 +706,9 @@ afterEvaluate { project ->
 
                     pom.withXml {
                         def root = asNode()
+                        if (root.packaging.size() == 1) {
+                            root.remove(root.packaging)
+                        }
                         root.children().last() + pomConfig
                     }
                 }
