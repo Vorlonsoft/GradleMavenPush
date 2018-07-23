@@ -266,6 +266,8 @@ POM_DIST_DOWNLOAD_URL (default is "")
 
 * [AndroidRate library](https://github.com/Vorlonsoft/AndroidRate)
 
+* [ExpandableSelector library](https://github.com/Karumi/ExpandableSelector)
+
 * ...
 
 ## Contribute
