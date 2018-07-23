@@ -652,6 +652,11 @@ afterEvaluate { project ->
                     } else {
                         root.children().last() + pomConfig
                     }
+                    if (root.dependencies.size() == 1) {
+                        def dependencies = root.dependencies
+                        root.remove(root.dependencies)
+                        root.append(dependencies)
+                    }
                 }
             }
         }
@@ -704,6 +709,11 @@ afterEvaluate { project ->
                     } else {
                         root.children().last() + pomConfig
                     }
+                    if (root.dependencies.size() == 1) {
+                        def dependencies = root.dependencies
+                        root.remove(root.dependencies)
+                        root.append(dependencies)
+                    }
                 }
             }
         }
@@ -754,6 +764,11 @@ afterEvaluate { project ->
                             }
                         } else {
                             root.children().last() + pomConfig
+                        }
+                        if (root.dependencies.size() == 1) {
+                            def dependencies = root.dependencies
+                            root.remove(root.dependencies)
+                            root.append(dependencies)
                         }
                     }
                 }
@@ -844,6 +859,11 @@ afterEvaluate { project ->
                             }
                         } else {
                             root.children().last() + pomConfig
+                        }
+                        if (root.dependencies.size() == 1) {
+                            def dependencies = root.dependencies
+                            root.remove(root.dependencies)
+                            root.append(dependencies)
                         }
                     }
                 }
