@@ -888,6 +888,9 @@ afterEvaluate { project ->
             if (!getDoclintCheck()) {
                 options.addStringOption('Xdoclint:none', '-quiet')
             }
+            if(JavaVersion.current().isJava9Compatible()) {
+                options.addBooleanOption('html4', true)
+            }
         }
     }
 }
