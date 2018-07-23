@@ -167,6 +167,7 @@ POM_SCM_URL (default is POM_URL value)
 POM_REPOSITORIES (example "mavenCentral,https://repo1.maven.org/maven2/,jCenter,https://jcenter.bintray.com/", default is "")
 # Snapshot Repositories, only id and url separated by comma
 POM_SNAPSHOT_REPOSITORIES (example "mavenCentral,https://oss.sonatype.org/content/repositories/snapshots/,jCenter,https://oss.jfrog.org/artifactory/oss-snapshot-local/", default is POM_REPOSITORIES value)
+POM_DIST_DOWNLOAD_URL (default is "")
 ```
 
 ## Already in use in following libraries

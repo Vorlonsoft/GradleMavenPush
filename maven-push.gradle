@@ -406,6 +406,14 @@ def getRepositories() {
     }
 }
 
+def getDistDownloadUrl() {
+    if (hasProperty('POM_DIST_DOWNLOAD_URL')){
+        return POM_DIST_DOWNLOAD_URL
+    } else {
+        return ''
+    }
+}
+
 def getJavaAPISpecificationLink() {
     if (JavaVersion.current().isJava10Compatible()){
         return 'https://docs.oracle.com/javase/10/docs/api/overview-summary.html'
@@ -457,6 +465,8 @@ afterEvaluate { project ->
     def pomCiSystemUrl = getCiSystemUrl()
     def pomMailingLists = getMailingLists()
     def pomRepositories = getRepositories()
+    def pomDistDownloadUrl = getDistDownloadUrl()
+
     def pomConfig = {
         packaging pomPackaging
         name pomName
@@ -572,6 +582,12 @@ afterEvaluate { project ->
             tag pomScmTag
             url pomScmUrl
         }
+
+        if (!''.equals(pomDistDownloadUrl)) {
+            distributionManagement {
+                downloadUrl pomDistDownloadUrl
+            }
+        }
     }
 
     signing {
@@ -625,7 +641,14 @@ afterEvaluate { project ->
                         def repositories = root.repositories
                         root.remove(root.repositories)
                         root.children().last() + pomConfig
-                        root.append(repositories)
+                        if (root.distributionManagement.size() == 1) {
+                            def distributionManagement = root.distributionManagement
+                            root.remove(root.distributionManagement)
+                            root.append(repositories)
+                            root.append(distributionManagement)
+                        } else {
+                            root.append(repositories)
+                        }
                     } else {
                         root.children().last() + pomConfig
                     }
@@ -670,7 +693,14 @@ afterEvaluate { project ->
                         def repositories = root.repositories
                         root.remove(root.repositories)
                         root.children().last() + pomConfig
-                        root.append(repositories)
+                        if (root.distributionManagement.size() == 1) {
+                            def distributionManagement = root.distributionManagement
+                            root.remove(root.distributionManagement)
+                            root.append(repositories)
+                            root.append(distributionManagement)
+                        } else {
+                            root.append(repositories)
+                        }
                     } else {
                         root.children().last() + pomConfig
                     }
@@ -714,7 +744,14 @@ afterEvaluate { project ->
                             def repositories = root.repositories
                             root.remove(root.repositories)
                             root.children().last() + pomConfig
-                            root.append(repositories)
+                            if (root.distributionManagement.size() == 1) {
+                                def distributionManagement = root.distributionManagement
+                                root.remove(root.distributionManagement)
+                                root.append(repositories)
+                                root.append(distributionManagement)
+                            } else {
+                                root.append(repositories)
+                            }
                         } else {
                             root.children().last() + pomConfig
                         }
@@ -797,7 +834,14 @@ afterEvaluate { project ->
                             def repositories = root.repositories
                             root.remove(root.repositories)
                             root.children().last() + pomConfig
-                            root.append(repositories)
+                            if (root.distributionManagement.size() == 1) {
+                                def distributionManagement = root.distributionManagement
+                                root.remove(root.distributionManagement)
+                                root.append(repositories)
+                                root.append(distributionManagement)
+                            } else {
+                                root.append(repositories)
+                            }
                         } else {
                             root.children().last() + pomConfig
                         }
