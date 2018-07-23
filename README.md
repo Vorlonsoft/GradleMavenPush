@@ -131,42 +131,134 @@ version = 1.2.0
 
 There are other properties which can be set:
 
+#### Repositories urls
+
 ```properties
 RELEASE_REPOSITORY_URL (defaults to Maven Central's or JCenter's staging server (depends on IS_JCENTER))
 SNAPSHOT_REPOSITORY_URL (defaults to Maven Central's or JCenter's snapshot server (depends on IS_JCENTER))
+```
+
+#### Javadoc generation
+
+```properties
 DOCLINT_CHECK (default is "false")
 JAVADOC_ENCODING (default is "UTF-8")
 JAVADOC_DOC_ENCODING (default is "UTF-8")
 JAVADOC_CHARSET (default is "UTF-8")
+```
+
+#### Snapshots names
+
+```properties
 POM_GENERATE_UNIQUE_SNAPSHOTS (default is "true")
+```
+
+#### Project Information
+
+```properties
 POM_INCEPTION_YEAR (default is "")
+```
+
+#### Organization
+
+```properties
 POM_ORG (default is "")
 POM_ORG_URL (default is "")
+```
+
+#### Licenses
+
+```properties
 POM_LICENCE_DIST (default is "repo")
 POM_LICENCE_COMMENTS (default is "")
+```
+
+#### Developers
+
+```properties
 POM_DEVELOPER_URL (default is "")
 POM_DEVELOPER_ORG (default is POM_ORG value)
 POM_DEVELOPER_ORG_URL (default is POM_ORG_URL value)
 POM_DEVELOPER_ROLE (default is "Software Developer")
 POM_DEVELOPER_ROLES (example "Software Architect,Software Developer", default is POM_DEVELOPER_ROLE value)
 POM_DEVELOPER_TIMEZONE (default is "")
-# 2nd, 3rd, etc developers, only id, name and email separated by comma
+```
+
+2nd, 3rd, etc developers, only id, name and email separated by comma.
+
+```properties
 POM_DEVELOPERS (example "BillG,Bill Gates,bill@example.com,SteveJ,Steve Jobs,steve@example.com", default is "")
-# Contributors, only name and email separated by comma
+```
+
+#### Contributors
+
+Contributors, only name and email separated by comma.
+
+```properties
 POM_CONTRIBUTORS (example "Bill Gates,bill@example.com,Steve Jobs,steve@example.com", default is "")
+```
+
+#### Issue Management
+
+```properties
 POM_ISSUE_SYSTEM (default is "")
 POM_ISSUE_SYSTEM_URL (default is "")
+```
+
+#### Continuous Integration Management
+
+```properties
 POM_CI_SYSTEM (default is "")
 POM_CI_SYSTEM_URL (default is "")
-# Mailing Lists, only name, subscribe email and unsubscribe email separated by comma
+```
+
+#### Mailing Lists
+
+Mailing Lists, only name, subscribe email and unsubscribe email separated by comma.
+
+```properties
 POM_MAILING_LISTS (example "Main,s@example.com,u@example.com,Support,ss@example.com,us@example.com", default is "")
+```
+
+#### Software Configuration Management
+
+Connection elements convey to how one is to connect to the version control system through Maven.
+
+```properties
 POM_SCM_DEV_CONNECTION (default is POM_SCM_CONNECTION value)
+```
+
+Specifies the tag that this project lives under. HEAD (meaning, the SCM root).
+
+```properties
 POM_SCM_TAG (default is "HEAD")
+```
+
+A publicly browsable repository.
+
+```properties
 POM_SCM_URL (default is POM_URL value)
-# Release Repositories, only id and url separated by comma
+```
+
+#### Repositories
+
+Release Repositories, only id and url separated by comma.
+
+```properties
 POM_REPOSITORIES (example "mavenCentral,https://repo1.maven.org/maven2/,jCenter,https://jcenter.bintray.com/", default is "")
-# Snapshot Repositories, only id and url separated by comma
+```
+
+Snapshot Repositories, only id and url separated by comma.
+
+```properties
 POM_SNAPSHOT_REPOSITORIES (example "mavenCentral,https://oss.sonatype.org/content/repositories/snapshots/,jCenter,https://oss.jfrog.org/artifactory/oss-snapshot-local/", default is POM_REPOSITORIES value)
+```
+
+#### Distribution Management
+
+This is the url of the repository from whence another POM may point to in order to grab this POM's artifact.
+
+```properties
 POM_DIST_DOWNLOAD_URL (default is "")
 ```
 
