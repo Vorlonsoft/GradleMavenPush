@@ -389,10 +389,20 @@ def getMailingLists() {
 }
 
 def getRepositories() {
-    if (hasProperty('POM_REPOSITORIES')){
-        return getProperty('POM_REPOSITORIES').split(',')
+    if (isReleaseBuild()) {
+        if (hasProperty('POM_REPOSITORIES')){
+            return getProperty('POM_REPOSITORIES').split(',')
+        } else {
+            return ['']
+        }
     } else {
-        return ['']
+        if (hasProperty('POM_SNAPSHOT_REPOSITORIES')){
+            return getProperty('POM_SNAPSHOT_REPOSITORIES').split(',')
+        } else if (hasProperty('POM_REPOSITORIES')){
+            return getProperty('POM_REPOSITORIES').split(',')
+        } else {
+            return ['']
+        }
     }
 }
 

@@ -163,8 +163,10 @@ POM_MAILING_LISTS (example "Main,s@example.com,u@example.com,Support,ss@example.
 POM_SCM_DEV_CONNECTION (default is POM_SCM_CONNECTION value)
 POM_SCM_TAG (default is "HEAD")
 POM_SCM_URL (default is POM_URL value)
-# Repositories, only id and url separated by comma
+# Release Repositories, only id and url separated by comma
 POM_REPOSITORIES (example "mavenCentral,https://repo1.maven.org/maven2/,jCenter,https://jcenter.bintray.com/", default is "")
+# Snapshot Repositories, only id and url separated by comma
+POM_SNAPSHOT_REPOSITORIES (example "mavenCentral,https://oss.sonatype.org/content/repositories/snapshots/,jCenter,https://oss.jfrog.org/artifactory/oss-snapshot-local/", default is POM_REPOSITORIES value)
 ```
 
 ## Already in use in following libraries
