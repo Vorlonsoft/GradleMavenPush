@@ -388,6 +388,14 @@ def getMailingLists() {
     }
 }
 
+def getRepositories() {
+    if (hasProperty('POM_REPOSITORIES')){
+        return getProperty('POM_REPOSITORIES').split(',')
+    } else {
+        return ['']
+    }
+}
+
 def getJavaAPISpecificationLink() {
     if (JavaVersion.current().isJava10Compatible()){
         return 'https://docs.oracle.com/javase/10/docs/api/overview-summary.html'
@@ -438,6 +446,7 @@ afterEvaluate { project ->
     def pomCiSystem = getCiSystem()
     def pomCiSystemUrl = getCiSystemUrl()
     def pomMailingLists = getMailingLists()
+    def pomRepositories = getRepositories()
     def pomConfig = {
         packaging pomPackaging
         name pomName
@@ -584,6 +593,17 @@ afterEvaluate { project ->
                 pom.project {
                     uniqueVersion = pomUniqueVersion
                     description pomDescription
+
+                    if (pomRepositories.size() > 1) {
+                        repositories {
+                            for (int i = 0; i + 1 < pomRepositories.size(); i+=2) {
+                                repository {
+                                    id pomRepositories[i]
+                                    url pomRepositories[i+1]
+                                }
+                            }
+                        }
+                    }
                 }
 
                 pom.withXml {
@@ -591,7 +611,14 @@ afterEvaluate { project ->
                     if (root.packaging.size() == 1) {
                         root.remove(root.packaging)
                     }
-                    root.children().last() + pomConfig
+                    if (root.repositories.size() == 1) {
+                        def repositories = root.repositories
+                        root.remove(root.repositories)
+                        root.children().last() + pomConfig
+                        root.append(repositories)
+                    } else {
+                        root.children().last() + pomConfig
+                    }
                 }
             }
         }
@@ -611,6 +638,17 @@ afterEvaluate { project ->
                 pom.project {
                     uniqueVersion = pomUniqueVersion
                     description pomDescription
+
+                    if (pomRepositories.size() > 1) {
+                        repositories {
+                            for (int i = 0; i + 1 < pomRepositories.size(); i+=2) {
+                                repository {
+                                    id pomRepositories[i]
+                                    url pomRepositories[i+1]
+                                }
+                            }
+                        }
+                    }
                 }
 
                 pom.withXml {
@@ -618,7 +656,14 @@ afterEvaluate { project ->
                     if (root.packaging.size() == 1) {
                         root.remove(root.packaging)
                     }
-                    root.children().last() + pomConfig
+                    if (root.repositories.size() == 1) {
+                        def repositories = root.repositories
+                        root.remove(root.repositories)
+                        root.children().last() + pomConfig
+                        root.append(repositories)
+                    } else {
+                        root.children().last() + pomConfig
+                    }
                 }
             }
         }
@@ -637,6 +682,17 @@ afterEvaluate { project ->
 
                     pom.project {
                         description pomDescription
+
+                        if (pomRepositories.size() > 1) {
+                            repositories {
+                                for (int i = 0; i + 1 < pomRepositories.size(); i+=2) {
+                                    repository {
+                                        id pomRepositories[i]
+                                        url pomRepositories[i+1]
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     pom.withXml {
@@ -644,7 +700,14 @@ afterEvaluate { project ->
                         if (root.packaging.size() == 1) {
                             root.remove(root.packaging)
                         }
-                        root.children().last() + pomConfig
+                        if (root.repositories.size() == 1) {
+                            def repositories = root.repositories
+                            root.remove(root.repositories)
+                            root.children().last() + pomConfig
+                            root.append(repositories)
+                        } else {
+                            root.children().last() + pomConfig
+                        }
                     }
                 }
             }
@@ -702,6 +765,17 @@ afterEvaluate { project ->
 
                     pom.project {
                         description pomDescription
+
+                        if (pomRepositories.size() > 1) {
+                            repositories {
+                                for (int i = 0; i + 1 < pomRepositories.size(); i+=2) {
+                                    repository {
+                                        id pomRepositories[i]
+                                        url pomRepositories[i+1]
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     pom.withXml {
@@ -709,7 +783,14 @@ afterEvaluate { project ->
                         if (root.packaging.size() == 1) {
                             root.remove(root.packaging)
                         }
-                        root.children().last() + pomConfig
+                        if (root.repositories.size() == 1) {
+                            def repositories = root.repositories
+                            root.remove(root.repositories)
+                            root.children().last() + pomConfig
+                            root.append(repositories)
+                        } else {
+                            root.children().last() + pomConfig
+                        }
                     }
                 }
             }
