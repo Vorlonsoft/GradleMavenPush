@@ -10,7 +10,7 @@ It is up to you.
 
 ### 2. Update your home gradle.properties
 
-This will include flag IS_JCENTER (default is "false" - Maven Central, "true" - JCenter), username and password to upload to the Maven server and so that they are kept local on your machine. The location defaults to `USER_HOME/.gradle/gradle.properties`.
+This will include flag IS_JCENTER (default is "false" - Maven Central, "true" - JCenter), username and password (API Key for JCenter) to upload to the Maven server and so that they are kept local on your machine. The location defaults to `USER_HOME/.gradle/gradle.properties`.
 
 It may also include your signing key id, password, and secret key ring file (for signed uploads).  Signing is only necessary if you're putting release builds of your project on Maven Central or JCenter.
 
@@ -26,7 +26,7 @@ signing.secretKeyRingFile = ./secring.gpg
 
 #### 2.1. Alternative, use environment variables
 
-You can modify username and password from environment variables (useful for CI). To use those environment variables on CI just export them:
+You can modify username and password (API Key for JCenter) from environment variables (useful for CI). To use those environment variables on CI just export them:
 
 ```properties
 export NEXUS_USERNAME      = vorlonsoft
