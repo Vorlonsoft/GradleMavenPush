@@ -466,10 +466,10 @@ afterEvaluate { project ->
     def pomMailingLists = getMailingLists()
     def pomRepositories = getRepositories()
     def pomDistDownloadUrl = getDistDownloadUrl()
-
-    def pomConfig = {
+    def pomPackagingConfig = {
         packaging pomPackaging
-        name pomName
+    }
+    def pomConfig = {        
         url pomUrl
         if (!''.equals(pomInceptionYear)) {
             inceptionYear pomInceptionYear
@@ -542,6 +542,25 @@ afterEvaluate { project ->
             }
         }
 
+        if (pomMailingLists.size() > 2) {
+            mailingLists {
+                for (int i = 0; i + 2 < pomMailingLists.size(); i+=3) {
+                    mailingList {
+                        name pomMailingLists[i]
+                        subscribe pomMailingLists[i+1]
+                        unsubscribe pomMailingLists[i+2]
+                    }
+                }
+            }
+        }
+
+        scm {
+            connection pomScmConnection
+            developerConnection pomScmDevConnection
+            tag pomScmTag
+            url pomScmUrl
+        }
+
         if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
             issueManagement {
                 if (!''.equals(pomIssueSystem)) {
@@ -562,25 +581,6 @@ afterEvaluate { project ->
                     url pomCiSystemUrl
                 }
             }
-        }
-
-        if (pomMailingLists.size() > 2) {
-            mailingLists {
-                for (int i = 0; i + 2 < pomMailingLists.size(); i+=3) {
-                    mailingList {
-                        name pomMailingLists[i]
-                        subscribe pomMailingLists[i+1]
-                        unsubscribe pomMailingLists[i+2]
-                    }
-                }
-            }
-        }
-
-        scm {
-            connection pomScmConnection
-            developerConnection pomScmDevConnection
-            tag pomScmTag
-            url pomScmUrl
         }
 
         if (!''.equals(pomDistDownloadUrl)) {
@@ -618,6 +618,8 @@ afterEvaluate { project ->
 
                 pom.project {
                     uniqueVersion = pomUniqueVersion
+
+                    name pomName
                     description pomDescription
 
                     if (pomRepositories.size() > 1) {
@@ -634,28 +636,26 @@ afterEvaluate { project ->
 
                 pom.withXml {
                     def root = asNode()
+                    def name = root.name
+                    def description = root.description
                     if (root.packaging.size() == 1) {
                         root.remove(root.packaging)
                     }
-                    if (root.repositories.size() == 1) {
-                        def repositories = root.repositories
-                        root.remove(root.repositories)
-                        root.children().last() + pomConfig
-                        if (root.distributionManagement.size() == 1) {
-                            def distributionManagement = root.distributionManagement
-                            root.remove(root.distributionManagement)
-                            root.append(repositories)
-                            root.append(distributionManagement)
-                        } else {
-                            root.append(repositories)
-                        }
-                    } else {
-                        root.children().last() + pomConfig
-                    }
+                    root.remove(root.name)
+                    root.remove(root.description)
+                    root.children().last() + pomPackagingConfig
+                    root.append(name)
+                    root.append(description)
+                    root.children().last() + pomConfig
                     if (root.dependencies.size() == 1) {
                         def dependencies = root.dependencies
                         root.remove(root.dependencies)
                         root.append(dependencies)
+                    }
+                    if (root.repositories.size() == 1) {
+                        def repositories = root.repositories
+                        root.remove(root.repositories)
+                        root.append(repositories)
                     }
                 }
             }
@@ -675,6 +675,8 @@ afterEvaluate { project ->
 
                 pom.project {
                     uniqueVersion = pomUniqueVersion
+
+                    name pomName
                     description pomDescription
 
                     if (pomRepositories.size() > 1) {
@@ -691,28 +693,26 @@ afterEvaluate { project ->
 
                 pom.withXml {
                     def root = asNode()
+                    def name = root.name
+                    def description = root.description
                     if (root.packaging.size() == 1) {
                         root.remove(root.packaging)
-                    }
-                    if (root.repositories.size() == 1) {
-                        def repositories = root.repositories
-                        root.remove(root.repositories)
-                        root.children().last() + pomConfig
-                        if (root.distributionManagement.size() == 1) {
-                            def distributionManagement = root.distributionManagement
-                            root.remove(root.distributionManagement)
-                            root.append(repositories)
-                            root.append(distributionManagement)
-                        } else {
-                            root.append(repositories)
-                        }
-                    } else {
-                        root.children().last() + pomConfig
-                    }
+                    }     
+                    root.remove(root.name)
+                    root.remove(root.description)
+                    root.children().last() + pomPackagingConfig
+                    root.append(name)
+                    root.append(description)
+                    root.children().last() + pomConfig
                     if (root.dependencies.size() == 1) {
                         def dependencies = root.dependencies
                         root.remove(root.dependencies)
                         root.append(dependencies)
+                    }
+                    if (root.repositories.size() == 1) {
+                        def repositories = root.repositories
+                        root.remove(root.repositories)
+                        root.append(repositories)
                     }
                 }
             }
@@ -731,6 +731,7 @@ afterEvaluate { project ->
                     pom.version = getPomVersionName()
 
                     pom.project {
+                        name pomName
                         description pomDescription
 
                         if (pomRepositories.size() > 1) {
@@ -747,28 +748,26 @@ afterEvaluate { project ->
 
                     pom.withXml {
                         def root = asNode()
+                        def name = root.name
+                        def description = root.description
                         if (root.packaging.size() == 1) {
                             root.remove(root.packaging)
                         }
-                        if (root.repositories.size() == 1) {
-                            def repositories = root.repositories
-                            root.remove(root.repositories)
-                            root.children().last() + pomConfig
-                            if (root.distributionManagement.size() == 1) {
-                                def distributionManagement = root.distributionManagement
-                                root.remove(root.distributionManagement)
-                                root.append(repositories)
-                                root.append(distributionManagement)
-                            } else {
-                                root.append(repositories)
-                            }
-                        } else {
-                            root.children().last() + pomConfig
-                        }
+                        root.remove(root.name)
+                        root.remove(root.description)
+                        root.children().last() + pomPackagingConfig
+                        root.append(name)
+                        root.append(description)
+                        root.children().last() + pomConfig
                         if (root.dependencies.size() == 1) {
                             def dependencies = root.dependencies
                             root.remove(root.dependencies)
                             root.append(dependencies)
+                        }
+                        if (root.repositories.size() == 1) {
+                            def repositories = root.repositories
+                            root.remove(root.repositories)
+                            root.append(repositories)
                         }
                     }
                 }
@@ -826,6 +825,7 @@ afterEvaluate { project ->
                     pom.version = getPomVersionName()
 
                     pom.project {
+                        name pomName
                         description pomDescription
 
                         if (pomRepositories.size() > 1) {
@@ -842,28 +842,26 @@ afterEvaluate { project ->
 
                     pom.withXml {
                         def root = asNode()
+                        def name = root.name
+                        def description = root.description
                         if (root.packaging.size() == 1) {
                             root.remove(root.packaging)
                         }
-                        if (root.repositories.size() == 1) {
-                            def repositories = root.repositories
-                            root.remove(root.repositories)
-                            root.children().last() + pomConfig
-                            if (root.distributionManagement.size() == 1) {
-                                def distributionManagement = root.distributionManagement
-                                root.remove(root.distributionManagement)
-                                root.append(repositories)
-                                root.append(distributionManagement)
-                            } else {
-                                root.append(repositories)
-                            }
-                        } else {
-                            root.children().last() + pomConfig
-                        }
+                        root.remove(root.name)
+                        root.remove(root.description)
+                        root.children().last() + pomPackagingConfig
+                        root.append(name)
+                        root.append(description)
+                        root.children().last() + pomConfig
                         if (root.dependencies.size() == 1) {
                             def dependencies = root.dependencies
                             root.remove(root.dependencies)
                             root.append(dependencies)
+                        }
+                        if (root.repositories.size() == 1) {
+                            def repositories = root.repositories
+                            root.remove(root.repositories)
+                            root.append(repositories)
                         }
                     }
                 }
