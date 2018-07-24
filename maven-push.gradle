@@ -106,6 +106,15 @@ def getJavadocCharSet() {
     return hasProperty('JAVADOC_CHARSET') ? JAVADOC_CHARSET : 'UTF-8'
 }
 
+/**
+ * HTML version in the document comments.
+ *
+ * @return boolean true if HTML version in the document comments is 5, false if something else.
+ */
+def isHtml5() {
+    return hasProperty('JAVADOC_HTML_VERSION') ? '5'.equals(JAVADOC_HTML_VERSION) : false
+}
+
 def getPomGroupId() {
     if (hasProperty('GROUP')){
         return GROUP
@@ -929,7 +938,11 @@ afterEvaluate { project ->
                 options.addStringOption('Xdoclint:none', '-quiet')
             }
             if(JavaVersion.current().isJava9Compatible()) {
-                options.addBooleanOption('html4', true)
+                if (isHtml5()) {
+                    options.addBooleanOption('html5', true)
+                } else {
+                    options.addBooleanOption('html4', true)
+                }
             }
         }
     }

@@ -147,6 +147,12 @@ JAVADOC_DOC_ENCODING (default is "UTF-8")
 JAVADOC_CHARSET (default is "UTF-8")
 ```
 
+Java 9+. This option assume that the HTML in the document comments is of the same version (4 or 5). It doesn't convert the HTML in the user documentation comments to the specified output version.
+
+```properties
+JAVADOC_HTML_VERSION (default is "4")
+```
+
 #### Snapshots names
 
 ```properties
