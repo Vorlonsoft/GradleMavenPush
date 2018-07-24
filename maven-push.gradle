@@ -820,6 +820,8 @@ afterEvaluate { project ->
             description 'Installs the artifacts to the local Maven repository.'
             repositories {
                 mavenInstaller {
+                    configuration = configurations.archives
+
                     pom.groupId = getPomGroupId()
                     pom.artifactId = getPomArtifactId()
                     pom.version = getPomVersionName()
