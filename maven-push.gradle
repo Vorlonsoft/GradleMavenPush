@@ -32,6 +32,15 @@ def isAndroid() {
     }
 }
 
+def isKotlin() {
+    if (project.getPlugins().hasPlugin('kotlin-android') ||
+        project.getPlugins().hasPlugin('kotlin-android-extensions')) {
+        return true
+    } else {
+        return false
+    }
+}
+
 def isReleaseBuild() {
     return !getPomVersionName().contains('SNAPSHOT')
 }
@@ -803,9 +812,16 @@ afterEvaluate { project ->
             from androidJavadocs.destinationDir
         }
 
-        task androidSourcesJar(type: Jar) {
-            classifier = 'sources'
-            from android.sourceSets.main.java.sourceFiles
+        if (isKotlin()) {
+            task androidKotlinSourcesJar(type: Jar) {
+                classifier = 'sources'
+                from 'src/main/java'
+            }
+        } else {
+            task androidSourcesJar(type: Jar) {
+                classifier = 'sources'
+                from android.sourceSets.main.java.sourceFiles
+            }
         }
 
         artifacts {
@@ -813,7 +829,11 @@ afterEvaluate { project ->
                 archives apklib
             }
             archives androidJavadocsJar
-            archives androidSourcesJar
+            if (isKotlin()) {
+                archives androidKotlinSourcesJar
+            } else {
+                archives androidSourcesJar
+            }
         }
     } else {
         install {

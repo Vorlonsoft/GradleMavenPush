@@ -1,7 +1,7 @@
 GradleMavenPush
 ===============
 
-Helper to upload Gradle Android Artifacts and Gradle Java Artifacts to Maven repositories (JCenter, Maven Central, Corporate staging/snapshot servers and local Maven repositories)
+Helper to upload Gradle Android Artifacts, Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter, Maven Central, Corporate staging/snapshot servers and local Maven repositories)
 
 ## Usage
 
@@ -73,7 +73,7 @@ POM_ARTIFACT_ID = androidrate
 POM_NAME        = AndroidRate Library
 ```
 
-You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts) and change it's value.
+You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts and Gradle Kotlin Artifacts) and change it's value.
 
 Add `APKLIB_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact apklib. You'll get both `POM_PACKAGING` value and "apklib" artifacts. apklib is a way to bundle an Android library project.
 
@@ -242,13 +242,13 @@ POM_SCM_URL (default is POM_URL value)
 
 #### Repositories
 
-Release Repositories, only id and url separated by comma.
+Repositories in the Release pom file, only id and url separated by comma.
 
 ```properties
 POM_REPOSITORIES (example "mavenCentral,https://repo1.maven.org/maven2/,jCenter,https://jcenter.bintray.com/", default is "")
 ```
 
-Snapshot Repositories, only id and url separated by comma.
+Repositories in the Snapshot pom file, only id and url separated by comma.
 
 ```properties
 POM_SNAPSHOT_REPOSITORIES (example "mavenCentral,https://oss.sonatype.org/content/repositories/snapshots/,jCenter,https://oss.jfrog.org/artifactory/oss-snapshot-local/", default is POM_REPOSITORIES value)
