@@ -10,7 +10,7 @@ It is up to you.
 
 ### 2. Update your home gradle.properties
 
-This will include flag IS_JCENTER (default is "false" - Maven Central, "true" - JCenter), username and password (API Key for JCenter) to upload to the Maven server and so that they are kept local on your machine. The location defaults to `USER_HOME/.gradle/gradle.properties`.
+This will include flag `IS_JCENTER` (default is "false" - Maven Central, "true" - JCenter), username and password (API Key for JCenter) to upload to the Maven server and so that they are kept local on your machine. The location defaults to `USER_HOME/.gradle/gradle.properties`.
 
 It may also include your signing key id, password, and secret key ring file (for signed uploads).  Signing is only necessary if you're putting release builds of your project on Maven Central or JCenter.
 
@@ -66,12 +66,15 @@ export VERSION_NAME_EXTRAS = -master-SNAPSHOT
 in this case it will be uploaded to the snapshot server and indicates it's from the master branch.
 
 ### 5. Create gradle.properties in each sub-project
-The values in this file are specific to the sub-project (and override those in the root `gradle.properties`). In this example, this is just the name and artifactId:
+The values in this file are specific to the sub-project (and override those in the root `gradle.properties`). In this example, this is just the name, artifactId and `JAVADOC_BY_DOKKA` (default is "false"):
 
 ```properties
-POM_ARTIFACT_ID = androidrate
-POM_NAME        = AndroidRate Library
+POM_ARTIFACT_ID  = androidrate
+POM_NAME         = AndroidRate Library
+JAVADOC_BY_DOKKA = false
 ```
+
+Set `JAVADOC_BY_DOKKA` to "true" to generate documentation by Dokka. Dokka is a documentation engine for Kotlin, it fully supports mixed-language Java/Kotlin projects.
 
 You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts and Gradle Kotlin Artifacts) and change it's value.
 
