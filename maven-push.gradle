@@ -455,8 +455,8 @@ def getJavaAPISpecificationLink() {
     }
 }
 
-def downloadFile(url, name) {
-    File file = new File("${buildDir}/download/${name}")
+static def downloadLib(url, path, version, name) {
+    File file = new File("${System.properties['user.home']}/.m2/repository/${path}/${version}/${name}")
     file.parentFile.mkdirs()
     if (!file.exists()) {
         new URL(url).withInputStream { downloadStream ->
@@ -468,6 +468,8 @@ def downloadFile(url, name) {
 }
 
 afterEvaluate { project ->
+    def dokkaFatJarVersion = '0.9.17'
+    def dokkaFatJarPath = 'org/jetbrains/dokka/dokka-fatjar'
     def pomName = getPomName()
     def pomPackaging = getPomPackaging()
     def pomDescription = getPomDescription()
@@ -623,6 +625,13 @@ afterEvaluate { project ->
                 downloadUrl pomDistDownloadUrl
             }
         }
+    }
+    
+    task dokkaInitializer {
+        downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.pom",
+                            dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.pom")
+        downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
+                            dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.jar")
     }
 
     signing {
@@ -824,22 +833,23 @@ afterEvaluate { project ->
         }
 
         if (isDokka()) {
-            task androidDokka(type: Exec) {
-                downloadFile('https://jcenter.bintray.com/org/jetbrains/dokka/dokka-fatjar/0.9.17/dokka-fatjar-0.9.17.jar', 'dokka-fatjar.jar')
+            task androidDokka(type: Exec, dependsOn: dokkaInitializer) {
                 def srcDirsNumber = android.sourceSets.main.java.srcDirs.size()
                 def classpathNumber = android.getBootClasspath().size()
                 def classpath = (classpathNumber > 0) ? android.getBootClasspath()[0] : ''
                 def javaAPISpecificationLink = getJavaAPISpecificationLink()
                 if (srcDirsNumber > 0) {
-                    commandLine 'java', '-jar', "$buildDir/download/dokka-fatjar.jar",
+                    commandLine 'java', '-jar',
+                            "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
                             android.sourceSets.main.java.srcDirs[0],
                             (srcDirsNumber == 2) ? android.sourceSets.main.java.srcDirs[1] : '',
                             (srcDirsNumber == 3) ? android.sourceSets.main.java.srcDirs[2] : '',
-                            '-output', "$buildDir/javadoc", '-format', 'javadoc',
+                            '-output', "${buildDir}/javadoc", '-format', 'javadoc',
                             (classpathNumber > 0) ? '-classpath' : '', (classpathNumber > 0) ? classpath : '',
                             '-links', "https://developer.android.com/reference/^${android.sdkDirectory}/docs/reference/^${javaAPISpecificationLink}"
                 } else {
-                    commandLine 'java', '-jar', "$buildDir/download/dokka-fatjar.jar"
+                    commandLine 'java', '-jar',
+                            "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
                 }
             }
 
@@ -948,19 +958,20 @@ afterEvaluate { project ->
         }
 
         if (isDokka()) {
-            task coreDokka(type: Exec) {
-                downloadFile('https://jcenter.bintray.com/org/jetbrains/dokka/dokka-fatjar/0.9.17/dokka-fatjar-0.9.17.jar', 'dokka-fatjar.jar')
+            task coreDokka(type: Exec, dependsOn: dokkaInitializer) {
                 def srcDirsNumber = sourceSets.main.java.srcDirs.size()
                 def javaAPISpecificationLink = getJavaAPISpecificationLink()
                 if (srcDirsNumber > 0) {
-                    commandLine 'java', '-jar', "$buildDir/download/dokka-fatjar.jar",
+                    commandLine 'java', '-jar',
+                            "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
                             sourceSets.main.java.srcDirs[0],
                             (srcDirsNumber == 2) ? sourceSets.main.java.srcDirs[1] : '',
                             (srcDirsNumber == 3) ? sourceSets.main.java.srcDirs[2] : '',
-                            '-output', "$buildDir/javadoc", '-format', 'javadoc',
+                            '-output', "${buildDir}/javadoc", '-format', 'javadoc',
                             '-links', "${javaAPISpecificationLink}"
                 } else {
-                    commandLine 'java', '-jar', "$buildDir/download/dokka-fatjar.jar"
+                    commandLine 'java', '-jar',
+                            "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
                 }
             }
 
