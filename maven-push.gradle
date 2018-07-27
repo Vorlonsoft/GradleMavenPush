@@ -877,7 +877,7 @@ afterEvaluate { project ->
         if (isKotlin()) {
             task androidKotlinSourcesJar(type: Jar) {
                 classifier = 'sources'
-                from 'src/main/java'
+                from android.sourceSets.main.java.sourceFiles
                 from 'src/main/kotlin'
             }
         } else {
@@ -992,9 +992,17 @@ afterEvaluate { project ->
             }
         }
 
-        task sourcesJar(type: Jar, dependsOn: classes) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
+        if (isKotlin()) {
+            task kotlinSourcesJar(type: Jar, dependsOn: classes) {
+                classifier = 'sources'
+                from sourceSets.main.allSource
+                from 'src/main/kotlin'
+            }
+        } else {
+            task sourcesJar(type: Jar, dependsOn: classes) {
+                classifier = 'sources'
+                from sourceSets.main.allSource
+            }
         }
 
         artifacts {
@@ -1003,7 +1011,11 @@ afterEvaluate { project ->
             } else {
                 archives javadocJar
             }
-            archives sourcesJar
+            if (isKotlin()) {
+                archives kotlinSourcesJar
+            } else {
+                archives sourcesJar
+            }
         }
     }
 
