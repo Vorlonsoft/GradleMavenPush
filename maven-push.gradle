@@ -22,28 +22,21 @@ def isJCenter() {
 }
 
 def isAndroid() {
-    if (project.getPlugins().hasPlugin('com.android.application') ||
-        project.getPlugins().hasPlugin('com.android.library')     ||
-        project.getPlugins().hasPlugin('android')                 ||
-        project.getPlugins().hasPlugin('android-library')) {
-        return true
-    } else {
-        return false
-    }
+    return getPlugins().hasPlugin('com.android.application') ||
+           getPlugins().hasPlugin('com.android.library') ||
+           getPlugins().hasPlugin('android') ||
+           getPlugins().hasPlugin('android-library')
 }
 
 def isKotlin() {
-    if (project.getPlugins().hasPlugin('kotlin') ||
-        project.getPlugins().hasPlugin('kotlin-android') ||
-        project.getPlugins().hasPlugin('kotlin-android-extensions')) {
-        return true
-    } else {
-        return false
-    }
+    return getPlugins().hasPlugin('kotlin') ||
+           getPlugins().hasPlugin('kotlin-android') ||
+           getPlugins().hasPlugin('kotlin-android-extensions')
 }
 
 def isDokkaPlugin() {
-    return (project.getPlugins().hasPlugin('org.jetbrains.dokka-android') || project.getPlugins().hasPlugin('org.jetbrains.dokka'))
+    return getPlugins().hasPlugin('org.jetbrains.dokka-android') ||
+           getPlugins().hasPlugin('org.jetbrains.dokka')
 }
 
 def isReleaseBuild() {
@@ -57,9 +50,9 @@ def getReleaseRepositoryUrl() {
         // https://bintray.com/api/v1/maven/{NEXUS_USERNAME}/maven/{POM_ARTIFACT_ID}/;publish=1
         return 'https://bintray.com/api/v1/maven/' +
                 getRepositoryUsername() +
-               '/maven/' +
+                '/maven/' +
                 getPomArtifactUrl() +
-               '/;publish=1'
+                '/;publish=1'
     } else {
         return 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
     }
@@ -121,15 +114,15 @@ def getJavadocCharSet() {
  * @return boolean true if HTML version in the document comments is 5, false if something else.
  */
 def isHtml5() {
-    return hasProperty('JAVADOC_HTML_VERSION') ? '5'.equals(JAVADOC_HTML_VERSION) : false
+    return hasProperty('JAVADOC_HTML_VERSION') ? (JAVADOC_HTML_VERSION == '5') : false
 }
 
 def getPomGroupId() {
-    if (hasProperty('GROUP')){
+    if (hasProperty('GROUP')) {
         return GROUP
-    } else if ((android.libraryVariants != null) && (android.libraryVariants.size() > 0)){
+    } else if ((android.libraryVariants != null) && (android.libraryVariants.size() > 0)) {
         return android.libraryVariants[0].applicationId
-    } else if ((android.applicationVariants != null) && (android.applicationVariants.size() > 0)){
+    } else if ((android.applicationVariants != null) && (android.applicationVariants.size() > 0)) {
         return android.applicationVariants[0].applicationId
     } else {
         throw new InvalidUserDataException('You must set GROUP in gradle.properties file.')
@@ -137,7 +130,7 @@ def getPomGroupId() {
 }
 
 def getPomArtifactId() {
-    if (hasProperty('POM_ARTIFACT_ID')){
+    if (hasProperty('POM_ARTIFACT_ID')) {
         return POM_ARTIFACT_ID
     } else {
         throw new InvalidUserDataException('You must set POM_ARTIFACT_ID in gradle.properties file.')
@@ -150,9 +143,9 @@ def getPomArtifactUrl() {
 
 def getPomVersionName() {
     def versionNameExtras = (System.getenv().containsKey('VERSION_NAME_EXTRAS')) ? System.getenv('VERSION_NAME_EXTRAS') : ''
-    if (hasProperty('VERSION_NAME')){
+    if (hasProperty('VERSION_NAME')) {
         return VERSION_NAME + versionNameExtras
-    } else if (android.defaultConfig.versionName != null){
+    } else if (android.defaultConfig.versionName != null) {
         return android.defaultConfig.versionName + versionNameExtras
     } else {
         throw new InvalidUserDataException('You must set VERSION_NAME in gradle.properties file.')
@@ -160,20 +153,15 @@ def getPomVersionName() {
 }
 
 def getPomPackaging() {
-    if (hasProperty('POM_PACKAGING')){
+    if (hasProperty('POM_PACKAGING')) {
         return POM_PACKAGING
-    } else if (project.getPlugins().hasPlugin('com.android.application') ||
-            project.getPlugins().hasPlugin('com.android.library')     ||
-            project.getPlugins().hasPlugin('android')                 ||
-            project.getPlugins().hasPlugin('android-library')) {
-        return 'aar'
     } else {
-        return 'jar'
+        return isAndroid() ? 'aar' : 'jar'
     }
 }
 
 def getPomName() {
-    if (hasProperty('POM_NAME')){
+    if (hasProperty('POM_NAME')) {
         return POM_NAME
     } else {
         throw new InvalidUserDataException('You must set POM_NAME in gradle.properties file.')
@@ -181,7 +169,7 @@ def getPomName() {
 }
 
 def getPomDescription() {
-    if (hasProperty('POM_DESCRIPTION')){
+    if (hasProperty('POM_DESCRIPTION')) {
         return POM_DESCRIPTION
     } else {
         throw new InvalidUserDataException('You must set POM_DESCRIPTION in gradle.properties file.')
@@ -193,7 +181,7 @@ def getPomUniqueVersion() {
 }
 
 def getPomUrl() {
-    if (hasProperty('POM_URL')){
+    if (hasProperty('POM_URL')) {
         return POM_URL
     } else {
         throw new InvalidUserDataException('You must set POM_URL in gradle.properties file.')
@@ -201,23 +189,15 @@ def getPomUrl() {
 }
 
 def getPomInceptionYear() {
-    if (hasProperty('POM_INCEPTION_YEAR')){
-        return POM_INCEPTION_YEAR
-    } else {
-        return ''
-    }
+    return hasProperty('POM_INCEPTION_YEAR') ? POM_INCEPTION_YEAR : ''
 }
 
 def getPomScmUrl() {
-    if (hasProperty('POM_SCM_URL')){
-        return POM_SCM_URL
-    } else {
-        return getPomUrl()
-    }
+    return hasProperty('POM_SCM_URL') ? POM_SCM_URL : getPomUrl()
 }
 
 def getPomScmConnection() {
-    if (hasProperty('POM_SCM_CONNECTION')){
+    if (hasProperty('POM_SCM_CONNECTION')) {
         return POM_SCM_CONNECTION
     } else {
         throw new InvalidUserDataException('You must set POM_SCM_CONNECTION in gradle.properties file.')
@@ -225,23 +205,15 @@ def getPomScmConnection() {
 }
 
 def getPomScmDevConnection() {
-    if (hasProperty('POM_SCM_DEV_CONNECTION')){
-        return POM_SCM_DEV_CONNECTION
-    } else {
-        return getPomScmConnection()
-    }
+    return hasProperty('POM_SCM_DEV_CONNECTION') ? POM_SCM_DEV_CONNECTION : getPomScmConnection()
 }
 
 def getPomScmTag() {
-    if (hasProperty('POM_SCM_TAG')){
-        return POM_SCM_TAG
-    } else {
-        return 'HEAD'
-    }
+    return hasProperty('POM_SCM_TAG') ? POM_SCM_TAG : 'HEAD'
 }
 
 def getPomLicenseName() {
-    if (hasProperty('POM_LICENCE_NAME')){
+    if (hasProperty('POM_LICENCE_NAME')) {
         return POM_LICENCE_NAME
     } else {
         throw new InvalidUserDataException('You must set POM_LICENCE_NAME in gradle.properties file.')
@@ -249,7 +221,7 @@ def getPomLicenseName() {
 }
 
 def getPomLicenseUrl() {
-    if (hasProperty('POM_LICENCE_URL')){
+    if (hasProperty('POM_LICENCE_URL')) {
         return POM_LICENCE_URL
     } else {
         throw new InvalidUserDataException('You must set POM_LICENCE_URL in gradle.properties file.')
@@ -257,39 +229,23 @@ def getPomLicenseUrl() {
 }
 
 def getPomLicenseDist() {
-    if (hasProperty('POM_LICENCE_DIST')){
-        return POM_LICENCE_DIST
-    } else {
-        return 'repo'
-    }
+    return hasProperty('POM_LICENCE_DIST') ? POM_LICENCE_DIST : 'repo'
 }
 
 def getPomLicenseComments() {
-    if (hasProperty('POM_LICENCE_COMMENTS')){
-        return POM_LICENCE_COMMENTS
-    } else {
-        return ''
-    }
+    return hasProperty('POM_LICENCE_COMMENTS') ? POM_LICENCE_COMMENTS : ''
 }
 
 def getOrg() {
-    if (hasProperty('POM_ORG')){
-        return POM_ORG
-    } else {
-        return ''
-    }
+    return hasProperty('POM_ORG') ? POM_ORG : ''
 }
 
 def getOrgUrl() {
-    if (hasProperty('POM_ORG_URL')){
-        return POM_ORG_URL
-    } else {
-        return ''
-    }
+    return hasProperty('POM_ORG_URL') ? POM_ORG_URL : ''
 }
 
 def getDeveloperId() {
-    if (hasProperty('POM_DEVELOPER_ID')){
+    if (hasProperty('POM_DEVELOPER_ID')) {
         return POM_DEVELOPER_ID
     } else {
         throw new InvalidUserDataException('You must set POM_DEVELOPER_ID in gradle.properties file.')
@@ -297,7 +253,7 @@ def getDeveloperId() {
 }
 
 def getDeveloperName() {
-    if (hasProperty('POM_DEVELOPER_NAME')){
+    if (hasProperty('POM_DEVELOPER_NAME')) {
         return POM_DEVELOPER_NAME
     } else {
         throw new InvalidUserDataException('You must set POM_DEVELOPER_NAME in gradle.properties file.')
@@ -305,154 +261,95 @@ def getDeveloperName() {
 }
 
 def getDeveloperEmail() {
-    if (hasProperty('POM_DEVELOPER_EMAIL')){
-        return POM_DEVELOPER_EMAIL
-    } else {
-        return 'lazy-developer-who-does-not-read-readme@example.com'
-    }
+    return hasProperty('POM_DEVELOPER_EMAIL') ? POM_DEVELOPER_EMAIL : 'lazy-developer-who-does-not-read-readme@example.com'
 }
 
 def getDeveloperUrl() {
-    if (hasProperty('POM_DEVELOPER_URL')){
-        return POM_DEVELOPER_URL
-    } else {
-        return ''
-    }
+    return hasProperty('POM_DEVELOPER_URL') ? POM_DEVELOPER_URL : ''
 }
 
 def getDeveloperOrg() {
-    if (hasProperty('POM_DEVELOPER_ORG')){
-        return POM_DEVELOPER_ORG
-    } else {
-        return getOrg()
-    }
+    return hasProperty('POM_DEVELOPER_ORG') ? POM_DEVELOPER_ORG : getOrg()
 }
 
 def getDeveloperOrgUrl() {
-    if (hasProperty('POM_DEVELOPER_ORG_URL')){
-        return POM_DEVELOPER_ORG_URL
-    } else {
-        return getOrgUrl()
-    }
+    return hasProperty('POM_DEVELOPER_ORG_URL') ? POM_DEVELOPER_ORG_URL : getOrgUrl()
 }
 
 def getDeveloperRoles() {
-    if (hasProperty('POM_DEVELOPER_ROLES')){
-        if (hasProperty('POM_DEVELOPER_ROLE')){
+    if (hasProperty('POM_DEVELOPER_ROLES')) {
+        if (hasProperty('POM_DEVELOPER_ROLE')) {
             def developerRoles = getProperty('POM_DEVELOPER_ROLE') + ',' + getProperty('POM_DEVELOPER_ROLES')
             return developerRoles.split(',')
         } else {
             return getProperty('POM_DEVELOPER_ROLES').split(',')
         }
-    } else if (hasProperty('POM_DEVELOPER_ROLE')){
-        return [POM_DEVELOPER_ROLE]
     } else {
-        return ['Software Developer']
+        return hasProperty('POM_DEVELOPER_ROLE') ? [POM_DEVELOPER_ROLE] : ['Software Developer']
     }
 }
 
 def getDeveloperTimezone() {
-    if (hasProperty('POM_DEVELOPER_TIMEZONE')){
-        return POM_DEVELOPER_TIMEZONE
-    } else {
-        return ''
-    }
+    return hasProperty('POM_DEVELOPER_TIMEZONE') ? POM_DEVELOPER_TIMEZONE : ''
 }
 
 def getDevelopers() {
-    if (hasProperty('POM_DEVELOPERS')){
-        return getProperty('POM_DEVELOPERS').split(',')
-    } else {
-        return ['']
-    }
+    return hasProperty('POM_DEVELOPERS') ? getProperty('POM_DEVELOPERS').split(',') : ['']
 }
 
 def getContributors() {
-    if (hasProperty('POM_CONTRIBUTORS')){
-        return getProperty('POM_CONTRIBUTORS').split(',')
-    } else {
-        return ['']
-    }
+    return hasProperty('POM_CONTRIBUTORS') ? getProperty('POM_CONTRIBUTORS').split(',') : ['']
 }
 
 def getIssueSystem() {
-    if (hasProperty('POM_ISSUE_SYSTEM')){
-        return POM_ISSUE_SYSTEM
-    } else {
-        return ''
-    }
+    return hasProperty('POM_ISSUE_SYSTEM') ?  POM_ISSUE_SYSTEM : ''
 }
 
 def getIssueSystemUrl() {
-    if (hasProperty('POM_ISSUE_SYSTEM_URL')){
-        return POM_ISSUE_SYSTEM_URL
-    } else {
-        return ''
-    }
+    return hasProperty('POM_ISSUE_SYSTEM_URL') ? POM_ISSUE_SYSTEM_URL : ''
 }
 
 def getCiSystem() {
-    if (hasProperty('POM_CI_SYSTEM')){
-        return POM_CI_SYSTEM
-    } else {
-        return ''
-    }
+    return hasProperty('POM_CI_SYSTEM') ? POM_CI_SYSTEM : ''
 }
 
 def getCiSystemUrl() {
-    if (hasProperty('POM_CI_SYSTEM_URL')){
-        return POM_CI_SYSTEM_URL
-    } else {
-        return ''
-    }
+    return hasProperty('POM_CI_SYSTEM_URL') ? POM_CI_SYSTEM_URL : ''
 }
 
 def getMailingLists() {
-    if (hasProperty('POM_MAILING_LISTS')){
-        return getProperty('POM_MAILING_LISTS').split(',')
-    } else {
-        return ['']
-    }
+    return hasProperty('POM_MAILING_LISTS') ? getProperty('POM_MAILING_LISTS').split(',') : ['']
 }
 
 def getRepositories() {
     if (isReleaseBuild()) {
-        if (hasProperty('POM_REPOSITORIES')){
-            return getProperty('POM_REPOSITORIES').split(',')
-        } else {
-            return ['']
-        }
+        return hasProperty('POM_REPOSITORIES') ? getProperty('POM_REPOSITORIES').split(',') : ['']
     } else {
-        if (hasProperty('POM_SNAPSHOT_REPOSITORIES')){
+        if (hasProperty('POM_SNAPSHOT_REPOSITORIES')) {
             return getProperty('POM_SNAPSHOT_REPOSITORIES').split(',')
-        } else if (hasProperty('POM_REPOSITORIES')){
-            return getProperty('POM_REPOSITORIES').split(',')
         } else {
-            return ['']
+            return hasProperty('POM_REPOSITORIES') ? getProperty('POM_REPOSITORIES').split(',') : ['']
+
         }
     }
 }
 
 def getDistDownloadUrl() {
-    if (hasProperty('POM_DIST_DOWNLOAD_URL')){
-        return POM_DIST_DOWNLOAD_URL
-    } else {
-        return ''
-    }
+    return hasProperty('POM_DIST_DOWNLOAD_URL') ? POM_DIST_DOWNLOAD_URL : ''
 }
 
-def getJavaAPISpecificationLink() {
-    if (JavaVersion.current().isJava10Compatible()){
+static def getJavaAPISpecificationLink() {
+    if (JavaVersion.current().isJava10Compatible()) {
         return 'https://docs.oracle.com/javase/10/docs/api/overview-summary.html'
-    } else if (JavaVersion.current().isJava9()){
+    } else if (JavaVersion.current().isJava9()) {
         return 'https://docs.oracle.com/javase/9/docs/api/overview-summary.html'
-    } else if (JavaVersion.current().isJava8()){
+    } else if (JavaVersion.current().isJava8()) {
         return 'https://docs.oracle.com/javase/8/docs/api/'
-    } else if (JavaVersion.current().isJava7()){
+    } else if (JavaVersion.current().isJava7()) {
         return 'https://docs.oracle.com/javase/7/docs/api/'
-    } else if (JavaVersion.current().isJava6()){
+    } else if (JavaVersion.current().isJava6()) {
         return 'https://docs.oracle.com/javase/6/docs/api/'
-    } else if (JavaVersion.current().isJava5()){
+    } else if (JavaVersion.current().isJava5()) {
         return 'https://docs.oracle.com/javase/1.5.0/docs/api/'
     } else {
         return ''
@@ -510,18 +407,18 @@ afterEvaluate { project ->
     def pomPackagingConfig = {
         packaging pomPackaging
     }
-    def pomConfig = {        
+    def pomConfig = {
         url pomUrl
-        if (!''.equals(pomInceptionYear)) {
+        if (pomInceptionYear != '') {
             inceptionYear pomInceptionYear
         }
 
-        if (!''.equals(pomOrg) || !''.equals(pomOrgUrl)) {
+        if ((pomOrg != '') || (pomOrgUrl != '')) {
             organization {
-                if (!''.equals(pomOrg)) {
+                if (pomOrg != '') {
                     name pomOrg
                 }
-                if (!''.equals(pomOrgUrl)) {
+                if (pomOrgUrl != '') {
                     url pomOrgUrl
                 }
             }
@@ -532,7 +429,7 @@ afterEvaluate { project ->
                 name pomLicenseName
                 url pomLicenseUrl
                 distribution pomDistribution
-                if (!''.equals(pomLicenseComments)) {
+                if (pomLicenseComments != '') {
                     comments pomLicenseComments
                 }
             }
@@ -543,13 +440,13 @@ afterEvaluate { project ->
                 id pomDeveloperId
                 name pomDeveloperName
                 email pomDeveloperEmail
-                if (!''.equals(pomDeveloperUrl)) {
+                if (pomDeveloperUrl != '') {
                     url pomDeveloperUrl
                 }
-                if (!''.equals(pomDeveloperOrg)) {
-                    organization pomDeveloperOrg // Workaround for https://github.com/gradle/gradle/issues/886
+                if (pomDeveloperOrg != '') {
+                    organization pomDeveloperOrg
                 }
-                if (!''.equals(pomDeveloperOrgUrl)) {
+                if (pomDeveloperOrgUrl != '') {
                     organizationUrl pomDeveloperOrgUrl
                 }
                 if (pomDeveloperRoles.size() > 0) {
@@ -559,25 +456,25 @@ afterEvaluate { project ->
                         }
                     }
                 }
-                if (!''.equals(pomDeveloperTimezone)) {
+                if (pomDeveloperTimezone != '') {
                     timezone pomDeveloperTimezone
                 }
             }
-            for (int i = 0; i + 2 < pomDevelopers.size(); i+=3) {
+            for (int i = 0; i + 2 < pomDevelopers.size(); i += 3) {
                 developer {
                     id pomDevelopers[i]
-                    name pomDevelopers[i+1]
-                    email pomDevelopers[i+2]
+                    name pomDevelopers[i + 1]
+                    email pomDevelopers[i + 2]
                 }
             }
         }
 
         if (pomContributors.size() > 1) {
             contributors {
-                for (int i = 0; i + 1 < pomContributors.size(); i+=2) {
+                for (int i = 0; i + 1 < pomContributors.size(); i += 2) {
                     contributor {
                         name pomContributors[i]
-                        email pomContributors[i+1]
+                        email pomContributors[i + 1]
                     }
                 }
             }
@@ -585,11 +482,11 @@ afterEvaluate { project ->
 
         if (pomMailingLists.size() > 2) {
             mailingLists {
-                for (int i = 0; i + 2 < pomMailingLists.size(); i+=3) {
+                for (int i = 0; i + 2 < pomMailingLists.size(); i += 3) {
                     mailingList {
                         name pomMailingLists[i]
-                        subscribe pomMailingLists[i+1]
-                        unsubscribe pomMailingLists[i+2]
+                        subscribe pomMailingLists[i + 1]
+                        unsubscribe pomMailingLists[i + 2]
                     }
                 }
             }
@@ -602,29 +499,29 @@ afterEvaluate { project ->
             url pomScmUrl
         }
 
-        if (!''.equals(pomIssueSystem) || !''.equals(pomIssueSystemUrl)) {
+        if ((pomIssueSystem != '') || (pomIssueSystemUrl != '')) {
             issueManagement {
-                if (!''.equals(pomIssueSystem)) {
+                if (pomIssueSystem != '') {
                     system pomIssueSystem
                 }
-                if (!''.equals(pomIssueSystemUrl)) {
+                if (pomIssueSystemUrl != '') {
                     url pomIssueSystemUrl
                 }
             }
         }
 
-        if (!''.equals(pomCiSystem) || !''.equals(pomCiSystemUrl)) {
+        if ((pomCiSystem != '') || (pomCiSystemUrl != '')) {
             ciManagement {
-                if (!''.equals(pomCiSystem)) {
+                if (pomCiSystem != '') {
                     system pomCiSystem
                 }
-                if (!''.equals(pomCiSystemUrl)) {
+                if (pomCiSystemUrl != '') {
                     url pomCiSystemUrl
                 }
             }
         }
 
-        if (!''.equals(pomDistDownloadUrl)) {
+        if (pomDistDownloadUrl != '') {
             distributionManagement {
                 downloadUrl pomDistDownloadUrl
             }
@@ -639,9 +536,9 @@ afterEvaluate { project ->
 
     task dokkaInitializer {
         downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.pom",
-                            dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.pom")
+                dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.pom")
         downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
-                            dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.jar")
+                dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.jar")
     }
 
     signing {
@@ -678,10 +575,10 @@ afterEvaluate { project ->
 
                     if (pomRepositories.size() > 1) {
                         repositories {
-                            for (int i = 0; i + 1 < pomRepositories.size(); i+=2) {
+                            for (int i = 0; i + 1 < pomRepositories.size(); i += 2) {
                                 repository {
                                     id pomRepositories[i]
-                                    url pomRepositories[i+1]
+                                    url pomRepositories[i + 1]
                                 }
                             }
                         }
@@ -735,10 +632,10 @@ afterEvaluate { project ->
 
                     if (pomRepositories.size() > 1) {
                         repositories {
-                            for (int i = 0; i + 1 < pomRepositories.size(); i+=2) {
+                            for (int i = 0; i + 1 < pomRepositories.size(); i += 2) {
                                 repository {
                                     id pomRepositories[i]
-                                    url pomRepositories[i+1]
+                                    url pomRepositories[i + 1]
                                 }
                             }
                         }
@@ -751,7 +648,7 @@ afterEvaluate { project ->
                     def description = root.description
                     if (root.packaging.size() == 1) {
                         root.remove(root.packaging)
-                    }     
+                    }
                     root.remove(root.name)
                     root.remove(root.description)
                     root.children().last() + pomPackagingConfig
@@ -790,10 +687,10 @@ afterEvaluate { project ->
 
                         if (pomRepositories.size() > 1) {
                             repositories {
-                                for (int i = 0; i + 1 < pomRepositories.size(); i+=2) {
+                                for (int i = 0; i + 1 < pomRepositories.size(); i += 2) {
                                     repository {
                                         id pomRepositories[i]
-                                        url pomRepositories[i+1]
+                                        url pomRepositories[i + 1]
                                     }
                                 }
                             }
@@ -851,16 +748,16 @@ afterEvaluate { project ->
                     def javaAPISpecificationLink = getJavaAPISpecificationLink()
                     if (srcDirsNumber > 0) {
                         commandLine 'java', '-jar',
-                            "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
-                            android.sourceSets.main.java.srcDirs[0],
-                            (srcDirsNumber == 2) ? android.sourceSets.main.java.srcDirs[1] : '',
-                            (srcDirsNumber == 3) ? android.sourceSets.main.java.srcDirs[2] : '',
-                            '-output', "${buildDir}/javadoc", '-format', 'javadoc',
-                            (classpathNumber > 0) ? '-classpath' : '', (classpathNumber > 0) ? classpath : '',
-                            '-links', "https://developer.android.com/reference/^${android.sdkDirectory}/docs/reference/^${javaAPISpecificationLink}"
+                                "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
+                                android.sourceSets.main.java.srcDirs[0],
+                                (srcDirsNumber == 2) ? android.sourceSets.main.java.srcDirs[1] : '',
+                                (srcDirsNumber == 3) ? android.sourceSets.main.java.srcDirs[2] : '',
+                                '-output', "${buildDir}/javadoc", '-format', 'javadoc',
+                                (classpathNumber > 0) ? '-classpath' : '', (classpathNumber > 0) ? classpath : '',
+                                '-links', "https://developer.android.com/reference/^${android.sdkDirectory}/docs/reference/^${javaAPISpecificationLink}"
                     } else {
                         commandLine 'java', '-jar',
-                            "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
+                                "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
                     }
                 }
             }
@@ -949,10 +846,10 @@ afterEvaluate { project ->
 
                         if (pomRepositories.size() > 1) {
                             repositories {
-                                for (int i = 0; i + 1 < pomRepositories.size(); i+=2) {
+                                for (int i = 0; i + 1 < pomRepositories.size(); i += 2) {
                                     repository {
                                         id pomRepositories[i]
-                                        url pomRepositories[i+1]
+                                        url pomRepositories[i + 1]
                                     }
                                 }
                             }
@@ -994,15 +891,15 @@ afterEvaluate { project ->
                     def javaAPISpecificationLink = getJavaAPISpecificationLink()
                     if (srcDirsNumber > 0) {
                         commandLine 'java', '-jar',
-                            "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
-                            sourceSets.main.java.srcDirs[0],
-                            (srcDirsNumber == 2) ? sourceSets.main.java.srcDirs[1] : '',
-                            (srcDirsNumber == 3) ? sourceSets.main.java.srcDirs[2] : '',
-                            '-output', "${buildDir}/javadoc", '-format', 'javadoc',
-                            '-links', "${javaAPISpecificationLink}"
+                                "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
+                                sourceSets.main.java.srcDirs[0],
+                                (srcDirsNumber == 2) ? sourceSets.main.java.srcDirs[1] : '',
+                                (srcDirsNumber == 3) ? sourceSets.main.java.srcDirs[2] : '',
+                                '-output', "${buildDir}/javadoc", '-format', 'javadoc',
+                                '-links', "${javaAPISpecificationLink}"
                     } else {
                         commandLine 'java', '-jar',
-                            "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
+                                "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
                     }
                 }
             }
@@ -1085,7 +982,7 @@ afterEvaluate { project ->
             if (!getDoclintCheck()) {
                 options.addStringOption('Xdoclint:none', '-quiet')
             }
-            if(JavaVersion.current().isJava9Compatible()) {
+            if (JavaVersion.current().isJava9Compatible()) {
                 if (isHtml5()) {
                     options.addBooleanOption('html5', true)
                 } else {
