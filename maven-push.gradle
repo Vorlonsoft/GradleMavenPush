@@ -329,7 +329,6 @@ def getRepositories() {
             return getProperty('POM_SNAPSHOT_REPOSITORIES').split(',')
         } else {
             return hasProperty('POM_REPOSITORIES') ? getProperty('POM_REPOSITORIES').split(',') : ['']
-
         }
     }
 }
@@ -742,16 +741,26 @@ afterEvaluate { project ->
         if (isDokka()) {
             if ((projectDokkaAndroidJavadocTask == null) && (projectDokkaJavadocTask == null)) {
                 task androidDokka(type: Exec, dependsOn: dokkaInitializer) {
-                    def srcDirsNumber = android.sourceSets.main.java.srcDirs.size()
+                    def srcDirsJavaNumber = (android.sourceSets.main.java.srcDirs != null) ? android.sourceSets.main.java.srcDirs.size() : 0
+                    def srcDirsKotlinNumber = (isKotlin() && (android.sourceSets.main.kotlin.srcDirs != null)) ? android.sourceSets.main.kotlin.srcDirs.size() : 0
                     def classpathNumber = android.getBootClasspath().size()
                     def classpath = (classpathNumber > 0) ? android.getBootClasspath()[0] : ''
                     def javaAPISpecificationLink = getJavaAPISpecificationLink()
-                    if (srcDirsNumber > 0) {
+                    if (srcDirsJavaNumber > 0) {
+                        mkdir android.sourceSets.main.java.srcDirs[0]
+                        if (srcDirsJavaNumber > 1) {
+                            mkdir android.sourceSets.main.java.srcDirs[1]
+                        }
+                    }
+                    if (srcDirsKotlinNumber > 0) {
+                        mkdir android.sourceSets.main.kotlin.srcDirs[0]
+                    }
+                    if (srcDirsJavaNumber + srcDirsKotlinNumber > 0) {
                         commandLine 'java', '-jar',
                                 "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
-                                android.sourceSets.main.java.srcDirs[0],
-                                (srcDirsNumber == 2) ? android.sourceSets.main.java.srcDirs[1] : '',
-                                (srcDirsNumber == 3) ? android.sourceSets.main.java.srcDirs[2] : '',
+                                (srcDirsJavaNumber > 0) ? android.sourceSets.main.java.srcDirs[0] : '',
+                                (srcDirsJavaNumber > 1) ? android.sourceSets.main.java.srcDirs[1] : '',
+                                (srcDirsKotlinNumber > 0) ? android.sourceSets.main.kotlin.srcDirs[0] : '',
                                 '-output', "${buildDir}/javadoc", '-format', 'javadoc',
                                 (classpathNumber > 0) ? '-classpath' : '', (classpathNumber > 0) ? classpath : '',
                                 '-links', "https://developer.android.com/reference/^${android.sdkDirectory}/docs/reference/^${javaAPISpecificationLink}"
@@ -781,6 +790,9 @@ afterEvaluate { project ->
         } else {
             task androidJavadocs(type: Javadoc) {
                 source = android.sourceSets.main.java.srcDirs
+                if (isKotlin() && (android.sourceSets.main.kotlin.srcDirs != null)) {
+                    source += android.sourceSets.main.kotlin.srcDirs
+                }
                 classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
                 options {
                     linksOffline 'https://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference/"
@@ -799,7 +811,12 @@ afterEvaluate { project ->
             task androidKotlinSourcesJar(type: Jar) {
                 classifier = 'sources'
                 from android.sourceSets.main.java.sourceFiles
-                from 'src/main/kotlin'
+                if (isKotlin() && (android.sourceSets.main.kotlin.srcDirs != null)) {
+                    def srcDirsKotlinNumber = android.sourceSets.main.kotlin.srcDirs.size()
+                    for (int i = 0; i < srcDirsKotlinNumber; i++) {
+                        from android.sourceSets.main.kotlin.srcDirs[i]
+                    }
+                }
             }
         } else {
             task androidSourcesJar(type: Jar) {
@@ -887,14 +904,24 @@ afterEvaluate { project ->
         if (isDokka()) {
             if ((projectDokkaAndroidJavadocTask == null) && (projectDokkaJavadocTask == null)) {
                 task coreDokka(type: Exec, dependsOn: dokkaInitializer) {
-                    def srcDirsNumber = sourceSets.main.java.srcDirs.size()
+                    def srcDirsJavaNumber = (sourceSets.main.java.srcDirs != null) ? sourceSets.main.java.srcDirs.size() : 0
+                    def srcDirsKotlinNumber = (isKotlin() && (sourceSets.main.kotlin.srcDirs != null)) ? sourceSets.main.kotlin.srcDirs.size() : 0
                     def javaAPISpecificationLink = getJavaAPISpecificationLink()
-                    if (srcDirsNumber > 0) {
+                    if (srcDirsJavaNumber > 0) {
+                        mkdir sourceSets.main.java.srcDirs[0]
+                        if (srcDirsJavaNumber > 1) {
+                            mkdir sourceSets.main.java.srcDirs[1]
+                        }
+                    }
+                    if (srcDirsKotlinNumber > 0) {
+                        mkdir sourceSets.main.kotlin.srcDirs[0]
+                    }
+                    if (srcDirsJavaNumber + srcDirsKotlinNumber > 0) {
                         commandLine 'java', '-jar',
                                 "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
-                                sourceSets.main.java.srcDirs[0],
-                                (srcDirsNumber == 2) ? sourceSets.main.java.srcDirs[1] : '',
-                                (srcDirsNumber == 3) ? sourceSets.main.java.srcDirs[2] : '',
+                                (srcDirsJavaNumber > 0) ? sourceSets.main.java.srcDirs[0] : '',
+                                (srcDirsJavaNumber > 1) ? sourceSets.main.java.srcDirs[1] : '',
+                                (srcDirsKotlinNumber > 0) ? sourceSets.main.kotlin.srcDirs[0] : '',
                                 '-output', "${buildDir}/javadoc", '-format', 'javadoc',
                                 '-links', "${javaAPISpecificationLink}"
                     } else {
@@ -923,6 +950,9 @@ afterEvaluate { project ->
         } else {
             task coreJavadoc(type: Javadoc) {
                 source = sourceSets.main.java.srcDirs
+                if (isKotlin() && (sourceSets.main.kotlin.srcDirs != null)) {
+                    source += sourceSets.main.kotlin.srcDirs
+                }
                 failOnError = false
                 exclude '**/*.kt'
             }
@@ -937,7 +967,12 @@ afterEvaluate { project ->
             task kotlinSourcesJar(type: Jar, dependsOn: classes) {
                 classifier = 'sources'
                 from sourceSets.main.allSource
-                from 'src/main/kotlin'
+                if (isKotlin() && (sourceSets.main.kotlin.srcDirs != null)) {
+                    def srcDirsKotlinNumber = sourceSets.main.kotlin.srcDirs.size()
+                    for (int i = 0; i < srcDirsKotlinNumber; i++) {
+                        from sourceSets.main.kotlin.srcDirs[i]
+                    }
+                }
             }
         } else {
             task sourcesJar(type: Jar, dependsOn: classes) {
