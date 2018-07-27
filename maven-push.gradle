@@ -42,6 +42,10 @@ def isKotlin() {
     }
 }
 
+def isDokkaPlugin() {
+    return (project.getPlugins().hasPlugin('org.jetbrains.dokka-android') || project.getPlugins().hasPlugin('org.jetbrains.dokka'))
+}
+
 def isReleaseBuild() {
     return !getPomVersionName().contains('SNAPSHOT')
 }
@@ -626,7 +630,13 @@ afterEvaluate { project ->
             }
         }
     }
-    
+    def projectDokkaJavadocTask = !isDokkaPlugin() ? null : project.tasks.find {
+        it.name == 'dokkaJavadoc'
+    }
+    def projectDokkaAndroidJavadocTask = !isDokkaPlugin() ? null : project.tasks.find {
+        it.name == 'dokkaAndroidJavadoc'
+    }
+
     task dokkaInitializer {
         downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.pom",
                             dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.pom")
@@ -833,13 +843,14 @@ afterEvaluate { project ->
         }
 
         if (isDokka()) {
-            task androidDokka(type: Exec, dependsOn: dokkaInitializer) {
-                def srcDirsNumber = android.sourceSets.main.java.srcDirs.size()
-                def classpathNumber = android.getBootClasspath().size()
-                def classpath = (classpathNumber > 0) ? android.getBootClasspath()[0] : ''
-                def javaAPISpecificationLink = getJavaAPISpecificationLink()
-                if (srcDirsNumber > 0) {
-                    commandLine 'java', '-jar',
+            if ((projectDokkaAndroidJavadocTask == null) && (projectDokkaJavadocTask == null)) {
+                task androidDokka(type: Exec, dependsOn: dokkaInitializer) {
+                    def srcDirsNumber = android.sourceSets.main.java.srcDirs.size()
+                    def classpathNumber = android.getBootClasspath().size()
+                    def classpath = (classpathNumber > 0) ? android.getBootClasspath()[0] : ''
+                    def javaAPISpecificationLink = getJavaAPISpecificationLink()
+                    if (srcDirsNumber > 0) {
+                        commandLine 'java', '-jar',
                             "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
                             android.sourceSets.main.java.srcDirs[0],
                             (srcDirsNumber == 2) ? android.sourceSets.main.java.srcDirs[1] : '',
@@ -847,15 +858,28 @@ afterEvaluate { project ->
                             '-output', "${buildDir}/javadoc", '-format', 'javadoc',
                             (classpathNumber > 0) ? '-classpath' : '', (classpathNumber > 0) ? classpath : '',
                             '-links', "https://developer.android.com/reference/^${android.sdkDirectory}/docs/reference/^${javaAPISpecificationLink}"
-                } else {
-                    commandLine 'java', '-jar',
+                    } else {
+                        commandLine 'java', '-jar',
                             "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
+                    }
                 }
             }
 
-            task androidDokkaJar(type: Jar, dependsOn: androidDokka) {
-                classifier = 'javadoc'
-                from "$buildDir/javadoc"
+            if (projectDokkaAndroidJavadocTask != null) {
+                task projectDokkaAndroidJavadocTaskJar(type: Jar, dependsOn: projectDokkaAndroidJavadocTask) {
+                    classifier = 'javadoc'
+                    from projectDokkaAndroidJavadocTask.outputDirectory
+                }
+            } else if (projectDokkaJavadocTask != null) {
+                task projectDokkaJavadocTaskJar(type: Jar, dependsOn: projectDokkaJavadocTask) {
+                    classifier = 'javadoc'
+                    from projectDokkaJavadocTask.outputDirectory
+                }
+            } else {
+                task androidDokkaJar(type: Jar, dependsOn: androidDokka) {
+                    classifier = 'javadoc'
+                    from "${buildDir}/javadoc"
+                }
             }
         } else {
             task androidJavadocs(type: Javadoc) {
@@ -892,7 +916,13 @@ afterEvaluate { project ->
                 archives apklib
             }
             if (isDokka()) {
-                archives androidDokkaJar
+                if (projectDokkaAndroidJavadocTask != null) {
+                    archives projectDokkaAndroidJavadocTaskJar
+                } else if (projectDokkaJavadocTask != null) {
+                    archives projectDokkaJavadocTaskJar
+                } else {
+                    archives androidDokkaJar
+                }
             } else {
                 archives androidJavadocsJar
             }
@@ -958,26 +988,40 @@ afterEvaluate { project ->
         }
 
         if (isDokka()) {
-            task coreDokka(type: Exec, dependsOn: dokkaInitializer) {
-                def srcDirsNumber = sourceSets.main.java.srcDirs.size()
-                def javaAPISpecificationLink = getJavaAPISpecificationLink()
-                if (srcDirsNumber > 0) {
-                    commandLine 'java', '-jar',
+            if ((projectDokkaAndroidJavadocTask == null) && (projectDokkaJavadocTask == null)) {
+                task coreDokka(type: Exec, dependsOn: dokkaInitializer) {
+                    def srcDirsNumber = sourceSets.main.java.srcDirs.size()
+                    def javaAPISpecificationLink = getJavaAPISpecificationLink()
+                    if (srcDirsNumber > 0) {
+                        commandLine 'java', '-jar',
                             "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
                             sourceSets.main.java.srcDirs[0],
                             (srcDirsNumber == 2) ? sourceSets.main.java.srcDirs[1] : '',
                             (srcDirsNumber == 3) ? sourceSets.main.java.srcDirs[2] : '',
                             '-output', "${buildDir}/javadoc", '-format', 'javadoc',
                             '-links', "${javaAPISpecificationLink}"
-                } else {
-                    commandLine 'java', '-jar',
+                    } else {
+                        commandLine 'java', '-jar',
                             "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
+                    }
                 }
             }
 
-            task dokkaJar(type: Jar, dependsOn: coreDokka) {
-                classifier = 'javadoc'
-                from "$buildDir/javadoc"
+            if (projectDokkaJavadocTask != null) {
+                task coreProjectDokkaJavadocTaskJar(type: Jar, dependsOn: projectDokkaJavadocTask) {
+                    classifier = 'javadoc'
+                    from projectDokkaJavadocTask.outputDirectory
+                }
+            } else if (projectDokkaAndroidJavadocTask != null) {
+                task coreProjectDokkaAndroidJavadocTaskJar(type: Jar, dependsOn: projectDokkaAndroidJavadocTask) {
+                    classifier = 'javadoc'
+                    from projectDokkaAndroidJavadocTask.outputDirectory
+                }
+            } else {
+                task dokkaJar(type: Jar, dependsOn: coreDokka) {
+                    classifier = 'javadoc'
+                    from "${buildDir}/javadoc"
+                }
             }
         } else {
             task coreJavadoc(type: Javadoc) {
@@ -1007,7 +1051,13 @@ afterEvaluate { project ->
 
         artifacts {
             if (isDokka()) {
-                archives dokkaJar
+                if (projectDokkaJavadocTask != null) {
+                    archives coreProjectDokkaJavadocTaskJar
+                } else if (projectDokkaAndroidJavadocTask != null) {
+                    archives coreProjectDokkaAndroidJavadocTaskJar
+                } else {
+                    archives dokkaJar
+                }
             } else {
                 archives javadocJar
             }
