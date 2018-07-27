@@ -30,6 +30,13 @@ def isAndroid() {
 
 def isKotlin() {
     return getPlugins().hasPlugin('kotlin') ||
+           getPlugins().hasPlugin('kotlin-platform-common') ||
+           getPlugins().hasPlugin('kotlin-platform-jvm') ||
+           getPlugins().hasPlugin('kotlin-platform-js') ||
+           getPlugins().hasPlugin('org.jetbrains.kotlin') ||
+           getPlugins().hasPlugin('org.jetbrains.kotlin.jvm') ||
+           getPlugins().hasPlugin('org.jetbrains.kotlin.js') ||
+           getPlugins().hasPlugin('kotlin2js') ||
            getPlugins().hasPlugin('kotlin-android') ||
            getPlugins().hasPlugin('kotlin-android-extensions')
 }
