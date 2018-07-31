@@ -99,6 +99,10 @@ def getAndroidJarArtifact() {
     return hasProperty('ANDROID_JAR_ARTIFACT') ? 'true'.equalsIgnoreCase(ANDROID_JAR_ARTIFACT) : false
 }
 
+def getFatjarArtifact() {
+    return hasProperty('FATJAR_ARTIFACT') ? 'true'.equalsIgnoreCase(FATJAR_ARTIFACT) : false
+}
+
 def isDokka() {
     return hasProperty('JAVADOC_BY_DOKKA') ? 'true'.equalsIgnoreCase(JAVADOC_BY_DOKKA) : false
 }
@@ -380,6 +384,7 @@ static def downloadLib(url, path, version, name) {
 
 afterEvaluate { project ->
     def androidJarArtifact = getAndroidJarArtifact()
+    def fatjarArtifact = getFatjarArtifact()
     def apklibArtifact = getApklibArtifact()
     def dokkaFatJarVersion = '0.9.17'
     def dokkaFatJarPath = 'org/jetbrains/dokka/dokka-fatjar'
@@ -650,6 +655,7 @@ afterEvaluate { project ->
         configuration = configurations.archives
         repositories {
             mavenDeployer {
+                
                 pom.groupId = pomGroupId
                 pom.artifactId = pomArtifactId
                 pom.version = pomVersionName
@@ -756,6 +762,67 @@ afterEvaluate { project ->
                         }
                     }
                 }
+            }
+        }
+
+        if (fatjarArtifact) {
+            task createAndroidFatjar(type: Jar) {
+                classifier = 'fatjar'
+                configurations.implementation.setCanBeResolved(true)
+                configurations.api.setCanBeResolved(true)
+                from {
+                    configurations.compile.findAll {
+                        it.getName() != 'android.jar' && !it.getName().startsWith('junit') && !it.getName().startsWith('hamcrest')
+                    }.collect {
+                        if (it.isDirectory()) {
+                            it
+                        } else if(it.getName().endsWith('.aar')) {
+                            zipTree(it).findAll {
+                                it.getName() == 'classes.jar'
+                            }.collect {
+                                zipTree(it)
+                            }
+                        } else {
+                            zipTree(it)
+                        }
+                    }
+                }
+                from {
+                    configurations.implementation.findAll {
+                        it.getName() != 'android.jar' && !it.getName().startsWith('junit') && !it.getName().startsWith('hamcrest')
+                    }.collect {
+                        if (it.isDirectory()) {
+                            it
+                        } else if(it.getName().endsWith('.aar')) {
+                            zipTree(it).findAll {
+                                it.getName() == 'classes.jar'
+                            }.collect {
+                                zipTree(it)
+                            }
+                        } else {
+                            zipTree(it)
+                        }
+                    }
+                }
+                from {
+                    configurations.api.findAll {
+                        it.getName() != 'android.jar' && !it.getName().startsWith('junit') && !it.getName().startsWith('hamcrest')
+                    }.collect {
+                        if (it.isDirectory()) {
+                            it
+                        } else if(it.getName().endsWith('.aar')) {
+                            zipTree(it).findAll {
+                                it.getName() == 'classes.jar'
+                            }.collect {
+                                zipTree(it)
+                            }
+                        } else {
+                            zipTree(it)
+                        }
+                    }
+                }
+                from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
+                from "${buildDir}/tmp/kotlin-classes/release/"
             }
         }
 
@@ -869,6 +936,9 @@ afterEvaluate { project ->
         }
 
         artifacts {
+            if (fatjarArtifact) {
+                archives createAndroidFatjar
+            }
             if (androidJarArtifact) {
                 archives createJar
             }
@@ -945,6 +1015,30 @@ afterEvaluate { project ->
                         }
                     }
                 }
+            }
+        }
+
+        if (fatjarArtifact) {
+            task createFatjar(type: Jar) {
+                classifier = 'fatjar'
+                from {
+                    configurations.compileClasspath.findAll {
+                        !it.getName().startsWith('junit') && !it.getName().startsWith('hamcrest')
+                    }.collect {
+                        if (it.isDirectory()) {
+                            it
+                        } else if(it.getName().endsWith('.aar')) {
+                            zipTree(it).findAll {
+                                it.getName() == 'classes.jar'
+                            }.collect {
+                                zipTree(it)
+                            }
+                        } else {
+                            zipTree(it)
+                        }
+                    }
+                }
+                from sourceSets.main.output.classesDirs
             }
         }
 
@@ -1029,6 +1123,9 @@ afterEvaluate { project ->
         }
 
         artifacts {
+            if (fatjarArtifact) {
+                archives createFatjar
+            }
             if (isDokka()) {
                 if (projectDokkaJavadocTask != null) {
                     archives coreProjectDokkaJavadocTaskJar

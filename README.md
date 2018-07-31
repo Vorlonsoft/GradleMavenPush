@@ -84,6 +84,8 @@ You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "
 
 Add `ANDROID_JAR_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact jar. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts) and "jar" artifacts in your Android library project.
 
+Add `FATJAR_ARTIFACT` (default is "false") and set it to "true" to generate fatjar. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts and Gradle Kotlin Artifacts) and "fatjar" artifacts.
+
 Add `APKLIB_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact apklib. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts) and "apklib" artifacts in your Android library project. apklib is a way to bundle an Android library project.
 
 Also you can set `POM_ARTIFACT_URL` (default is `POM_ARTIFACT_ID` value), this is makes to easier to have an artifact with one artifactId but the name on JCenter something else.
