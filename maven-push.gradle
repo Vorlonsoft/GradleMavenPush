@@ -95,6 +95,10 @@ def getApklibArtifact() {
     return hasProperty('APKLIB_ARTIFACT') ? 'true'.equalsIgnoreCase(APKLIB_ARTIFACT) : false
 }
 
+def getAndroidJarArtifact() {
+    return hasProperty('ANDROID_JAR_ARTIFACT') ? 'true'.equalsIgnoreCase(ANDROID_JAR_ARTIFACT) : false
+}
+
 def isDokka() {
     return hasProperty('JAVADOC_BY_DOKKA') ? 'true'.equalsIgnoreCase(JAVADOC_BY_DOKKA) : false
 }
@@ -375,6 +379,7 @@ static def downloadLib(url, path, version, name) {
 }
 
 afterEvaluate { project ->
+    def androidJarArtifact = getAndroidJarArtifact()
     def dokkaFatJarVersion = '0.9.17'
     def dokkaFatJarPath = 'org/jetbrains/dokka/dokka-fatjar'
     def pomName = getPomName()
@@ -731,8 +736,16 @@ afterEvaluate { project ->
             }
         }
 
+        if (androidJarArtifact) {
+            task createJar(type: Jar) {
+                classifier = ''
+                from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
+                from "${buildDir}/tmp/kotlin-classes/release/"
+            }
+        }
+
         if (getApklibArtifact()) {
-            task apklib(type: Zip) {
+            task createApklib(type: Zip) {
                 appendix = extension = 'apklib'
 
                 from 'AndroidManifest.xml'
@@ -833,8 +846,11 @@ afterEvaluate { project ->
         }
 
         artifacts {
+            if (androidJarArtifact) {
+                archives createJar
+            }
             if (getApklibArtifact()) {
-                archives apklib
+                archives createApklib
             }
             if (isDokka()) {
                 if (projectDokkaAndroidJavadocTask != null) {
