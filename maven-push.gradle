@@ -380,8 +380,12 @@ static def downloadLib(url, path, version, name) {
 
 afterEvaluate { project ->
     def androidJarArtifact = getAndroidJarArtifact()
+    def apklibArtifact = getApklibArtifact()
     def dokkaFatJarVersion = '0.9.17'
     def dokkaFatJarPath = 'org/jetbrains/dokka/dokka-fatjar'
+    def pomGroupId = getPomGroupId()
+    def pomArtifactId = getPomArtifactId()
+    def pomVersionName = getPomVersionName()
     def pomName = getPomName()
     def pomPackaging = getPomPackaging()
     def pomDescription = getPomDescription()
@@ -561,15 +565,17 @@ afterEvaluate { project ->
 
     uploadArchives {
         description 'Deploys the artifacts to the Maven Central repository.'
+        configuration = configurations.archives
         repositories {
             mavenDeployer {
-                beforeDeployment {
-                    MavenDeployment deployment -> signing.signPom(deployment)
+                beforeDeployment { MavenDeployment deployment ->
+                    signing.signPom(deployment)
                 }
 
-                pom.groupId = getPomGroupId()
-                pom.artifactId = getPomArtifactId()
-                pom.version = getPomVersionName()
+                pom.groupId = pomGroupId
+                pom.artifactId = pomArtifactId
+                pom.version = pomVersionName
+                pom.packaging = pomPackaging
 
                 repository(url: getReleaseRepositoryUrl()) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
@@ -624,14 +630,15 @@ afterEvaluate { project ->
         }
     }
 
-    task installArchives(type: Upload) {
+    task installArchives(type: Upload, dependsOn: assemble) {
         description 'Deploys the artifacts to the local Maven repository.'
         configuration = configurations.archives
         repositories {
             mavenDeployer {
-                pom.groupId = getPomGroupId()
-                pom.artifactId = getPomArtifactId()
-                pom.version = getPomVersionName()
+                pom.groupId = pomGroupId
+                pom.artifactId = pomArtifactId
+                pom.version = pomVersionName
+                pom.packaging = pomPackaging
 
                 repository url: "file://${System.properties['user.home']}/.m2/repository"
 
@@ -684,13 +691,14 @@ afterEvaluate { project ->
     if (isAndroid()) {
         task install(type: Upload, dependsOn: assemble) {
             description 'Installs the artifacts to the local Maven repository.'
+            configuration = configurations.archives
             repositories {
                 mavenInstaller {
-                    configuration = configurations.archives
 
-                    pom.groupId = getPomGroupId()
-                    pom.artifactId = getPomArtifactId()
-                    pom.version = getPomVersionName()
+                    pom.groupId = pomGroupId
+                    pom.artifactId = pomArtifactId
+                    pom.version = pomVersionName
+                    pom.packaging = pomPackaging
 
                     pom.project {
                         name pomName
@@ -744,7 +752,7 @@ afterEvaluate { project ->
             }
         }
 
-        if (getApklibArtifact()) {
+        if (apklibArtifact) {
             task createApklib(type: Zip) {
                 appendix = extension = 'apklib'
 
@@ -849,7 +857,7 @@ afterEvaluate { project ->
             if (androidJarArtifact) {
                 archives createJar
             }
-            if (getApklibArtifact()) {
+            if (apklibArtifact) {
                 archives createApklib
             }
             if (isDokka()) {
@@ -872,13 +880,14 @@ afterEvaluate { project ->
     } else {
         install {
             description 'Installs the artifacts to the local Maven repository.'
+            configuration = configurations.archives
             repositories {
                 mavenInstaller {
-                    configuration = configurations.archives
 
-                    pom.groupId = getPomGroupId()
-                    pom.artifactId = getPomArtifactId()
-                    pom.version = getPomVersionName()
+                    pom.groupId = pomGroupId
+                    pom.artifactId = pomArtifactId
+                    pom.version = pomVersionName
+                    pom.packaging = pomPackaging
 
                     pom.project {
                         name pomName
