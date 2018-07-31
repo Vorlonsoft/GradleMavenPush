@@ -80,7 +80,7 @@ Set `JAVADOC_BY_DOKKA` to "true" to generate documentation by Dokka. Dokka is a 
 
 #### 4.1 Other gradle.properties in each sub-project
 
-You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts and Gradle Kotlin Artifacts) and change it's value.
+You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts and Gradle Kotlin Artifacts) and change it's value. Depends on Gradle/Plugins versions this option: 1. Changes `<packaging>` tag in the generated pom file only; 2. Changes main artifact file extension and `<packaging>` tag in the generated pom file; 3. Changes main artifact and it's asc file extensions and change `<packaging>` tag in the generated pom file;
 
 Add `ANDROID_JAR_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact jar. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts) and "jar" artifacts in your Android library project.
 
