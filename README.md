@@ -6,6 +6,7 @@ Helper to upload Gradle Android Artifacts, Gradle Java Artifacts and Gradle Kotl
 ## Usage
 
 ### 1. Have a working Gradle build
+
 It is up to you.
 
 ### 2. Update your home gradle.properties
@@ -34,6 +35,7 @@ export NEXUS_PASSWORD      = $tr0ngP@55w0rd
 ```
 
 ### 3. Create project root gradle.properties
+
 You may already have this file, in which case just edit the original. This file should contain the POM values which are common to all of your sub-project (if you have any). For instance, here's [AndroidRate's](https://github.com/Vorlonsoft/AndroidRate):
 
 ```properties
@@ -54,8 +56,7 @@ POM_SCM_CONNECTION     = scm:git@github.com:Vorlonsoft/AndroidRate.git
 
 The `VERSION_NAME` value is important. If it contains the keyword `SNAPSHOT` then the build will upload to the snapshot server, if not then to the release server.
 
-
-### 4. Modify the version name from environment variable
+#### 3.1. Modify the version name from environment variable
 
 If there's an environment variable called `VERSION_NAME_EXTRAS`, its value will get appended at the end of `VERSION_NAME`.
 This can be very powerful when running from CI. For example, to have one SNAPSHOT per branch, you could
@@ -65,7 +66,8 @@ export VERSION_NAME_EXTRAS = -master-SNAPSHOT
 ```
 in this case it will be uploaded to the snapshot server and indicates it's from the master branch.
 
-### 5. Create gradle.properties in each sub-project
+### 4. Create gradle.properties in each sub-project
+
 The values in this file are specific to the sub-project (and override those in the root `gradle.properties`). In this example, this is just the name, artifactId and `JAVADOC_BY_DOKKA` (default is "false"):
 
 ```properties
@@ -76,15 +78,17 @@ JAVADOC_BY_DOKKA = false
 
 Set `JAVADOC_BY_DOKKA` to "true" to generate documentation by Dokka. Dokka is a documentation engine for Kotlin, it fully supports mixed-language Java/Kotlin projects.
 
+#### 4.1 Other gradle.properties in each sub-project
+
 You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts and Gradle Kotlin Artifacts) and change it's value.
 
-Add `ANDROID_JAR_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact jar. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts) and "jar" artifacts.
+Add `ANDROID_JAR_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact jar. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts) and "jar" artifacts in your Android library project.
 
-Add `APKLIB_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact apklib. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts) and "apklib" artifacts. apklib is a way to bundle an Android library project.
+Add `APKLIB_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact apklib. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts) and "apklib" artifacts in your Android library project. apklib is a way to bundle an Android library project.
 
 Also you can set `POM_ARTIFACT_URL` (default is `POM_ARTIFACT_ID` value), this is makes to easier to have an artifact with one artifactId but the name on JCenter something else.
 
-### 6. Call the script from each sub-modules build.gradle
+### 5. Call the script from each sub-modules build.gradle
 
 Add the following at the end of each `build.gradle` that you wish to upload:
 
@@ -92,7 +96,7 @@ Add the following at the end of each `build.gradle` that you wish to upload:
 apply from: 'https://raw.github.com/Vorlonsoft/GradleMavenPush/master/maven-push.gradle'
 ```
 
-### 7. Build and Deploy/Install
+### 6. Build and Deploy/Install
 
 You can now build and *deploy* on JCenter, Maven Central or Corporate staging/snapshot servers:
 
@@ -112,11 +116,11 @@ Build and *deploy* on local Maven (~/.m2/repository/):
 $ gradle clean build installArchives
 ```
 
-### 8. Inter-module dependency
+#### 6.1 Inter-module dependency
 
 If your modules have dependencies on each other (e.g. implementation project(':other_module')), then you should do one of the following for proper POM generation
 
-- **option A**: add to top level build.gradle:
+- **option A**: add to top level `build.gradle`:
 
 ```groovy
 allprojects {
@@ -125,7 +129,7 @@ allprojects {
 }
 ```
 
-- **option B**: add to top level gradle.properties:
+- **option B**: add to top level `gradle.properties`:
 
 ```properties
 group   = com.vorlonsoft
