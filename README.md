@@ -25,7 +25,7 @@ signing.password          = P@55w0rd
 signing.secretKeyRingFile = ./secring.gpg
 ```
 
-#### 2.1. Alternative, use environment variables
+#### 2.1. Alternative, use environment variables (optional)
 
 You can modify username and password (API Key for JCenter) from environment variables (useful for CI). To use those environment variables on CI just export them:
 
@@ -56,7 +56,7 @@ POM_SCM_CONNECTION     = scm:git@github.com:Vorlonsoft/AndroidRate.git
 
 The `VERSION_NAME` value is important. If it contains the keyword `SNAPSHOT` then the build will upload to the snapshot server, if not then to the release server.
 
-#### 3.1. Modify the version name from environment variable
+#### 3.1. Modify the version name from environment variable (optional)
 
 If there's an environment variable called `VERSION_NAME_EXTRAS`, its value will get appended at the end of `VERSION_NAME`.
 This can be very powerful when running from CI. For example, to have one SNAPSHOT per branch, you could
@@ -78,7 +78,7 @@ JAVADOC_BY_DOKKA = false
 
 Set `JAVADOC_BY_DOKKA` to "true" to generate documentation by Dokka. Dokka is a documentation engine for Kotlin, it fully supports mixed-language Java/Kotlin projects.
 
-#### 4.1 Other gradle.properties in each sub-project
+#### 4.1 Other gradle.properties in each sub-project (optional)
 
 You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts and Gradle Kotlin Artifacts) and change it's value. Depends on Gradle/Plugins versions this option: 1. Changes `<packaging>` tag in the generated pom file only; 2. Changes main artifact file extension and `<packaging>` tag in the generated pom file; 3. Changes main artifact and it's asc file extensions and change `<packaging>` tag in the generated pom file;
 
@@ -118,7 +118,7 @@ Build and *deploy* on local Maven (~/.m2/repository/):
 $ gradle deployOnLocalRepository
 ```
 
-#### 6.1 Inter-module dependency
+#### 6.1 Inter-module dependency (optional)
 
 If your modules have dependencies on each other (e.g. implementation project(':other_module')), then you should do one of the following for proper POM generation
 
@@ -138,7 +138,45 @@ group   = com.vorlonsoft
 version = 1.2.0
 ```
 
-### Other Properties
+#### 6.2 Dokka configuration (optional)
+
+If you want to configure Dokka documentation engine by yourself you must add to `build.gradle`:
+
+* For Android projects:
+
+```properties
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:${dokka_version}"
+    }
+}
+apply plugin: 'org.jetbrains.dokka-android'
+task dokkaAndroidJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    // Task name is important. Set options here.
+}
+```
+
+* For Other projects:
+
+```properties
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
+    }
+}
+apply plugin: 'org.jetbrains.dokka'
+task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    // Task name is important. Set options here.
+}
+```
+
+### Other Properties (optional)
 
 There are other properties which can be set:
 
