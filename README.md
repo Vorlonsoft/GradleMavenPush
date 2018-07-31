@@ -101,19 +101,19 @@ apply from: 'https://raw.github.com/Vorlonsoft/GradleMavenPush/master/maven-push
 You can now build and *deploy* on JCenter, Maven Central or Corporate staging/snapshot servers:
 
 ```bash
-$ gradle clean build uploadArchives
+$ gradle deployOnServerRepository
 ```
 
 Build and *install* on local Maven (~/.m2/repository/):
 
 ```bash
-$ gradle clean build install
+$ gradle installOnLocalRepository
 ```
 
 Build and *deploy* on local Maven (~/.m2/repository/):
 
 ```bash
-$ gradle clean build installArchives
+$ gradle deployOnLocalRepository
 ```
 
 #### 6.1 Inter-module dependency

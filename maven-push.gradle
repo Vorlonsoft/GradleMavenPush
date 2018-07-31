@@ -549,6 +549,21 @@ afterEvaluate { project ->
         it.name == 'dokkaAndroidJavadoc'
     }
 
+    task deployOnServerRepository(type: GradleBuild) {
+        description 'Deploys the artifacts to the server repository.'
+        tasks = ['build', 'uploadArchives']
+    }
+
+    task deployOnLocalRepository(type: GradleBuild) {
+        description 'Deploys the artifacts to the local repository.'
+        tasks = ['build', 'installArchives']
+    }
+
+    task installOnLocalRepository(type: GradleBuild) {
+        description 'Installs the artifacts to the local repository.'
+        tasks = ['build', 'install']
+    }
+
     task dokkaInitializer {
         downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.pom",
                 dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.pom")
@@ -564,7 +579,7 @@ afterEvaluate { project ->
     }
 
     uploadArchives {
-        description 'Deploys the artifacts to the Maven Central repository.'
+        description 'Deploys the artifacts to the server repository.'
         configuration = configurations.archives
         repositories {
             mavenDeployer {
@@ -631,7 +646,7 @@ afterEvaluate { project ->
     }
 
     task installArchives(type: Upload, dependsOn: assemble) {
-        description 'Deploys the artifacts to the local Maven repository.'
+        description 'Deploys the artifacts to the local repository.'
         configuration = configurations.archives
         repositories {
             mavenDeployer {
@@ -690,7 +705,7 @@ afterEvaluate { project ->
 
     if (isAndroid()) {
         task install(type: Upload, dependsOn: assemble) {
-            description 'Installs the artifacts to the local Maven repository.'
+            description 'Installs the artifacts to the local repository.'
             configuration = configurations.archives
             repositories {
                 mavenInstaller {
@@ -879,7 +894,7 @@ afterEvaluate { project ->
         }
     } else {
         install {
-            description 'Installs the artifacts to the local Maven repository.'
+            description 'Installs the artifacts to the local repository.'
             configuration = configurations.archives
             repositories {
                 mavenInstaller {
