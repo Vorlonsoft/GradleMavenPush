@@ -17,417 +17,60 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-def isJCenter() {
-    return (hasProperty('IS_JCENTER') && 'true'.equalsIgnoreCase(IS_JCENTER))
-}
-
-def isAndroid() {
-    return getPlugins().hasPlugin('com.android.application') ||
-           getPlugins().hasPlugin('com.android.library') ||
-           getPlugins().hasPlugin('android') ||
-           getPlugins().hasPlugin('android-library')
-}
-
-def isKotlin() {
-    return getPlugins().hasPlugin('kotlin') ||
-           getPlugins().hasPlugin('kotlin-platform-common') ||
-           getPlugins().hasPlugin('kotlin-platform-jvm') ||
-           getPlugins().hasPlugin('kotlin-platform-js') ||
-           getPlugins().hasPlugin('org.jetbrains.kotlin') ||
-           getPlugins().hasPlugin('org.jetbrains.kotlin.jvm') ||
-           getPlugins().hasPlugin('org.jetbrains.kotlin.js') ||
-           getPlugins().hasPlugin('kotlin2js') ||
-           getPlugins().hasPlugin('kotlin-android') ||
-           getPlugins().hasPlugin('kotlin-android-extensions')
-}
-
-def isDokkaPlugin() {
-    return getPlugins().hasPlugin('org.jetbrains.dokka-android') ||
-           getPlugins().hasPlugin('org.jetbrains.dokka')
-}
-
-def isReleaseBuild() {
-    return !getPomVersionName().contains('SNAPSHOT')
-}
-
-def getReleaseRepositoryUrl() {
-    if (hasProperty('RELEASE_REPOSITORY_URL')) {
-        return RELEASE_REPOSITORY_URL
-    } else if (isJCenter()) {
-        // https://bintray.com/api/v1/maven/{NEXUS_USERNAME}/maven/{POM_ARTIFACT_ID}/;publish=1
-        return 'https://bintray.com/api/v1/maven/' +
-                getRepositoryUsername() +
-                '/maven/' +
-                getPomArtifactUrl() +
-                '/;publish=1'
-    } else {
-        return 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-    }
-}
-
-def getSnapshotRepositoryUrl() {
-    if (hasProperty('SNAPSHOT_REPOSITORY_URL')) {
-        return SNAPSHOT_REPOSITORY_URL
-    } else if (isJCenter()) {
-        return 'https://oss.jfrog.org/artifactory/oss-snapshot-local/'
-    } else {
-        return 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
-
-def getRepositoryUsername() {
-    if (System.getenv().containsKey('NEXUS_USERNAME')) {
-        return System.getenv('NEXUS_USERNAME')
-    } else {
-        return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ''
-    }
-}
-
-def getRepositoryPassword() {
-    if (System.getenv().containsKey('NEXUS_PASSWORD')) {
-        return System.getenv('NEXUS_PASSWORD')
-    } else {
-        return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ''
-    }
-}
-
-def getApklibArtifact() {
-    return hasProperty('APKLIB_ARTIFACT') ? 'true'.equalsIgnoreCase(APKLIB_ARTIFACT) : false
-}
-
-def getAndroidJarArtifact() {
-    return hasProperty('ANDROID_JAR_ARTIFACT') ? 'true'.equalsIgnoreCase(ANDROID_JAR_ARTIFACT) : false
-}
-
-def getFatjarArtifact() {
-    return hasProperty('FATJAR_ARTIFACT') ? 'true'.equalsIgnoreCase(FATJAR_ARTIFACT) : false
-}
-
-def isDokka() {
-    return hasProperty('JAVADOC_BY_DOKKA') ? 'true'.equalsIgnoreCase(JAVADOC_BY_DOKKA) : false
-}
-
-def getDoclintCheck() {
-    return hasProperty('DOCLINT_CHECK') ? 'true'.equalsIgnoreCase(DOCLINT_CHECK) : false
-}
-
-def getJavadocEncoding() {
-    return hasProperty('JAVADOC_ENCODING') ? JAVADOC_ENCODING : 'UTF-8'
-}
-
-def getJavadocDocEncoding() {
-    return hasProperty('JAVADOC_DOC_ENCODING') ? JAVADOC_DOC_ENCODING : 'UTF-8'
-}
-
-def getJavadocCharSet() {
-    return hasProperty('JAVADOC_CHARSET') ? JAVADOC_CHARSET : 'UTF-8'
-}
-
-/**
- * HTML version in the document comments.
- *
- * @return boolean true if HTML version in the document comments is 5, false if something else.
- */
-def isHtml5() {
-    return hasProperty('JAVADOC_HTML_VERSION') ? (JAVADOC_HTML_VERSION == '5') : false
-}
-
-def getPomGroupId() {
-    if (hasProperty('GROUP')) {
-        return GROUP
-    } else if ((android.libraryVariants != null) && (android.libraryVariants.size() > 0)) {
-        return android.libraryVariants[0].applicationId
-    } else if ((android.applicationVariants != null) && (android.applicationVariants.size() > 0)) {
-        return android.applicationVariants[0].applicationId
-    } else {
-        throw new InvalidUserDataException('You must set GROUP in gradle.properties file.')
-    }
-}
-
-def getPomArtifactId() {
-    if (hasProperty('POM_ARTIFACT_ID')) {
-        return POM_ARTIFACT_ID
-    } else {
-        throw new InvalidUserDataException('You must set POM_ARTIFACT_ID in gradle.properties file.')
-    }
-}
-
-def getPomArtifactUrl() {
-    return hasProperty('POM_ARTIFACT_URL') ? POM_ARTIFACT_URL : getPomArtifactId()
-}
-
-def getPomVersionName() {
-    def versionNameExtras = (System.getenv().containsKey('VERSION_NAME_EXTRAS')) ? System.getenv('VERSION_NAME_EXTRAS') : ''
-    if (hasProperty('VERSION_NAME')) {
-        return VERSION_NAME + versionNameExtras
-    } else if (android.defaultConfig.versionName != null) {
-        return android.defaultConfig.versionName + versionNameExtras
-    } else {
-        throw new InvalidUserDataException('You must set VERSION_NAME in gradle.properties file.')
-    }
-}
-
-def getPomPackaging() {
-    if (hasProperty('POM_PACKAGING')) {
-        return POM_PACKAGING
-    } else {
-        return isAndroid() ? 'aar' : 'jar'
-    }
-}
-
-def getPomName() {
-    if (hasProperty('POM_NAME')) {
-        return POM_NAME
-    } else {
-        throw new InvalidUserDataException('You must set POM_NAME in gradle.properties file.')
-    }
-}
-
-def getPomDescription() {
-    if (hasProperty('POM_DESCRIPTION')) {
-        return POM_DESCRIPTION
-    } else {
-        throw new InvalidUserDataException('You must set POM_DESCRIPTION in gradle.properties file.')
-    }
-}
-
-def getPomUniqueVersion() {
-    return hasProperty('POM_GENERATE_UNIQUE_SNAPSHOTS') ? 'true'.equalsIgnoreCase(POM_GENERATE_UNIQUE_SNAPSHOTS) : true
-}
-
-def getPomUrl() {
-    if (hasProperty('POM_URL')) {
-        return POM_URL
-    } else {
-        throw new InvalidUserDataException('You must set POM_URL in gradle.properties file.')
-    }
-}
-
-def getPomInceptionYear() {
-    return hasProperty('POM_INCEPTION_YEAR') ? POM_INCEPTION_YEAR : ''
-}
-
-def getPomScmUrl() {
-    return hasProperty('POM_SCM_URL') ? POM_SCM_URL : getPomUrl()
-}
-
-def getPomScmConnection() {
-    if (hasProperty('POM_SCM_CONNECTION')) {
-        return POM_SCM_CONNECTION
-    } else {
-        throw new InvalidUserDataException('You must set POM_SCM_CONNECTION in gradle.properties file.')
-    }
-}
-
-def getPomScmDevConnection() {
-    return hasProperty('POM_SCM_DEV_CONNECTION') ? POM_SCM_DEV_CONNECTION : getPomScmConnection()
-}
-
-def getPomScmTag() {
-    return hasProperty('POM_SCM_TAG') ? POM_SCM_TAG : 'HEAD'
-}
-
-def getPomLicenseName() {
-    if (hasProperty('POM_LICENCE_NAME')) {
-        return POM_LICENCE_NAME
-    } else {
-        throw new InvalidUserDataException('You must set POM_LICENCE_NAME in gradle.properties file.')
-    }
-}
-
-def getPomLicenseUrl() {
-    if (hasProperty('POM_LICENCE_URL')) {
-        return POM_LICENCE_URL
-    } else {
-        throw new InvalidUserDataException('You must set POM_LICENCE_URL in gradle.properties file.')
-    }
-}
-
-def getPomLicenseDist() {
-    return hasProperty('POM_LICENCE_DIST') ? POM_LICENCE_DIST : 'repo'
-}
-
-def getPomLicenseComments() {
-    return hasProperty('POM_LICENCE_COMMENTS') ? POM_LICENCE_COMMENTS : ''
-}
-
-def getOrg() {
-    return hasProperty('POM_ORG') ? POM_ORG : ''
-}
-
-def getOrgUrl() {
-    return hasProperty('POM_ORG_URL') ? POM_ORG_URL : ''
-}
-
-def getDeveloperId() {
-    if (hasProperty('POM_DEVELOPER_ID')) {
-        return POM_DEVELOPER_ID
-    } else {
-        throw new InvalidUserDataException('You must set POM_DEVELOPER_ID in gradle.properties file.')
-    }
-}
-
-def getDeveloperName() {
-    if (hasProperty('POM_DEVELOPER_NAME')) {
-        return POM_DEVELOPER_NAME
-    } else {
-        throw new InvalidUserDataException('You must set POM_DEVELOPER_NAME in gradle.properties file.')
-    }
-}
-
-def getDeveloperEmail() {
-    return hasProperty('POM_DEVELOPER_EMAIL') ? POM_DEVELOPER_EMAIL : 'lazy-developer-who-does-not-read-readme@example.com'
-}
-
-def getDeveloperUrl() {
-    return hasProperty('POM_DEVELOPER_URL') ? POM_DEVELOPER_URL : ''
-}
-
-def getDeveloperOrg() {
-    return hasProperty('POM_DEVELOPER_ORG') ? POM_DEVELOPER_ORG : getOrg()
-}
-
-def getDeveloperOrgUrl() {
-    return hasProperty('POM_DEVELOPER_ORG_URL') ? POM_DEVELOPER_ORG_URL : getOrgUrl()
-}
-
-def getDeveloperRoles() {
-    if (hasProperty('POM_DEVELOPER_ROLES')) {
-        if (hasProperty('POM_DEVELOPER_ROLE')) {
-            def developerRoles = getProperty('POM_DEVELOPER_ROLE') + ',' + getProperty('POM_DEVELOPER_ROLES')
-            return developerRoles.split(',')
-        } else {
-            return getProperty('POM_DEVELOPER_ROLES').split(',')
-        }
-    } else {
-        return hasProperty('POM_DEVELOPER_ROLE') ? [POM_DEVELOPER_ROLE] : ['Software Developer']
-    }
-}
-
-def getDeveloperTimezone() {
-    return hasProperty('POM_DEVELOPER_TIMEZONE') ? POM_DEVELOPER_TIMEZONE : ''
-}
-
-def getDevelopers() {
-    return hasProperty('POM_DEVELOPERS') ? getProperty('POM_DEVELOPERS').split(',') : ['']
-}
-
-def getContributors() {
-    return hasProperty('POM_CONTRIBUTORS') ? getProperty('POM_CONTRIBUTORS').split(',') : ['']
-}
-
-def getIssueSystem() {
-    return hasProperty('POM_ISSUE_SYSTEM') ?  POM_ISSUE_SYSTEM : ''
-}
-
-def getIssueSystemUrl() {
-    return hasProperty('POM_ISSUE_SYSTEM_URL') ? POM_ISSUE_SYSTEM_URL : ''
-}
-
-def getCiSystem() {
-    return hasProperty('POM_CI_SYSTEM') ? POM_CI_SYSTEM : ''
-}
-
-def getCiSystemUrl() {
-    return hasProperty('POM_CI_SYSTEM_URL') ? POM_CI_SYSTEM_URL : ''
-}
-
-def getMailingLists() {
-    return hasProperty('POM_MAILING_LISTS') ? getProperty('POM_MAILING_LISTS').split(',') : ['']
-}
-
-def getRepositories() {
-    if (isReleaseBuild()) {
-        return hasProperty('POM_REPOSITORIES') ? getProperty('POM_REPOSITORIES').split(',') : ['']
-    } else {
-        if (hasProperty('POM_SNAPSHOT_REPOSITORIES')) {
-            return getProperty('POM_SNAPSHOT_REPOSITORIES').split(',')
-        } else {
-            return hasProperty('POM_REPOSITORIES') ? getProperty('POM_REPOSITORIES').split(',') : ['']
-        }
-    }
-}
-
-def getDistDownloadUrl() {
-    return hasProperty('POM_DIST_DOWNLOAD_URL') ? POM_DIST_DOWNLOAD_URL : ''
-}
-
-static def getJavaAPISpecificationLink() {
-    if (JavaVersion.current().isJava10Compatible()) {
-        return 'https://docs.oracle.com/javase/10/docs/api/overview-summary.html'
-    } else if (JavaVersion.current().isJava9()) {
-        return 'https://docs.oracle.com/javase/9/docs/api/overview-summary.html'
-    } else if (JavaVersion.current().isJava8()) {
-        return 'https://docs.oracle.com/javase/8/docs/api/'
-    } else if (JavaVersion.current().isJava7()) {
-        return 'https://docs.oracle.com/javase/7/docs/api/'
-    } else if (JavaVersion.current().isJava6()) {
-        return 'https://docs.oracle.com/javase/6/docs/api/'
-    } else if (JavaVersion.current().isJava5()) {
-        return 'https://docs.oracle.com/javase/1.5.0/docs/api/'
-    } else {
-        return ''
-    }
-}
-
-static def downloadLib(url, path, version, name) {
-    File file = new File("${System.properties['user.home']}/.m2/repository/${path}/${version}/${name}")
-    file.parentFile.mkdirs()
-    if (!file.exists()) {
-        new URL(url).withInputStream { downloadStream ->
-            file.withOutputStream { fileOutputStream ->
-                fileOutputStream << downloadStream
-            }
-        }
-    }
-}
-
 afterEvaluate { project ->
-    def androidJarArtifact = getAndroidJarArtifact()
-    def fatjarArtifact = getFatjarArtifact()
-    def apklibArtifact = getApklibArtifact()
-    def dokkaFatJarVersion = '0.9.17'
-    def dokkaFatJarPath = 'org/jetbrains/dokka/dokka-fatjar'
-    def pomGroupId = getPomGroupId()
-    def pomArtifactId = getPomArtifactId()
-    def pomVersionName = getPomVersionName()
-    def pomName = getPomName()
-    def pomPackaging = getPomPackaging()
-    def pomDescription = getPomDescription()
-    def pomUniqueVersion = getPomUniqueVersion()
-    def pomUrl = getPomUrl()
-    def pomInceptionYear = getPomInceptionYear()
-    def pomScmUrl = getPomScmUrl()
-    def pomScmConnection = getPomScmConnection()
-    def pomScmDevConnection = getPomScmDevConnection()
-    def pomScmTag = getPomScmTag()
-    def pomLicenseName = getPomLicenseName()
-    def pomLicenseUrl = getPomLicenseUrl()
-    def pomDistribution = getPomLicenseDist()
-    def pomLicenseComments = getPomLicenseComments()
-    def pomOrg = getOrg()
-    def pomOrgUrl = getOrgUrl()
-    def pomDeveloperId = getDeveloperId()
-    def pomDeveloperName = getDeveloperName()
-    def pomDeveloperEmail = getDeveloperEmail()
-    def pomDeveloperUrl = getDeveloperUrl()
-    def pomDeveloperOrg = getDeveloperOrg()
-    def pomDeveloperOrgUrl = getDeveloperOrgUrl()
-    def pomDeveloperRoles = getDeveloperRoles()
-    def pomDeveloperTimezone = getDeveloperTimezone()
-    def pomDevelopers = getDevelopers()
-    def pomContributors = getContributors()
-    def pomIssueSystem = getIssueSystem()
-    def pomIssueSystemUrl = getIssueSystemUrl()
-    def pomCiSystem = getCiSystem()
-    def pomCiSystemUrl = getCiSystemUrl()
-    def pomMailingLists = getMailingLists()
-    def pomRepositories = getRepositories()
-    def pomDistDownloadUrl = getDistDownloadUrl()
-    def pomPackagingConfig = {
+    final boolean androidOs = MavenPush.with(project).isAndroid()
+    final boolean kotlinLanguage = MavenPush.with(project).isKotlin()
+    final boolean androidJarArtifact = MavenPush.with(project).getAndroidJarArtifact()
+    final boolean fatjarArtifact = MavenPush.with(project).getFatjarArtifact()
+    final boolean apklibArtifact = MavenPush.with(project).getApklibArtifact()
+    final boolean pomUniqueVersion = MavenPush.with(project).getPomUniqueVersion()
+    final boolean dokkaEngine = MavenPush.with(project).isDokka()
+    final boolean dokkaPlugin = MavenPush.with(project).isDokkaPlugin()
+    final String[] gradleVersion = gradle.gradleVersion.split('[\\.]')
+    final int gradleMajor = Integer.parseInt(gradleVersion[0])
+    final String dokkaFatJarVersion = '0.9.17'
+    final String dokkaFatJarPath = 'org/jetbrains/dokka/dokka-fatjar'
+    final String repositoryUsername = MavenPush.with(project).getRepositoryUsername()
+    final String repositoryPassword = MavenPush.with(project).getRepositoryPassword()
+    final String pomGroupId = MavenPush.with(project).getPomGroupId()
+    final String pomArtifactId = MavenPush.with(project).getPomArtifactId()
+    final String pomVersionName = MavenPush.with(project).getPomVersionName()
+    final String pomName = MavenPush.with(project).getPomName()
+    final String pomPackaging = MavenPush.with(project).getPomPackaging()
+    final String pomDescription = MavenPush.with(project).getPomDescription()
+    final String pomUrl = MavenPush.with(project).getPomUrl()
+    final String pomInceptionYear = MavenPush.with(project).getPomInceptionYear()
+    final String pomScmUrl = MavenPush.with(project).getPomScmUrl()
+    final String pomScmConnection = MavenPush.with(project).getPomScmConnection()
+    final String pomScmDevConnection = MavenPush.with(project).getPomScmDevConnection()
+    final String pomScmTag = MavenPush.with(project).getPomScmTag()
+    final String pomLicenseName = MavenPush.with(project).getPomLicenseName()
+    final String pomLicenseUrl = MavenPush.with(project).getPomLicenseUrl()
+    final String pomDistribution = MavenPush.with(project).getPomLicenseDist()
+    final String pomLicenseComments = MavenPush.with(project).getPomLicenseComments()
+    final String pomOrg = MavenPush.with(project).getOrg()
+    final String pomOrgUrl = MavenPush.with(project).getOrgUrl()
+    final String pomDeveloperId = MavenPush.with(project).getDeveloperId()
+    final String pomDeveloperName = MavenPush.with(project).getDeveloperName()
+    final String pomDeveloperEmail = MavenPush.with(project).getDeveloperEmail()
+    final String pomDeveloperUrl = MavenPush.with(project).getDeveloperUrl()
+    final String pomDeveloperOrg = MavenPush.with(project).getDeveloperOrg()
+    final String pomDeveloperOrgUrl = MavenPush.with(project).getDeveloperOrgUrl()
+    final String[] pomDeveloperRoles = MavenPush.with(project).getDeveloperRoles()
+    final String pomDeveloperTimezone = MavenPush.with(project).getDeveloperTimezone()
+    final String[] pomDevelopers = MavenPush.with(project).getDevelopers()
+    final String[] pomContributors = MavenPush.with(project).getContributors()
+    final String pomIssueSystem = MavenPush.with(project).getIssueSystem()
+    final String pomIssueSystemUrl = MavenPush.with(project).getIssueSystemUrl()
+    final String pomCiSystem = MavenPush.with(project).getCiSystem()
+    final String pomCiSystemUrl = MavenPush.with(project).getCiSystemUrl()
+    final String[] pomMailingLists = MavenPush.with(project).getMailingLists()
+    final String[] pomRepositories = MavenPush.with(project).getRepositories()
+    final String pomDistDownloadUrl = MavenPush.with(project).getDistDownloadUrl()
+    final def pomPackagingConfig = {
         packaging pomPackaging
     }
-    def pomConfig = {
+    final def pomConfig = {
         url pomUrl
         if (pomInceptionYear != '') {
             inceptionYear pomInceptionYear
@@ -471,7 +114,7 @@ afterEvaluate { project ->
                 }
                 if (pomDeveloperRoles.size() > 0) {
                     roles {
-                        for (int i = 0; i < pomDeveloperRoles.size(); i++) {
+                        for (byte i = 0; i < pomDeveloperRoles.size(); i++) {
                             role pomDeveloperRoles[i]
                         }
                     }
@@ -480,7 +123,7 @@ afterEvaluate { project ->
                     timezone pomDeveloperTimezone
                 }
             }
-            for (int i = 0; i + 2 < pomDevelopers.size(); i += 3) {
+            for (short i = 0; i + 2 < pomDevelopers.size(); i += 3) {
                 developer {
                     id pomDevelopers[i]
                     name pomDevelopers[i + 1]
@@ -491,7 +134,7 @@ afterEvaluate { project ->
 
         if (pomContributors.size() > 1) {
             contributors {
-                for (int i = 0; i + 1 < pomContributors.size(); i += 2) {
+                for (short i = 0; i + 1 < pomContributors.size(); i += 2) {
                     contributor {
                         name pomContributors[i]
                         email pomContributors[i + 1]
@@ -502,7 +145,7 @@ afterEvaluate { project ->
 
         if (pomMailingLists.size() > 2) {
             mailingLists {
-                for (int i = 0; i + 2 < pomMailingLists.size(); i += 3) {
+                for (byte i = 0; i + 2 < pomMailingLists.size(); i += 3) {
                     mailingList {
                         name pomMailingLists[i]
                         subscribe pomMailingLists[i + 1]
@@ -547,40 +190,45 @@ afterEvaluate { project ->
             }
         }
     }
-    def projectDokkaJavadocTask = !isDokkaPlugin() ? null : project.tasks.find {
+    final def projectDokkaJavadocTask = !dokkaPlugin ? null : project.tasks.find {
         it.name == 'dokkaJavadoc'
     }
-    def projectDokkaAndroidJavadocTask = !isDokkaPlugin() ? null : project.tasks.find {
+    final def projectDokkaAndroidJavadocTask = !dokkaPlugin ? null : project.tasks.find {
         it.name == 'dokkaAndroidJavadoc'
     }
 
-    task deployOnServerRepository(type: GradleBuild) {
-        description 'Deploys the artifacts to the server repository.'
-        tasks = ['build', 'uploadArchives']
-    }
-
-    task deployOnLocalRepository(type: GradleBuild) {
-        description 'Deploys the artifacts to the local repository.'
-        tasks = ['build', 'installArchives']
-    }
-
-    task installOnLocalRepository(type: GradleBuild) {
-        description 'Installs the artifacts to the local repository.'
-        tasks = ['build', 'install']
-    }
-
     task dokkaInitializer {
-        downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.pom",
+        MavenPush.downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.pom",
                 dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.pom")
-        downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
+        MavenPush.downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
                 dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.jar")
     }
 
-    signing {
-        required {
-            isReleaseBuild() && gradle.taskGraph.hasTask('uploadArchives')
+    gradle.taskGraph.whenReady { taskGraph ->
+        if (gradle.taskGraph.hasTask('uploadArchives') ||
+                gradle.taskGraph.hasTask('deployOnServerRepository')) {
+            signing {
+                required {
+                    MavenPush.with(project).isReleaseBuild()
+                }
+                sign configurations.archives
+            }
         }
-        sign configurations.archives
+    }
+
+    task deployOnServerRepository(type: GradleBuild, dependsOn: assemble) {
+        description 'Deploys the artifacts to the server repository.'
+        tasks = ['clean', 'build', 'uploadArchives']
+    }
+
+    task deployOnLocalRepository(type: GradleBuild, dependsOn: assemble) {
+        description 'Deploys the artifacts to the local repository.'
+        tasks = ['clean', 'build', 'installArchives']
+    }
+
+    task installOnLocalRepository(type: GradleBuild, dependsOn: assemble) {
+        description 'Installs the artifacts to the local repository.'
+        tasks = ['clean', 'build', 'install']
     }
 
     uploadArchives {
@@ -597,11 +245,11 @@ afterEvaluate { project ->
                 pom.version = pomVersionName
                 pom.packaging = pomPackaging
 
-                repository(url: getReleaseRepositoryUrl()) {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                repository(url: MavenPush.with(project).getReleaseRepositoryUrl()) {
+                    authentication(userName: repositoryUsername, password: repositoryPassword)
                 }
-                snapshotRepository(url: getSnapshotRepositoryUrl()) {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                snapshotRepository(url: MavenPush.with(project).getSnapshotRepositoryUrl()) {
+                    authentication(userName: repositoryUsername, password: repositoryPassword)
                 }
 
                 pom.project {
@@ -612,7 +260,7 @@ afterEvaluate { project ->
 
                     if (pomRepositories.size() > 1) {
                         repositories {
-                            for (int i = 0; i + 1 < pomRepositories.size(); i += 2) {
+                            for (byte i = 0; i + 1 < pomRepositories.size(); i += 2) {
                                 repository {
                                     id pomRepositories[i]
                                     url pomRepositories[i + 1]
@@ -623,9 +271,9 @@ afterEvaluate { project ->
                 }
 
                 pom.withXml {
-                    def root = asNode()
-                    def name = root.name
-                    def description = root.description
+                    final def root = asNode()
+                    final def name = root.name
+                    final def description = root.description
                     if (root.packaging.size() == 1) {
                         root.remove(root.packaging)
                     }
@@ -636,12 +284,12 @@ afterEvaluate { project ->
                     root.append(description)
                     root.children().last() + pomConfig
                     if (root.dependencies.size() == 1) {
-                        def dependencies = root.dependencies
+                        final def dependencies = root.dependencies
                         root.remove(root.dependencies)
                         root.append(dependencies)
                     }
                     if (root.repositories.size() == 1) {
-                        def repositories = root.repositories
+                        final def repositories = root.repositories
                         root.remove(root.repositories)
                         root.append(repositories)
                     }
@@ -655,7 +303,7 @@ afterEvaluate { project ->
         configuration = configurations.archives
         repositories {
             mavenDeployer {
-                
+
                 pom.groupId = pomGroupId
                 pom.artifactId = pomArtifactId
                 pom.version = pomVersionName
@@ -671,7 +319,7 @@ afterEvaluate { project ->
 
                     if (pomRepositories.size() > 1) {
                         repositories {
-                            for (int i = 0; i + 1 < pomRepositories.size(); i += 2) {
+                            for (byte i = 0; i + 1 < pomRepositories.size(); i += 2) {
                                 repository {
                                     id pomRepositories[i]
                                     url pomRepositories[i + 1]
@@ -682,9 +330,9 @@ afterEvaluate { project ->
                 }
 
                 pom.withXml {
-                    def root = asNode()
-                    def name = root.name
-                    def description = root.description
+                    final def root = asNode()
+                    final def name = root.name
+                    final def description = root.description
                     if (root.packaging.size() == 1) {
                         root.remove(root.packaging)
                     }
@@ -695,12 +343,12 @@ afterEvaluate { project ->
                     root.append(description)
                     root.children().last() + pomConfig
                     if (root.dependencies.size() == 1) {
-                        def dependencies = root.dependencies
+                        final def dependencies = root.dependencies
                         root.remove(root.dependencies)
                         root.append(dependencies)
                     }
                     if (root.repositories.size() == 1) {
-                        def repositories = root.repositories
+                        final def repositories = root.repositories
                         root.remove(root.repositories)
                         root.append(repositories)
                     }
@@ -709,7 +357,7 @@ afterEvaluate { project ->
         }
     }
 
-    if (isAndroid()) {
+    if (androidOs) {
         task install(type: Upload, dependsOn: assemble) {
             description 'Installs the artifacts to the local repository.'
             configuration = configurations.archives
@@ -727,7 +375,7 @@ afterEvaluate { project ->
 
                         if (pomRepositories.size() > 1) {
                             repositories {
-                                for (int i = 0; i + 1 < pomRepositories.size(); i += 2) {
+                                for (byte i = 0; i + 1 < pomRepositories.size(); i += 2) {
                                     repository {
                                         id pomRepositories[i]
                                         url pomRepositories[i + 1]
@@ -738,9 +386,9 @@ afterEvaluate { project ->
                     }
 
                     pom.withXml {
-                        def root = asNode()
-                        def name = root.name
-                        def description = root.description
+                        final def root = asNode()
+                        final def name = root.name
+                        final def description = root.description
                         if (root.packaging.size() == 1) {
                             root.remove(root.packaging)
                         }
@@ -751,12 +399,12 @@ afterEvaluate { project ->
                         root.append(description)
                         root.children().last() + pomConfig
                         if (root.dependencies.size() == 1) {
-                            def dependencies = root.dependencies
+                            final def dependencies = root.dependencies
                             root.remove(root.dependencies)
                             root.append(dependencies)
                         }
                         if (root.repositories.size() == 1) {
-                            def repositories = root.repositories
+                            final def repositories = root.repositories
                             root.remove(root.repositories)
                             root.append(repositories)
                         }
@@ -766,8 +414,9 @@ afterEvaluate { project ->
         }
 
         if (fatjarArtifact) {
-            task createAndroidFatjar(type: Jar) {
+            task createAndroidFatjar(type: Jar, dependsOn: 'check') {
                 classifier = 'fatjar'
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
                 configurations.implementation.setCanBeResolved(true)
                 configurations.api.setCanBeResolved(true)
                 from {
@@ -776,7 +425,7 @@ afterEvaluate { project ->
                     }.collect {
                         if (it.isDirectory()) {
                             it
-                        } else if(it.getName().endsWith('.aar')) {
+                        } else if (it.getName().endsWith('.aar')) {
                             zipTree(it).findAll {
                                 it.getName() == 'classes.jar'
                             }.collect {
@@ -793,7 +442,7 @@ afterEvaluate { project ->
                     }.collect {
                         if (it.isDirectory()) {
                             it
-                        } else if(it.getName().endsWith('.aar')) {
+                        } else if (it.getName().endsWith('.aar')) {
                             zipTree(it).findAll {
                                 it.getName() == 'classes.jar'
                             }.collect {
@@ -810,7 +459,7 @@ afterEvaluate { project ->
                     }.collect {
                         if (it.isDirectory()) {
                             it
-                        } else if(it.getName().endsWith('.aar')) {
+                        } else if (it.getName().endsWith('.aar')) {
                             zipTree(it).findAll {
                                 it.getName() == 'classes.jar'
                             }.collect {
@@ -821,41 +470,83 @@ afterEvaluate { project ->
                         }
                     }
                 }
-                from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
                 from "${buildDir}/tmp/kotlin-classes/release/"
+                from "${buildDir}/intermediates/javac/release/compileReleaseJavaWithJavac/classes/"
+                from zipTree("${buildDir}/intermediates/packaged-classes/release/classes.jar")
+                from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
+                from zipTree("${buildDir}/intermediates/intermediate-jars/release/classes.jar")
             }
         }
 
         if (androidJarArtifact) {
-            task createJar(type: Jar) {
+            task createJar(type: Jar, dependsOn: 'check') {
                 classifier = ''
-                from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
                 from "${buildDir}/tmp/kotlin-classes/release/"
+                from "${buildDir}/intermediates/javac/release/compileReleaseJavaWithJavac/classes/"
+                from zipTree("${buildDir}/intermediates/packaged-classes/release/classes.jar")
+                from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
+                from zipTree("${buildDir}/intermediates/intermediate-jars/release/classes.jar")
             }
         }
 
         if (apklibArtifact) {
-            task createApklib(type: Zip) {
-                appendix = extension = 'apklib'
+            if (kotlinLanguage) {
+                task createApklibKotlin(type: Zip) {
+                    appendix = extension = 'apklib'
 
-                from 'AndroidManifest.xml'
-                into('res') {
-                    from 'res'
+                    from '/src/main/AndroidManifest.xml'
+                    into('assets') {
+                        from '/src/main/assets/'
+                    }
+                    into('libs') {
+                        from '/libs/'
+                    }
+                    into('res') {
+                        from '/src/main/res/'
+                    }
+                    into('src') {
+                        final String[] sources
+                        if (android.sourceSets.main.kotlin.srcDirs != null) {
+                            sources = android.sourceSets.main.java.srcDirs + android.sourceSets.main.kotlin.srcDirs
+                        } else {
+                            sources = android.sourceSets.main.java.srcDirs
+                        }
+                        final byte srcDirsNumber = sources.size()
+                        for (byte i = 0; i < srcDirsNumber; i++) {
+                            from sources[i]
+                        }
+                    }
                 }
-                into('src') {
-                    from 'src'
+            } else {
+                task createApklib(type: Zip) {
+                    appendix = extension = 'apklib'
+
+                    from '/src/main/AndroidManifest.xml'
+                    into('assets') {
+                        from '/src/main/assets/'
+                    }
+                    into('libs') {
+                        from '/libs/'
+                    }
+                    into('res') {
+                        from '/src/main/res/'
+                    }
+                    into('src') {
+                        from android.sourceSets.main.java.sourceFiles
+                    }
                 }
             }
         }
 
-        if (isDokka()) {
+        if (dokkaEngine) {
             if ((projectDokkaAndroidJavadocTask == null) && (projectDokkaJavadocTask == null)) {
                 task androidDokka(type: Exec, dependsOn: dokkaInitializer) {
-                    def srcDirsJavaNumber = (android.sourceSets.main.java.srcDirs != null) ? android.sourceSets.main.java.srcDirs.size() : 0
-                    def srcDirsKotlinNumber = (isKotlin() && (android.sourceSets.main.kotlin.srcDirs != null)) ? android.sourceSets.main.kotlin.srcDirs.size() : 0
-                    def classpathNumber = android.getBootClasspath().size()
-                    def classpath = (classpathNumber > 0) ? android.getBootClasspath()[0] : ''
-                    def javaAPISpecificationLink = getJavaAPISpecificationLink()
+                    final byte srcDirsJavaNumber = (android.sourceSets.main.java.srcDirs != null) ? android.sourceSets.main.java.srcDirs.size() : 0
+                    final byte srcDirsKotlinNumber = (kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) ? android.sourceSets.main.kotlin.srcDirs.size() : 0
+                    final byte classpathNumber = (android.getBootClasspath() != null) ? android.getBootClasspath().size() : 0
+                    final String classpath = (classpathNumber > 0) ? android.getBootClasspath()[0] : ''
+                    final String javaAPISpecificationLink = MavenPush.getJavaAPISpecificationLink()
                     if (srcDirsJavaNumber > 0) {
                         mkdir android.sourceSets.main.java.srcDirs[0]
                         if (srcDirsJavaNumber > 1) {
@@ -900,7 +591,7 @@ afterEvaluate { project ->
         } else {
             task androidJavadocs(type: Javadoc) {
                 source = android.sourceSets.main.java.srcDirs
-                if (isKotlin() && (android.sourceSets.main.kotlin.srcDirs != null)) {
+                if (kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) {
                     source += android.sourceSets.main.kotlin.srcDirs
                 }
                 classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
@@ -917,15 +608,18 @@ afterEvaluate { project ->
             }
         }
 
-        if (isKotlin()) {
+        if (kotlinLanguage) {
             task androidKotlinSourcesJar(type: Jar) {
                 classifier = 'sources'
-                from android.sourceSets.main.java.sourceFiles
-                if (isKotlin() && (android.sourceSets.main.kotlin.srcDirs != null)) {
-                    def srcDirsKotlinNumber = android.sourceSets.main.kotlin.srcDirs.size()
-                    for (int i = 0; i < srcDirsKotlinNumber; i++) {
-                        from android.sourceSets.main.kotlin.srcDirs[i]
-                    }
+                final String[] sources
+                if (android.sourceSets.main.kotlin.srcDirs != null) {
+                    sources = android.sourceSets.main.java.srcDirs + android.sourceSets.main.kotlin.srcDirs
+                } else {
+                    sources = android.sourceSets.main.java.srcDirs
+                }
+                final byte srcDirsNumber = sources.size()
+                for (byte i = 0; i < srcDirsNumber; i++) {
+                    from sources[i]
                 }
             }
         } else {
@@ -935,31 +629,513 @@ afterEvaluate { project ->
             }
         }
 
-        artifacts {
-            if (fatjarArtifact) {
-                archives createAndroidFatjar
-            }
+        if (fatjarArtifact) {
             if (androidJarArtifact) {
-                archives createJar
-            }
-            if (apklibArtifact) {
-                archives createApklib
-            }
-            if (isDokka()) {
-                if (projectDokkaAndroidJavadocTask != null) {
-                    archives projectDokkaAndroidJavadocTaskJar
-                } else if (projectDokkaJavadocTask != null) {
-                    archives projectDokkaJavadocTaskJar
+                if (apklibArtifact) {
+                    if (kotlinLanguage) {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives createApklibKotlin
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives createApklibKotlin
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives createApklibKotlin
+                                    archives androidDokkaJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createAndroidFatjar
+                                archives createJar
+                                archives createApklibKotlin
+                                archives androidJavadocsJar
+                                archives androidKotlinSourcesJar
+                            }
+                        }
+                    } else {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives createApklib
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives createApklib
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives createApklib
+                                    archives androidDokkaJar
+                                    archives androidSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createAndroidFatjar
+                                archives createJar
+                                archives createApklib
+                                archives androidJavadocsJar
+                                archives androidSourcesJar
+                            }
+                        }
+                    }
                 } else {
-                    archives androidDokkaJar
+                    if (kotlinLanguage) {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives androidDokkaJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createAndroidFatjar
+                                archives createJar
+                                archives androidJavadocsJar
+                                archives androidKotlinSourcesJar
+                            }
+                        }
+                    } else {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createJar
+                                    archives androidDokkaJar
+                                    archives androidSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createAndroidFatjar
+                                archives createJar
+                                archives androidJavadocsJar
+                                archives androidSourcesJar
+                            }
+                        }
+                    }
                 }
             } else {
-                archives androidJavadocsJar
+                if (apklibArtifact) {
+                    if (kotlinLanguage) {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createApklibKotlin
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createApklibKotlin
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createApklibKotlin
+                                    archives androidDokkaJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createAndroidFatjar
+                                archives createApklibKotlin
+                                archives androidJavadocsJar
+                                archives androidKotlinSourcesJar
+                            }
+                        }
+                    } else {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createApklib
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createApklib
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives createApklib
+                                    archives androidDokkaJar
+                                    archives androidSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createAndroidFatjar
+                                archives createApklib
+                                archives androidJavadocsJar
+                                archives androidSourcesJar
+                            }
+                        }
+                    }
+                } else {
+                    if (kotlinLanguage) {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives androidDokkaJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createAndroidFatjar
+                                archives androidJavadocsJar
+                                archives androidKotlinSourcesJar
+                            }
+                        }
+                    } else {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createAndroidFatjar
+                                    archives androidDokkaJar
+                                    archives androidSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createAndroidFatjar
+                                archives androidJavadocsJar
+                                archives androidSourcesJar
+                            }
+                        }
+                    }
+                }
             }
-            if (isKotlin()) {
-                archives androidKotlinSourcesJar
+        } else {
+            if (androidJarArtifact) {
+                if (apklibArtifact) {
+                    if (kotlinLanguage) {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createJar
+                                    archives createApklibKotlin
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createJar
+                                    archives createApklibKotlin
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createJar
+                                    archives createApklibKotlin
+                                    archives androidDokkaJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createJar
+                                archives createApklibKotlin
+                                archives androidJavadocsJar
+                                archives androidKotlinSourcesJar
+                            }
+                        }
+                    } else {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createJar
+                                    archives createApklib
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createJar
+                                    archives createApklib
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createJar
+                                    archives createApklib
+                                    archives androidDokkaJar
+                                    archives androidSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createJar
+                                archives createApklib
+                                archives androidJavadocsJar
+                                archives androidSourcesJar
+                            }
+                        }
+                    }
+                } else {
+                    if (kotlinLanguage) {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createJar
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createJar
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createJar
+                                    archives androidDokkaJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createJar
+                                archives androidJavadocsJar
+                                archives androidKotlinSourcesJar
+                            }
+                        }
+                    } else {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createJar
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createJar
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createJar
+                                    archives androidDokkaJar
+                                    archives androidSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createJar
+                                archives androidJavadocsJar
+                                archives androidSourcesJar
+                            }
+                        }
+                    }
+                }
             } else {
-                archives androidSourcesJar
+                if (apklibArtifact) {
+                    if (kotlinLanguage) {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createApklibKotlin
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createApklibKotlin
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createApklibKotlin
+                                    archives androidDokkaJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createApklibKotlin
+                                archives androidJavadocsJar
+                                archives androidKotlinSourcesJar
+                            }
+                        }
+                    } else {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives createApklib
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives createApklib
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives createApklib
+                                    archives androidDokkaJar
+                                    archives androidSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives createApklib
+                                archives androidJavadocsJar
+                                archives androidSourcesJar
+                            }
+                        }
+                    }
+                } else {
+                    if (kotlinLanguage) {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives androidDokkaJar
+                                    archives androidKotlinSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives androidJavadocsJar
+                                archives androidKotlinSourcesJar
+                            }
+                        }
+                    } else {
+                        if (dokkaEngine) {
+                            if (projectDokkaAndroidJavadocTask != null) {
+                                artifacts {
+                                    archives projectDokkaAndroidJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else if (projectDokkaJavadocTask != null) {
+                                artifacts {
+                                    archives projectDokkaJavadocTaskJar
+                                    archives androidSourcesJar
+                                }
+                            } else {
+                                artifacts {
+                                    archives androidDokkaJar
+                                    archives androidSourcesJar
+                                }
+                            }
+                        } else {
+                            artifacts {
+                                archives androidJavadocsJar
+                                archives androidSourcesJar
+                            }
+                        }
+                    }
+                }
             }
         }
     } else {
@@ -980,7 +1156,7 @@ afterEvaluate { project ->
 
                         if (pomRepositories.size() > 1) {
                             repositories {
-                                for (int i = 0; i + 1 < pomRepositories.size(); i += 2) {
+                                for (byte i = 0; i + 1 < pomRepositories.size(); i += 2) {
                                     repository {
                                         id pomRepositories[i]
                                         url pomRepositories[i + 1]
@@ -991,9 +1167,9 @@ afterEvaluate { project ->
                     }
 
                     pom.withXml {
-                        def root = asNode()
-                        def name = root.name
-                        def description = root.description
+                        final def root = asNode()
+                        final def name = root.name
+                        final def description = root.description
                         if (root.packaging.size() == 1) {
                             root.remove(root.packaging)
                         }
@@ -1004,12 +1180,12 @@ afterEvaluate { project ->
                         root.append(description)
                         root.children().last() + pomConfig
                         if (root.dependencies.size() == 1) {
-                            def dependencies = root.dependencies
+                            final def dependencies = root.dependencies
                             root.remove(root.dependencies)
                             root.append(dependencies)
                         }
                         if (root.repositories.size() == 1) {
-                            def repositories = root.repositories
+                            final def repositories = root.repositories
                             root.remove(root.repositories)
                             root.append(repositories)
                         }
@@ -1019,15 +1195,16 @@ afterEvaluate { project ->
         }
 
         if (fatjarArtifact) {
-            task createFatjar(type: Jar) {
+            task createFatjar(type: Jar, dependsOn: 'compileJava') {
                 classifier = 'fatjar'
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
                 from {
                     configurations.compileClasspath.findAll {
-                        !it.getName().startsWith('junit') && !it.getName().startsWith('hamcrest')
+                        it.getName() != 'android.jar' && !it.getName().startsWith('junit') && !it.getName().startsWith('hamcrest')
                     }.collect {
                         if (it.isDirectory()) {
                             it
-                        } else if(it.getName().endsWith('.aar')) {
+                        } else if (it.getName().endsWith('.aar')) {
                             zipTree(it).findAll {
                                 it.getName() == 'classes.jar'
                             }.collect {
@@ -1038,16 +1215,20 @@ afterEvaluate { project ->
                         }
                     }
                 }
-                from sourceSets.main.output.classesDirs
+                if (gradleMajor < 4) {
+                    from sourceSets.main.output.classesDir
+                } else {
+                    from sourceSets.main.output.classesDirs
+                }
             }
         }
 
-        if (isDokka()) {
+        if (dokkaEngine) {
             if ((projectDokkaAndroidJavadocTask == null) && (projectDokkaJavadocTask == null)) {
                 task coreDokka(type: Exec, dependsOn: dokkaInitializer) {
-                    def srcDirsJavaNumber = (sourceSets.main.java.srcDirs != null) ? sourceSets.main.java.srcDirs.size() : 0
-                    def srcDirsKotlinNumber = (isKotlin() && (sourceSets.main.kotlin.srcDirs != null)) ? sourceSets.main.kotlin.srcDirs.size() : 0
-                    def javaAPISpecificationLink = getJavaAPISpecificationLink()
+                    final byte srcDirsJavaNumber = (sourceSets.main.java.srcDirs != null) ? sourceSets.main.java.srcDirs.size() : 0
+                    final byte srcDirsKotlinNumber = (kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) ? sourceSets.main.kotlin.srcDirs.size() : 0
+                    final String javaAPISpecificationLink = MavenPush.getJavaAPISpecificationLink()
                     if (srcDirsJavaNumber > 0) {
                         mkdir sourceSets.main.java.srcDirs[0]
                         if (srcDirsJavaNumber > 1) {
@@ -1091,7 +1272,7 @@ afterEvaluate { project ->
         } else {
             task coreJavadoc(type: Javadoc) {
                 source = sourceSets.main.java.srcDirs
-                if (isKotlin() && (sourceSets.main.kotlin.srcDirs != null)) {
+                if (kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) {
                     source += sourceSets.main.kotlin.srcDirs
                 }
                 failOnError = false
@@ -1104,15 +1285,18 @@ afterEvaluate { project ->
             }
         }
 
-        if (isKotlin()) {
+        if (kotlinLanguage) {
             task kotlinSourcesJar(type: Jar, dependsOn: classes) {
                 classifier = 'sources'
-                from sourceSets.main.allSource
-                if (isKotlin() && (sourceSets.main.kotlin.srcDirs != null)) {
-                    def srcDirsKotlinNumber = sourceSets.main.kotlin.srcDirs.size()
-                    for (int i = 0; i < srcDirsKotlinNumber; i++) {
-                        from sourceSets.main.kotlin.srcDirs[i]
-                    }
+                final String[] sources
+                if (sourceSets.main.kotlin.srcDirs != null) {
+                    sources = sourceSets.main.java.srcDirs + sourceSets.main.kotlin.srcDirs
+                } else {
+                    sources = sourceSets.main.java.srcDirs
+                }
+                final byte srcDirsNumber = sources.size()
+                for (byte i = 0; i < srcDirsNumber; i++) {
+                    from sources[i]
                 }
             }
         } else {
@@ -1122,52 +1306,527 @@ afterEvaluate { project ->
             }
         }
 
-        artifacts {
-            if (fatjarArtifact) {
-                archives createFatjar
-            }
-            if (isDokka()) {
-                if (projectDokkaJavadocTask != null) {
-                    archives coreProjectDokkaJavadocTaskJar
-                } else if (projectDokkaAndroidJavadocTask != null) {
-                    archives coreProjectDokkaAndroidJavadocTaskJar
+        if (createFatjar) {
+            if (kotlinLanguage) {
+                if (dokkaEngine) {
+                    if (projectDokkaJavadocTask != null) {
+                        artifacts {
+                            archives createFatjar
+                            archives coreProjectDokkaJavadocTaskJar
+                            archives kotlinSourcesJar
+                        }
+                    } else if (projectDokkaAndroidJavadocTask != null) {
+                        artifacts {
+                            archives createFatjar
+                            archives coreProjectDokkaAndroidJavadocTaskJar
+                            archives kotlinSourcesJar
+                        }
+                    } else {
+                        artifacts {
+                            archives createFatjar
+                            archives dokkaJar
+                            archives kotlinSourcesJar
+                        }
+                    }
                 } else {
-                    archives dokkaJar
+                    artifacts {
+                        archives createFatjar
+                        archives javadocJar
+                        archives kotlinSourcesJar
+                    }
                 }
             } else {
-                archives javadocJar
+                if (dokkaEngine) {
+                    if (projectDokkaJavadocTask != null) {
+                        artifacts {
+                            archives createFatjar
+                            archives coreProjectDokkaJavadocTaskJar
+                            archives sourcesJar
+                        }
+                    } else if (projectDokkaAndroidJavadocTask != null) {
+                        artifacts {
+                            archives createFatjar
+                            archives coreProjectDokkaAndroidJavadocTaskJar
+                            archives sourcesJar
+                        }
+                    } else {
+                        artifacts {
+                            archives createFatjar
+                            archives dokkaJar
+                            archives sourcesJar
+                        }
+                    }
+                } else {
+                    artifacts {
+                        archives createFatjar
+                        archives javadocJar
+                        archives sourcesJar
+                    }
+                }
             }
-            if (isKotlin()) {
-                archives kotlinSourcesJar
+        } else {
+            if (kotlinLanguage) {
+                if (dokkaEngine) {
+                    if (projectDokkaJavadocTask != null) {
+                        artifacts {
+                            archives coreProjectDokkaJavadocTaskJar
+                            archives kotlinSourcesJar
+                        }
+                    } else if (projectDokkaAndroidJavadocTask != null) {
+                        artifacts {
+                            archives coreProjectDokkaAndroidJavadocTaskJar
+                            archives kotlinSourcesJar
+                        }
+                    } else {
+                        artifacts {
+                            archives dokkaJar
+                            archives kotlinSourcesJar
+                        }
+                    }
+                } else {
+                    artifacts {
+                        archives javadocJar
+                        archives kotlinSourcesJar
+                    }
+                }
             } else {
-                archives sourcesJar
+                if (dokkaEngine) {
+                    if (projectDokkaJavadocTask != null) {
+                        artifacts {
+                            archives coreProjectDokkaJavadocTaskJar
+                            archives sourcesJar
+                        }
+                    } else if (projectDokkaAndroidJavadocTask != null) {
+                        artifacts {
+                            archives coreProjectDokkaAndroidJavadocTaskJar
+                            archives sourcesJar
+                        }
+                    } else {
+                        artifacts {
+                            archives dokkaJar
+                            archives sourcesJar
+                        }
+                    }
+                } else {
+                    artifacts {
+                        archives javadocJar
+                        archives sourcesJar
+                    }
+                }
             }
         }
     }
 
     tasks.withType(Javadoc).all {
-        options.encoding = getJavadocEncoding()
-        options.docEncoding = getJavadocDocEncoding()
-        options.charSet = getJavadocCharSet()
+        options.encoding = MavenPush.with(project).getJavadocEncoding()
+        options.docEncoding = MavenPush.with(project).getJavadocDocEncoding()
+        options.charSet = MavenPush.with(project).getJavadocCharSet()
         options.author = true
         options.version = true
-        options.addStringOption('link', getJavaAPISpecificationLink())
+        options.addStringOption('link', MavenPush.getJavaAPISpecificationLink())
         if (JavaVersion.current().isJava8Compatible()) {
-            if (isAndroid()) {
+            if (androidOs) {
                 /* JDK 1.8 has a bug that requires the rt.jar file to be
                    in the bootclasspath (https://stackoverflow.com/a/30458820). */
                 options.bootClasspath = [file("${System.properties['java.home']}/jre/lib/rt.jar")] + android.bootClasspath
             }
-            if (!getDoclintCheck()) {
+            if (!MavenPush.with(project).getDoclintCheck()) {
                 options.addStringOption('Xdoclint:none', '-quiet')
             }
             if (JavaVersion.current().isJava9Compatible()) {
-                if (isHtml5()) {
+                if (MavenPush.with(project).isHtml5()) {
                     options.addBooleanOption('html5', true)
                 } else {
                     options.addBooleanOption('html4', true)
                 }
             }
         }
+    }
+}
+
+final class MavenPush {
+
+    private static volatile MavenPush singleton = null
+
+    private final def project
+
+    private MavenPush(project) {
+        this.project = project
+    }
+
+    static MavenPush with(project) {
+        if (singleton == null) {
+            synchronized (MavenPush.class) {
+                if (singleton == null) {
+                    singleton = new MavenPush(project)
+                }
+            }
+        }
+        return singleton
+    }
+
+    static String getJavaAPISpecificationLink() {
+        if (JavaVersion.current().isJava10Compatible()) {
+            return 'https://docs.oracle.com/javase/10/docs/api/overview-summary.html'
+        } else if (JavaVersion.current().isJava9()) {
+            return 'https://docs.oracle.com/javase/9/docs/api/overview-summary.html'
+        } else if (JavaVersion.current().isJava8()) {
+            return 'https://docs.oracle.com/javase/8/docs/api/'
+        } else if (JavaVersion.current().isJava7()) {
+            return 'https://docs.oracle.com/javase/7/docs/api/'
+        } else if (JavaVersion.current().isJava6()) {
+            return 'https://docs.oracle.com/javase/6/docs/api/'
+        } else if (JavaVersion.current().isJava5()) {
+            return 'https://docs.oracle.com/javase/1.5.0/docs/api/'
+        } else {
+            return ''
+        }
+    }
+
+    static void downloadLib(String url, String path, String version, String name) {
+        File file = new File("${System.properties['user.home']}/.m2/repository/${path}/${version}/${name}")
+        file.parentFile.mkdirs()
+        if (!file.exists()) {
+            new URL(url).withInputStream { downloadStream ->
+                file.withOutputStream { fileOutputStream ->
+                    fileOutputStream << downloadStream
+                }
+            }
+        }
+    }
+
+    boolean isAndroid() {
+        return project.getPlugins().hasPlugin('com.android.application') ||
+                project.getPlugins().hasPlugin('com.android.library') ||
+                project.getPlugins().hasPlugin('android') ||
+                project.getPlugins().hasPlugin('android-library')
+    }
+
+    boolean isKotlin() {
+        return project.getPlugins().hasPlugin('kotlin') ||
+                project.getPlugins().hasPlugin('kotlin-platform-common') ||
+                project.getPlugins().hasPlugin('kotlin-platform-jvm') ||
+                project.getPlugins().hasPlugin('kotlin-platform-js') ||
+                project.getPlugins().hasPlugin('org.jetbrains.kotlin') ||
+                project.getPlugins().hasPlugin('org.jetbrains.kotlin.jvm') ||
+                project.getPlugins().hasPlugin('org.jetbrains.kotlin.js') ||
+                project.getPlugins().hasPlugin('kotlin2js') ||
+                project.getPlugins().hasPlugin('kotlin-android') ||
+                project.getPlugins().hasPlugin('kotlin-android-extensions')
+    }
+
+    boolean isDokkaPlugin() {
+        return project.getPlugins().hasPlugin('org.jetbrains.dokka-android') ||
+                project.getPlugins().hasPlugin('org.jetbrains.dokka')
+    }
+
+    boolean isJCenter() {
+        return (project.hasProperty('IS_JCENTER') && 'true'.equalsIgnoreCase(project.IS_JCENTER))
+    }
+
+    boolean isReleaseBuild() {
+        return !getPomVersionName().contains('SNAPSHOT')
+    }
+
+    String getReleaseRepositoryUrl() {
+        if (project.hasProperty('RELEASE_REPOSITORY_URL')) {
+            return project.RELEASE_REPOSITORY_URL
+        } else if (isJCenter()) {
+            // https://bintray.com/api/v1/maven/{project.NEXUS_USERNAME}/maven/{project.POM_ARTIFACT_ID}/;publish=1
+            return 'https://bintray.com/api/v1/maven/' +
+                    getRepositoryUsername() +
+                    '/maven/' +
+                    getPomArtifactUrl() +
+                    '/;publish=1'
+        } else {
+            return 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+        }
+    }
+
+    String getSnapshotRepositoryUrl() {
+        if (project.hasProperty('SNAPSHOT_REPOSITORY_URL')) {
+            return project.SNAPSHOT_REPOSITORY_URL
+        } else if (isJCenter()) {
+            return 'https://oss.jfrog.org/artifactory/oss-snapshot-local/'
+        } else {
+            return 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+    }
+
+    String getRepositoryUsername() {
+        if (System.getenv().containsKey('NEXUS_USERNAME')) {
+            return System.getenv('NEXUS_USERNAME')
+        } else {
+            return project.hasProperty('NEXUS_USERNAME') ? project.NEXUS_USERNAME : ''
+        }
+    }
+
+    String getRepositoryPassword() {
+        if (System.getenv().containsKey('NEXUS_PASSWORD')) {
+            return System.getenv('NEXUS_PASSWORD')
+        } else {
+            return project.hasProperty('NEXUS_PASSWORD') ? project.NEXUS_PASSWORD : ''
+        }
+    }
+
+    boolean getApklibArtifact() {
+        return project.hasProperty('APKLIB_ARTIFACT') ? 'true'.equalsIgnoreCase(project.APKLIB_ARTIFACT) : false
+    }
+
+    boolean getAndroidJarArtifact() {
+        return project.hasProperty('ANDROID_JAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.ANDROID_JAR_ARTIFACT) : false
+    }
+
+    boolean getFatjarArtifact() {
+        return project.hasProperty('FATJAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.FATJAR_ARTIFACT) : false
+    }
+
+    boolean isDokka() {
+        return project.hasProperty('JAVADOC_BY_DOKKA') ? 'true'.equalsIgnoreCase(project.JAVADOC_BY_DOKKA) : false
+    }
+
+    boolean getDoclintCheck() {
+        return project.hasProperty('DOCLINT_CHECK') ? 'true'.equalsIgnoreCase(project.DOCLINT_CHECK) : false
+    }
+
+    String getJavadocEncoding() {
+        return project.hasProperty('JAVADOC_ENCODING') ? project.JAVADOC_ENCODING : 'UTF-8'
+    }
+
+    String getJavadocDocEncoding() {
+        return project.hasProperty('JAVADOC_DOC_ENCODING') ? project.JAVADOC_DOC_ENCODING : 'UTF-8'
+    }
+
+    String getJavadocCharSet() {
+        return project.hasProperty('JAVADOC_CHARSET') ? project.JAVADOC_CHARSET : 'UTF-8'
+    }
+
+    /**
+     * HTML version in the document comments.
+     *
+     * @return boolean true if HTML version in the document comments is 5, false if something else.
+     */
+    boolean isHtml5() {
+        return project.hasProperty('JAVADOC_HTML_VERSION') ? (project.JAVADOC_HTML_VERSION == '5') : false
+    }
+
+    String getPomGroupId() {
+        if (project.hasProperty('GROUP')) {
+            return project.GROUP
+        } else if ((android.libraryVariants != null) && (android.libraryVariants.size() > 0)) {
+            return android.libraryVariants[0].applicationId
+        } else if ((android.applicationVariants != null) && (android.applicationVariants.size() > 0)) {
+            return android.applicationVariants[0].applicationId
+        } else {
+            throw new InvalidUserDataException('You must set GROUP in gradle.properties file.')
+        }
+    }
+
+    String getPomArtifactId() {
+        if (project.hasProperty('POM_ARTIFACT_ID')) {
+            return project.POM_ARTIFACT_ID
+        } else {
+            throw new InvalidUserDataException('You must set POM_ARTIFACT_ID in gradle.properties file.')
+        }
+    }
+
+    String getPomArtifactUrl() {
+        return project.hasProperty('POM_ARTIFACT_URL') ? project.POM_ARTIFACT_URL : getPomArtifactId()
+    }
+
+    String getPomVersionName() {
+        final String versionNameExtras = (System.getenv().containsKey('VERSION_NAME_EXTRAS')) ? System.getenv('VERSION_NAME_EXTRAS') : ''
+        if (project.hasProperty('VERSION_NAME')) {
+            return project.VERSION_NAME + versionNameExtras
+        } else if (android.defaultConfig.versionName != null) {
+            return android.defaultConfig.versionName + versionNameExtras
+        } else {
+            throw new InvalidUserDataException('You must set VERSION_NAME in gradle.properties file.')
+        }
+    }
+
+    String getPomPackaging() {
+        if (project.hasProperty('POM_PACKAGING')) {
+            return project.POM_PACKAGING
+        } else {
+            return isAndroid() ? 'aar' : 'jar'
+        }
+    }
+
+    String getPomName() {
+        if (project.hasProperty('POM_NAME')) {
+            return project.POM_NAME
+        } else {
+            throw new InvalidUserDataException('You must set POM_NAME in gradle.properties file.')
+        }
+    }
+
+    String getPomDescription() {
+        if (project.hasProperty('POM_DESCRIPTION')) {
+            return project.POM_DESCRIPTION
+        } else {
+            throw new InvalidUserDataException('You must set POM_DESCRIPTION in gradle.properties file.')
+        }
+    }
+
+    boolean getPomUniqueVersion() {
+        return project.hasProperty('POM_GENERATE_UNIQUE_SNAPSHOTS') ? 'true'.equalsIgnoreCase(project.POM_GENERATE_UNIQUE_SNAPSHOTS) : true
+    }
+
+    String getPomUrl() {
+        if (project.hasProperty('POM_URL')) {
+            return project.POM_URL
+        } else {
+            throw new InvalidUserDataException('You must set POM_URL in gradle.properties file.')
+        }
+    }
+
+    String getPomInceptionYear() {
+        return project.hasProperty('POM_INCEPTION_YEAR') ? project.POM_INCEPTION_YEAR : ''
+    }
+
+    String getPomScmUrl() {
+        return project.hasProperty('POM_SCM_URL') ? project.POM_SCM_URL : getPomUrl()
+    }
+
+    String getPomScmConnection() {
+        if (project.hasProperty('POM_SCM_CONNECTION')) {
+            return project.POM_SCM_CONNECTION
+        } else {
+            throw new InvalidUserDataException('You must set POM_SCM_CONNECTION in gradle.properties file.')
+        }
+    }
+
+    String getPomScmDevConnection() {
+        return project.hasProperty('POM_SCM_DEV_CONNECTION') ? project.POM_SCM_DEV_CONNECTION : getPomScmConnection()
+    }
+
+    String getPomScmTag() {
+        return project.hasProperty('POM_SCM_TAG') ? project.POM_SCM_TAG : 'HEAD'
+    }
+
+    String getPomLicenseName() {
+        if (project.hasProperty('POM_LICENCE_NAME')) {
+            return project.POM_LICENCE_NAME
+        } else {
+            throw new InvalidUserDataException('You must set POM_LICENCE_NAME in gradle.properties file.')
+        }
+    }
+
+    String getPomLicenseUrl() {
+        if (project.hasProperty('POM_LICENCE_URL')) {
+            return project.POM_LICENCE_URL
+        } else {
+            throw new InvalidUserDataException('You must set POM_LICENCE_URL in gradle.properties file.')
+        }
+    }
+
+    String getPomLicenseDist() {
+        return project.hasProperty('POM_LICENCE_DIST') ? project.POM_LICENCE_DIST : 'repo'
+    }
+
+    String getPomLicenseComments() {
+        return project.hasProperty('POM_LICENCE_COMMENTS') ? project.POM_LICENCE_COMMENTS : ''
+    }
+
+    String getOrg() {
+        return project.hasProperty('POM_ORG') ? project.POM_ORG : ''
+    }
+
+    String getOrgUrl() {
+        return project.hasProperty('POM_ORG_URL') ? project.POM_ORG_URL : ''
+    }
+
+    String getDeveloperId() {
+        if (project.hasProperty('POM_DEVELOPER_ID')) {
+            return project.POM_DEVELOPER_ID
+        } else {
+            throw new InvalidUserDataException('You must set POM_DEVELOPER_ID in gradle.properties file.')
+        }
+    }
+
+    String getDeveloperName() {
+        if (project.hasProperty('POM_DEVELOPER_NAME')) {
+            return project.POM_DEVELOPER_NAME
+        } else {
+            throw new InvalidUserDataException('You must set POM_DEVELOPER_NAME in gradle.properties file.')
+        }
+    }
+
+    String getDeveloperEmail() {
+        return project.hasProperty('POM_DEVELOPER_EMAIL') ? project.POM_DEVELOPER_EMAIL : 'lazy-developer-who-does-not-read-readme@example.com'
+    }
+
+    String getDeveloperUrl() {
+        return project.hasProperty('POM_DEVELOPER_URL') ? project.POM_DEVELOPER_URL : ''
+    }
+
+    String getDeveloperOrg() {
+        return project.hasProperty('POM_DEVELOPER_ORG') ? project.POM_DEVELOPER_ORG : getOrg()
+    }
+
+    String getDeveloperOrgUrl() {
+        return project.hasProperty('POM_DEVELOPER_ORG_URL') ? project.POM_DEVELOPER_ORG_URL : getOrgUrl()
+    }
+
+    String[] getDeveloperRoles() {
+        if (project.hasProperty('POM_DEVELOPER_ROLES')) {
+            if (project.hasProperty('POM_DEVELOPER_ROLE')) {
+                final String developerRoles = project.getProperty('POM_DEVELOPER_ROLE') + ',' + project.getProperty('POM_DEVELOPER_ROLES')
+                return developerRoles.split(',')
+            } else {
+                return project.getProperty('POM_DEVELOPER_ROLES').split(',')
+            }
+        } else {
+            return project.hasProperty('POM_DEVELOPER_ROLE') ? [project.POM_DEVELOPER_ROLE] : ['Software Developer']
+        }
+    }
+
+    String getDeveloperTimezone() {
+        return project.hasProperty('POM_DEVELOPER_TIMEZONE') ? project.POM_DEVELOPER_TIMEZONE : ''
+    }
+
+    String[] getDevelopers() {
+        return project.hasProperty('POM_DEVELOPERS') ? project.getProperty('POM_DEVELOPERS').split(',') : ['']
+    }
+
+    String[] getContributors() {
+        return project.hasProperty('POM_CONTRIBUTORS') ? project.getProperty('POM_CONTRIBUTORS').split(',') : ['']
+    }
+
+    String getIssueSystem() {
+        return project.hasProperty('POM_ISSUE_SYSTEM') ? project.POM_ISSUE_SYSTEM : ''
+    }
+
+    String getIssueSystemUrl() {
+        return project.hasProperty('POM_ISSUE_SYSTEM_URL') ? project.POM_ISSUE_SYSTEM_URL : ''
+    }
+
+    String getCiSystem() {
+        return project.hasProperty('POM_CI_SYSTEM') ? project.POM_CI_SYSTEM : ''
+    }
+
+    String getCiSystemUrl() {
+        return project.hasProperty('POM_CI_SYSTEM_URL') ? project.POM_CI_SYSTEM_URL : ''
+    }
+
+    String[] getMailingLists() {
+        return project.hasProperty('POM_MAILING_LISTS') ? project.getProperty('POM_MAILING_LISTS').split(',') : ['']
+    }
+
+    String[] getRepositories() {
+        if (isReleaseBuild()) {
+            return project.hasProperty('POM_REPOSITORIES') ? project.getProperty('POM_REPOSITORIES').split(',') : ['']
+        } else {
+            if (project.hasProperty('POM_SNAPSHOT_REPOSITORIES')) {
+                return project.getProperty('POM_SNAPSHOT_REPOSITORIES').split(',')
+            } else {
+                return project.hasProperty('POM_REPOSITORIES') ? project.getProperty('POM_REPOSITORIES').split(',') : ['']
+            }
+        }
+    }
+
+    String getDistDownloadUrl() {
+        return project.hasProperty('POM_DIST_DOWNLOAD_URL') ? project.POM_DIST_DOWNLOAD_URL : ''
     }
 }
