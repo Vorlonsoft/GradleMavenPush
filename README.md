@@ -331,6 +331,8 @@ POM_DIST_DOWNLOAD_URL (default is "")
 
 * [ExpandableSelector library](https://github.com/Karumi/ExpandableSelector)
 
+* [Helpers](https://github.com/danielgindi/android-helpers)
+
 * ...
 
 ## Contribute
