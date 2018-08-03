@@ -204,18 +204,14 @@ afterEvaluate { project ->
                 dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.jar")
     }
 
-    gradle.taskGraph.whenReady { taskGraph ->
-        if (gradle.taskGraph.hasTask('uploadArchives') ||
-                gradle.taskGraph.hasTask('deployOnServerRepository')) {
-            signing {
-                required {
-                    MavenPush.with(project).isReleaseBuild()
-                }
-                sign configurations.archives
-            }
+    signing {
+        required {
+            MavenPush.with(project).isReleaseBuild() &&
+            (gradle.taskGraph.hasTask('uploadArchives') || gradle.taskGraph.hasTask('deployOnServerRepository'))
         }
+        sign configurations.archives
     }
-
+       
     task deployOnServerRepository(type: GradleBuild, dependsOn: assemble) {
         description 'Deploys the artifacts to the server repository.'
         tasks = ['clean', 'build', 'uploadArchives']
