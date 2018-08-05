@@ -335,6 +335,10 @@ POM_DIST_DOWNLOAD_URL (default is "")
 
 * ...
 
+## Our other pligins
+
+[EasyDokkaPlugin](https://github.com/Vorlonsoft/EasyDokkaPlugin) - Gradle script plugin to generate documentation by Dokka documentation engine in Javadoc format for Java, Kotlin, Android and non-Android projects. It's very easy, you don't need to add to `dependencies` section additional `classpath` or think about compatibility issues, you don't need additional repositories also.
+
 ## Contribute
 
 1. Fork it
