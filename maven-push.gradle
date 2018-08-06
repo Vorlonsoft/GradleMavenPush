@@ -26,6 +26,7 @@ afterEvaluate { project ->
     final boolean pomUniqueVersion = MavenPush.with(project).getPomUniqueVersion()
     final boolean dokkaEngine = MavenPush.with(project).isDokka()
     final boolean dokkaPlugin = MavenPush.with(project).isDokkaPlugin()
+    final String androidJarMainClass = MavenPush.with(project).getAndroidJarMainClass()
     final String[] gradleVersion = gradle.gradleVersion.split('[\\.]')
     final int gradleMajor = Integer.parseInt(gradleVersion[0])
     final String dokkaFatJarVersion = '0.9.17'
@@ -413,6 +414,11 @@ afterEvaluate { project ->
             task createAndroidFatjar(type: Jar, dependsOn: 'check') {
                 classifier = 'fatjar'
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                if (androidJarMainClass != '') {
+                    manifest {
+                        attributes 'Main-Class' : androidJarMainClass
+                    }
+                }
                 configurations.implementation.setCanBeResolved(true)
                 configurations.api.setCanBeResolved(true)
                 from {
@@ -478,6 +484,11 @@ afterEvaluate { project ->
             task createJar(type: Jar, dependsOn: 'check') {
                 classifier = ''
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                if (androidJarMainClass != '') {
+                    manifest {
+                        attributes 'Main-Class' : androidJarMainClass
+                    }
+                }
                 from "${buildDir}/tmp/kotlin-classes/release/"
                 from "${buildDir}/intermediates/javac/release/compileReleaseJavaWithJavac/classes/"
                 from zipTree("${buildDir}/intermediates/packaged-classes/release/classes.jar")
@@ -1574,6 +1585,10 @@ final class MavenPush {
 
     boolean getAndroidJarArtifact() {
         return project.hasProperty('ANDROID_JAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.ANDROID_JAR_ARTIFACT) : false
+    }
+
+    String getAndroidJarMainClass() {
+        return project.hasProperty('ANDROID_JAR_MAIN_CLASS') ? project.ANDROID_JAR_MAIN_CLASS : ''
     }
 
     boolean getFatjarArtifact() {

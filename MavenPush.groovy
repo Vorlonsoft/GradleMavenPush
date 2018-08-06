@@ -147,6 +147,10 @@ final class MavenPush {
         return project.hasProperty('ANDROID_JAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.ANDROID_JAR_ARTIFACT) : false
     }
 
+    String getAndroidJarMainClass() {
+        return project.hasProperty('ANDROID_JAR_MAIN_CLASS') ? project.ANDROID_JAR_MAIN_CLASS : ''
+    }
+
     boolean getFatjarArtifact() {
         return project.hasProperty('FATJAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.FATJAR_ARTIFACT) : false
     }

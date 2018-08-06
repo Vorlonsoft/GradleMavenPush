@@ -84,6 +84,8 @@ You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "
 
 Add `ANDROID_JAR_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact jar. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts) and "jar" artifacts in your Android library project.
 
+Add `ANDROID_JAR_MAIN_CLASS` (example "com.vorlonsoft.android.rate.AppRate", default is "") and set it to "${package}.${main-class-name}" to add "Main-Class" attribute to Android's "jar" and "fatjar" `MANIFEST.MF` files.
+
 Add `FATJAR_ARTIFACT` (default is "false") and set it to "true" to generate fatjar. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts and Gradle Kotlin Artifacts) and "fatjar" artifacts.
 
 Add `APKLIB_ARTIFACT` (default is "false") and set it to "true" to generate Gradle Android Artifact apklib. You'll get both `POM_PACKAGING` value (default is "aar" for Gradle Android Artifacts) and "apklib" artifacts in your Android library project. apklib is a way to bundle an Android library project.
