@@ -350,9 +350,6 @@ afterEvaluate { project ->
                         attributes 'Main-Class' : androidJarMainClass
                     }
                 }
-                configurations {
-                    exclude compileOnly
-                }
                 configurations.implementation.setCanBeResolved(true)
                 configurations.api.setCanBeResolved(true)
                 from {
@@ -552,6 +549,8 @@ afterEvaluate { project ->
         if (kotlinLanguage) {
             task androidKotlinSourcesJar(type: Jar) {
                 classifier = 'sources'
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                from android.sourceSets.main.java.sourceFiles
                 final String[] sources
                 if (android.sourceSets.main.kotlin.srcDirs != null) {
                     sources = android.sourceSets.main.java.srcDirs + android.sourceSets.main.kotlin.srcDirs
@@ -567,516 +566,6 @@ afterEvaluate { project ->
             task androidSourcesJar(type: Jar) {
                 classifier = 'sources'
                 from android.sourceSets.main.java.sourceFiles
-            }
-        }
-
-        if (fatjarArtifact) {
-            if (androidJarArtifact) {
-                if (apklibArtifact) {
-                    if (kotlinLanguage) {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives createApklibKotlin
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives createApklibKotlin
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives createApklibKotlin
-                                    archives androidDokkaJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createAndroidFatjar
-                                archives createJar
-                                archives createApklibKotlin
-                                archives androidJavadocsJar
-                                archives androidKotlinSourcesJar
-                            }
-                        }
-                    } else {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives createApklib
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives createApklib
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives createApklib
-                                    archives androidDokkaJar
-                                    archives androidSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createAndroidFatjar
-                                archives createJar
-                                archives createApklib
-                                archives androidJavadocsJar
-                                archives androidSourcesJar
-                            }
-                        }
-                    }
-                } else {
-                    if (kotlinLanguage) {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives androidDokkaJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createAndroidFatjar
-                                archives createJar
-                                archives androidJavadocsJar
-                                archives androidKotlinSourcesJar
-                            }
-                        }
-                    } else {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createJar
-                                    archives androidDokkaJar
-                                    archives androidSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createAndroidFatjar
-                                archives createJar
-                                archives androidJavadocsJar
-                                archives androidSourcesJar
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (apklibArtifact) {
-                    if (kotlinLanguage) {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createApklibKotlin
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createApklibKotlin
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createApklibKotlin
-                                    archives androidDokkaJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createAndroidFatjar
-                                archives createApklibKotlin
-                                archives androidJavadocsJar
-                                archives androidKotlinSourcesJar
-                            }
-                        }
-                    } else {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createApklib
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createApklib
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives createApklib
-                                    archives androidDokkaJar
-                                    archives androidSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createAndroidFatjar
-                                archives createApklib
-                                archives androidJavadocsJar
-                                archives androidSourcesJar
-                            }
-                        }
-                    }
-                } else {
-                    if (kotlinLanguage) {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives androidDokkaJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createAndroidFatjar
-                                archives androidJavadocsJar
-                                archives androidKotlinSourcesJar
-                            }
-                        }
-                    } else {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createAndroidFatjar
-                                    archives androidDokkaJar
-                                    archives androidSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createAndroidFatjar
-                                archives androidJavadocsJar
-                                archives androidSourcesJar
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            if (androidJarArtifact) {
-                if (apklibArtifact) {
-                    if (kotlinLanguage) {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createJar
-                                    archives createApklibKotlin
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createJar
-                                    archives createApklibKotlin
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createJar
-                                    archives createApklibKotlin
-                                    archives androidDokkaJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createJar
-                                archives createApklibKotlin
-                                archives androidJavadocsJar
-                                archives androidKotlinSourcesJar
-                            }
-                        }
-                    } else {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createJar
-                                    archives createApklib
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createJar
-                                    archives createApklib
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createJar
-                                    archives createApklib
-                                    archives androidDokkaJar
-                                    archives androidSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createJar
-                                archives createApklib
-                                archives androidJavadocsJar
-                                archives androidSourcesJar
-                            }
-                        }
-                    }
-                } else {
-                    if (kotlinLanguage) {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createJar
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createJar
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createJar
-                                    archives androidDokkaJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createJar
-                                archives androidJavadocsJar
-                                archives androidKotlinSourcesJar
-                            }
-                        }
-                    } else {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createJar
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createJar
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createJar
-                                    archives androidDokkaJar
-                                    archives androidSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createJar
-                                archives androidJavadocsJar
-                                archives androidSourcesJar
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (apklibArtifact) {
-                    if (kotlinLanguage) {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createApklibKotlin
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createApklibKotlin
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createApklibKotlin
-                                    archives androidDokkaJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createApklibKotlin
-                                archives androidJavadocsJar
-                                archives androidKotlinSourcesJar
-                            }
-                        }
-                    } else {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives createApklib
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives createApklib
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives createApklib
-                                    archives androidDokkaJar
-                                    archives androidSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives createApklib
-                                archives androidJavadocsJar
-                                archives androidSourcesJar
-                            }
-                        }
-                    }
-                } else {
-                    if (kotlinLanguage) {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives androidDokkaJar
-                                    archives androidKotlinSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives androidJavadocsJar
-                                archives androidKotlinSourcesJar
-                            }
-                        }
-                    } else {
-                        if (dokkaEngine) {
-                            if (projectDokkaAndroidJavadocTask != null) {
-                                artifacts {
-                                    archives projectDokkaAndroidJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else if (projectDokkaJavadocTask != null) {
-                                artifacts {
-                                    archives projectDokkaJavadocTaskJar
-                                    archives androidSourcesJar
-                                }
-                            } else {
-                                artifacts {
-                                    archives androidDokkaJar
-                                    archives androidSourcesJar
-                                }
-                            }
-                        } else {
-                            artifacts {
-                                archives androidJavadocsJar
-                                archives androidSourcesJar
-                            }
-                        }
-                    }
-                }
             }
         }
     } else {
@@ -1212,6 +701,8 @@ afterEvaluate { project ->
         if (kotlinLanguage) {
             task kotlinSourcesJar(type: Jar, dependsOn: classes) {
                 classifier = 'sources'
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                from sourceSets.main.allSource
                 final String[] sources
                 if (sourceSets.main.kotlin.srcDirs != null) {
                     sources = sourceSets.main.java.srcDirs + sourceSets.main.kotlin.srcDirs
@@ -1229,114 +720,58 @@ afterEvaluate { project ->
                 from sourceSets.main.allSource
             }
         }
+    }
 
-        if (createFatjar) {
-            if (kotlinLanguage) {
-                if (dokkaEngine) {
-                    if (projectDokkaJavadocTask != null) {
-                        artifacts {
-                            archives createFatjar
-                            archives coreProjectDokkaJavadocTaskJar
-                            archives kotlinSourcesJar
-                        }
-                    } else if (projectDokkaAndroidJavadocTask != null) {
-                        artifacts {
-                            archives createFatjar
-                            archives coreProjectDokkaAndroidJavadocTaskJar
-                            archives kotlinSourcesJar
-                        }
-                    } else {
-                        artifacts {
-                            archives createFatjar
-                            archives dokkaJar
-                            archives kotlinSourcesJar
-                        }
-                    }
+    artifacts {
+        if (androidOs) {
+            if (fatjarArtifact) {
+                archives createAndroidFatjar
+            }
+            if (androidJarArtifact) {
+                archives createJar
+            }
+            if (apklibArtifact) {
+                if (kotlinLanguage) {
+                    archives createApklibKotlin
                 } else {
-                    artifacts {
-                        archives createFatjar
-                        archives javadocJar
-                        archives kotlinSourcesJar
-                    }
-                }
-            } else {
-                if (dokkaEngine) {
-                    if (projectDokkaJavadocTask != null) {
-                        artifacts {
-                            archives createFatjar
-                            archives coreProjectDokkaJavadocTaskJar
-                            archives sourcesJar
-                        }
-                    } else if (projectDokkaAndroidJavadocTask != null) {
-                        artifacts {
-                            archives createFatjar
-                            archives coreProjectDokkaAndroidJavadocTaskJar
-                            archives sourcesJar
-                        }
-                    } else {
-                        artifacts {
-                            archives createFatjar
-                            archives dokkaJar
-                            archives sourcesJar
-                        }
-                    }
-                } else {
-                    artifacts {
-                        archives createFatjar
-                        archives javadocJar
-                        archives sourcesJar
-                    }
+                    archives createApklib
                 }
             }
-        } else {
-            if (kotlinLanguage) {
-                if (dokkaEngine) {
-                    if (projectDokkaJavadocTask != null) {
-                        artifacts {
-                            archives coreProjectDokkaJavadocTaskJar
-                            archives kotlinSourcesJar
-                        }
-                    } else if (projectDokkaAndroidJavadocTask != null) {
-                        artifacts {
-                            archives coreProjectDokkaAndroidJavadocTaskJar
-                            archives kotlinSourcesJar
-                        }
-                    } else {
-                        artifacts {
-                            archives dokkaJar
-                            archives kotlinSourcesJar
-                        }
-                    }
+            if (dokkaEngine) {
+                if (projectDokkaAndroidJavadocTask != null) {
+                    archives projectDokkaAndroidJavadocTaskJar
+                } else if (projectDokkaJavadocTask != null) {
+                    archives projectDokkaJavadocTaskJar
                 } else {
-                    artifacts {
-                        archives javadocJar
-                        archives kotlinSourcesJar
-                    }
+                    archives androidDokkaJar
                 }
             } else {
-                if (dokkaEngine) {
-                    if (projectDokkaJavadocTask != null) {
-                        artifacts {
-                            archives coreProjectDokkaJavadocTaskJar
-                            archives sourcesJar
-                        }
-                    } else if (projectDokkaAndroidJavadocTask != null) {
-                        artifacts {
-                            archives coreProjectDokkaAndroidJavadocTaskJar
-                            archives sourcesJar
-                        }
-                    } else {
-                        artifacts {
-                            archives dokkaJar
-                            archives sourcesJar
-                        }
-                    }
+                archives androidJavadocsJar
+            }
+            if (kotlinLanguage) {
+                archives androidKotlinSourcesJar
+            } else {
+                archives androidSourcesJar
+            }
+        } else {
+            if (createFatjar) {
+                archives createFatjar
+            }
+            if (dokkaEngine) {
+                if (projectDokkaJavadocTask != null) {
+                    archives coreProjectDokkaJavadocTaskJar
+                } else if (projectDokkaAndroidJavadocTask != null) {
+                    archives coreProjectDokkaAndroidJavadocTaskJar
                 } else {
-                    artifacts {
-                        archives javadocJar
-                        archives sourcesJar
-                    }
+                    archives dokkaJar
                 }
+            } else {
+                archives javadocJar
+            }
+            if (kotlinLanguage) {
+                archives kotlinSourcesJar
+            } else {
+                archives sourcesJar
             }
         }
     }
