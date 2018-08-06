@@ -1194,6 +1194,9 @@ afterEvaluate { project ->
             task createFatjar(type: Jar, dependsOn: 'compileJava') {
                 classifier = 'fatjar'
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                manifest {
+                    attributes project.jar.manifest.attributes
+                }
                 from {
                     configurations.compileClasspath.findAll {
                         it.getName() != 'android.jar' && !it.getName().startsWith('junit') && !it.getName().startsWith('hamcrest')
