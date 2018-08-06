@@ -65,6 +65,33 @@ final class MavenPush {
         }
     }
 
+    static void pomFinalizer(def pom, def pomPackagingConfig, def pomConfig) {
+        pom.withXml {
+            final def root = asNode()
+            final def name = root.name
+            final def description = root.description
+            if (root.packaging.size() == 1) {
+                root.remove(root.packaging)
+            }
+            root.remove(root.name)
+            root.remove(root.description)
+            root.children().last() + pomPackagingConfig
+            root.append(name)
+            root.append(description)
+            root.children().last() + pomConfig
+            if (root.dependencies.size() == 1) {
+                final def dependencies = root.dependencies
+                root.remove(root.dependencies)
+                root.append(dependencies)
+            }
+            if (root.repositories.size() == 1) {
+                final def repositories = root.repositories
+                root.remove(root.repositories)
+                root.append(repositories)
+            }
+        }
+    }
+
     boolean isAndroid() {
         return project.getPlugins().hasPlugin('com.android.application') ||
                 project.getPlugins().hasPlugin('com.android.library') ||
