@@ -350,6 +350,9 @@ afterEvaluate { project ->
                         attributes 'Main-Class' : androidJarMainClass
                     }
                 }
+                configurations {
+                    exclude compileOnly
+                }
                 configurations.implementation.setCanBeResolved(true)
                 configurations.api.setCanBeResolved(true)
                 from {
@@ -1113,6 +1116,9 @@ afterEvaluate { project ->
             task createFatjar(type: Jar, dependsOn: 'compileJava') {
                 classifier = 'fatjar'
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                configurations {
+                    exclude compileOnly
+                }
                 manifest {
                     attributes project.jar.manifest.attributes
                 }
