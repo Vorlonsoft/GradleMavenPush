@@ -39,9 +39,9 @@ export NEXUS_PASSWORD      = $tr0ngP@55w0rd
 You may already have this file, in which case just edit the original. This file should contain the POM values which are common to all of your sub-project (if you have any). For instance, here's [AndroidRate's](https://github.com/Vorlonsoft/AndroidRate):
 
 ```properties
-# GROUP (default is packageName)
+# GROUP (default is packageName for Android projects, "" for non-Android)
 GROUP                  = com.vorlonsoft
-# VERSION_NAME (default is build.gradle versionName)
+# VERSION_NAME (default is build.gradle versionName for Android projects, "" for non-Android)
 VERSION_NAME           = 1.2.0-SNAPSHOT
 
 POM_DESCRIPTION        = Library for Android applications, which provides rating dialog.
