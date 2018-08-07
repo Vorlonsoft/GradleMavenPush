@@ -195,11 +195,18 @@ afterEvaluate { project ->
             }
         }
     }
-    final def projectDokkaJavadocTask = !dokkaPlugin ? null : project.tasks.find {
+    def projectDokkaJavadocTask = !dokkaPlugin ? null : project.tasks.find {
         it.name == 'dokkaJavadoc'
     }
-    final def projectDokkaAndroidJavadocTask = !dokkaPlugin ? null : project.tasks.find {
+    def projectDokkaAndroidJavadocTask = !dokkaPlugin ? null : project.tasks.find {
         it.name == 'dokkaAndroidJavadoc'
+    }
+
+    if (projectDokkaJavadocTask == null) {
+        projectDokkaJavadocTask = projectDokkaAndroidJavadocTask
+    }
+    if (projectDokkaAndroidJavadocTask == null) {
+        projectDokkaAndroidJavadocTask = projectDokkaJavadocTask
     }
 
     task dokkaInitializer {
@@ -416,7 +423,7 @@ afterEvaluate { project ->
         }
 
         if (androidJarArtifact) {
-            task createJar(type: Jar, dependsOn: 'check') {
+            task createAndroidJar(type: Jar, dependsOn: 'check') {
                 classifier = ''
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
                 if (androidJarMainClass != '') {
@@ -433,7 +440,7 @@ afterEvaluate { project ->
         }
 
         if (apklibArtifact) {
-            task createApklib(type: Zip) {
+            task createAndroidApklib(type: Zip) {
                 appendix = extension = 'apklib'
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
@@ -466,7 +473,12 @@ afterEvaluate { project ->
         }
 
         if (dokkaEngine) {
-            if ((projectDokkaAndroidJavadocTask == null) && (projectDokkaJavadocTask == null)) {
+            if (projectDokkaAndroidJavadocTask != null) {
+                task projectDokkaAndroidJavadocTaskJar(type: Jar, dependsOn: projectDokkaAndroidJavadocTask) {
+                    classifier = 'javadoc'
+                    from projectDokkaAndroidJavadocTask.outputDirectory
+                }
+            } else {
                 task androidDokka(type: Exec, dependsOn: dokkaInitializer) {
                     final byte srcDirsJavaNumber = (android.sourceSets.main.java.srcDirs != null) ? android.sourceSets.main.java.srcDirs.size() : 0
                     final byte srcDirsKotlinNumber = (kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) ? android.sourceSets.main.kotlin.srcDirs.size() : 0
@@ -495,19 +507,7 @@ afterEvaluate { project ->
                                 "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
                     }
                 }
-            }
 
-            if (projectDokkaAndroidJavadocTask != null) {
-                task projectDokkaAndroidJavadocTaskJar(type: Jar, dependsOn: projectDokkaAndroidJavadocTask) {
-                    classifier = 'javadoc'
-                    from projectDokkaAndroidJavadocTask.outputDirectory
-                }
-            } else if (projectDokkaJavadocTask != null) {
-                task projectDokkaJavadocTaskJar(type: Jar, dependsOn: projectDokkaJavadocTask) {
-                    classifier = 'javadoc'
-                    from projectDokkaJavadocTask.outputDirectory
-                }
-            } else {
                 task androidDokkaJar(type: Jar, dependsOn: androidDokka) {
                     classifier = 'javadoc'
                     from "${buildDir}/javadoc"
@@ -619,7 +619,12 @@ afterEvaluate { project ->
         }
 
         if (dokkaEngine) {
-            if ((projectDokkaAndroidJavadocTask == null) && (projectDokkaJavadocTask == null)) {
+            if (projectDokkaJavadocTask != null) {
+                task projectDokkaJavadocTaskJar(type: Jar, dependsOn: projectDokkaJavadocTask) {
+                    classifier = 'javadoc'
+                    from projectDokkaJavadocTask.outputDirectory
+                }
+            } else {
                 task coreDokka(type: Exec, dependsOn: dokkaInitializer) {
                     final byte srcDirsJavaNumber = (sourceSets.main.java.srcDirs != null) ? sourceSets.main.java.srcDirs.size() : 0
                     final byte srcDirsKotlinNumber = (kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) ? sourceSets.main.kotlin.srcDirs.size() : 0
@@ -645,19 +650,7 @@ afterEvaluate { project ->
                                 "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
                     }
                 }
-            }
 
-            if (projectDokkaJavadocTask != null) {
-                task coreProjectDokkaJavadocTaskJar(type: Jar, dependsOn: projectDokkaJavadocTask) {
-                    classifier = 'javadoc'
-                    from projectDokkaJavadocTask.outputDirectory
-                }
-            } else if (projectDokkaAndroidJavadocTask != null) {
-                task coreProjectDokkaAndroidJavadocTaskJar(type: Jar, dependsOn: projectDokkaAndroidJavadocTask) {
-                    classifier = 'javadoc'
-                    from projectDokkaAndroidJavadocTask.outputDirectory
-                }
-            } else {
                 task dokkaJar(type: Jar, dependsOn: coreDokka) {
                     classifier = 'javadoc'
                     from "${buildDir}/javadoc"
@@ -673,7 +666,7 @@ afterEvaluate { project ->
                 exclude '**/*.kt'
             }
 
-            task javadocJar(type: Jar, dependsOn: coreJavadoc) {
+            task javadocsJar(type: Jar, dependsOn: coreJavadoc) {
                 classifier = 'javadoc'
                 from javadoc.destinationDir
             }
@@ -704,16 +697,14 @@ afterEvaluate { project ->
                 archives createAndroidFatjar
             }
             if (androidJarArtifact) {
-                archives createJar
+                archives createAndroidJar
             }
             if (apklibArtifact) {
-                archives createApklib
+                archives createAndroidApklib
             }
             if (dokkaEngine) {
                 if (projectDokkaAndroidJavadocTask != null) {
                     archives projectDokkaAndroidJavadocTaskJar
-                } else if (projectDokkaJavadocTask != null) {
-                    archives projectDokkaJavadocTaskJar
                 } else {
                     archives androidDokkaJar
                 }
@@ -727,14 +718,12 @@ afterEvaluate { project ->
             }
             if (dokkaEngine) {
                 if (projectDokkaJavadocTask != null) {
-                    archives coreProjectDokkaJavadocTaskJar
-                } else if (projectDokkaAndroidJavadocTask != null) {
-                    archives coreProjectDokkaAndroidJavadocTaskJar
+                    archives projectDokkaJavadocTaskJar
                 } else {
                     archives dokkaJar
                 }
             } else {
-                archives javadocJar
+                archives javadocsJar
             }
             archives sourcesJar
         }
