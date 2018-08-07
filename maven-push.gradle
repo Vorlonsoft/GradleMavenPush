@@ -17,22 +17,8 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-Class MavenPush = new GroovyClassLoader(getClass().getClassLoader()).parseClass(downloadGroovyClass('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPush.groovy', 'MavenPush.groovy'))
-Class MavenPushUtils = new GroovyClassLoader(getClass().getClassLoader()).parseClass(downloadGroovyClass('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPushUtils.groovy', 'MavenPushUtils.groovy'))
-
-static File downloadGroovyClass(String url, String name) {
-    File file = new File("${System.properties['user.home']}/.m2/repository/com/vorlonsoft/GradleMavenPush/${name}")
-    file.parentFile.mkdirs()
-    if (file.exists()) {
-        file.delete()
-    }
-    new URL(url).withInputStream { downloadStream ->
-        file.withOutputStream { fileOutputStream ->
-            fileOutputStream << downloadStream
-        }
-    }
-    return file
-}
+Class MavenPush = new GroovyClassLoader(getClass().getClassLoader()).parseClass(MavenPushInitializer.downloadGroovyClass('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPush.groovy', 'MavenPush.groovy'))
+Class MavenPushUtils = new GroovyClassLoader(getClass().getClassLoader()).parseClass(MavenPushInitializer.downloadGroovyClass('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPushUtils.groovy', 'MavenPushUtils.groovy'))
 
 afterEvaluate { project ->
     final boolean androidOs = MavenPushUtils.with(project).isAndroid()
@@ -815,5 +801,26 @@ afterEvaluate { project ->
                 }
             }
         }
+    }
+}
+
+final class MavenPushInitializer {
+
+    private MavenPushInitializer() {
+        throw new AssertionError();
+    }
+
+    static File downloadGroovyClass(String url, String name) {
+        File file = new File("${System.properties['user.home']}/.m2/repository/com/vorlonsoft/GradleMavenPush/${name}")
+        file.parentFile.mkdirs()
+        if (file.exists()) {
+            file.delete()
+        }
+        new URL(url).withInputStream { downloadStream ->
+            file.withOutputStream { fileOutputStream ->
+                fileOutputStream << downloadStream
+            }
+        }
+        return file
     }
 }
