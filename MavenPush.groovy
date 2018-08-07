@@ -24,6 +24,12 @@ final class MavenPush {
         this.project = project
     }
 
+    final private class InvalidUserDataException extends Exception {
+        InvalidUserDataException(String message) {
+            super(message)
+        }
+    }
+
     static MavenPush with(project) {
         if (singleton == null) {
             synchronized (MavenPush.class) {
@@ -222,7 +228,7 @@ final class MavenPush {
         } else if (isAndroid() && (project.android.libraryVariants != null) && (project.android.libraryVariants.size() > 0)) {
             return project.android.libraryVariants[0].applicationId
         } else {
-            throw new Exception('You must set GROUP in gradle.properties file.')
+            throw new InvalidUserDataException('You must set GROUP in gradle.properties file.')
         }
     }
 
@@ -230,7 +236,7 @@ final class MavenPush {
         if (project.hasProperty('POM_ARTIFACT_ID')) {
             return project.POM_ARTIFACT_ID
         } else {
-            throw new Exception('You must set POM_ARTIFACT_ID in gradle.properties file.')
+            throw new InvalidUserDataException('You must set POM_ARTIFACT_ID in gradle.properties file.')
         }
     }
 
@@ -245,7 +251,7 @@ final class MavenPush {
         } else if (isAndroid() && (project.android.defaultConfig.versionName != null)) {
             return project.android.defaultConfig.versionName + versionNameExtras
         } else {
-            throw new Exception('You must set VERSION_NAME in gradle.properties file.')
+            throw new InvalidUserDataException('You must set VERSION_NAME in gradle.properties file.')
         }
     }
 
@@ -261,7 +267,7 @@ final class MavenPush {
         if (project.hasProperty('POM_NAME')) {
             return project.POM_NAME
         } else {
-            throw new Exception('You must set POM_NAME in gradle.properties file.')
+            throw new InvalidUserDataException('You must set POM_NAME in gradle.properties file.')
         }
     }
 
@@ -269,7 +275,7 @@ final class MavenPush {
         if (project.hasProperty('POM_DESCRIPTION')) {
             return project.POM_DESCRIPTION
         } else {
-            throw new Exception('You must set POM_DESCRIPTION in gradle.properties file.')
+            throw new InvalidUserDataException('You must set POM_DESCRIPTION in gradle.properties file.')
         }
     }
 
@@ -281,7 +287,7 @@ final class MavenPush {
         if (project.hasProperty('POM_URL')) {
             return project.POM_URL
         } else {
-            throw new Exception('You must set POM_URL in gradle.properties file.')
+            throw new InvalidUserDataException('You must set POM_URL in gradle.properties file.')
         }
     }
 
@@ -297,7 +303,7 @@ final class MavenPush {
         if (project.hasProperty('POM_SCM_CONNECTION')) {
             return project.POM_SCM_CONNECTION
         } else {
-            throw new Exception('You must set POM_SCM_CONNECTION in gradle.properties file.')
+            throw new InvalidUserDataException('You must set POM_SCM_CONNECTION in gradle.properties file.')
         }
     }
 
@@ -313,7 +319,7 @@ final class MavenPush {
         if (project.hasProperty('POM_LICENCE_NAME')) {
             return project.POM_LICENCE_NAME
         } else {
-            throw new Exception('You must set POM_LICENCE_NAME in gradle.properties file.')
+            throw new InvalidUserDataException('You must set POM_LICENCE_NAME in gradle.properties file.')
         }
     }
 
@@ -321,7 +327,7 @@ final class MavenPush {
         if (project.hasProperty('POM_LICENCE_URL')) {
             return project.POM_LICENCE_URL
         } else {
-            throw new Exception('You must set POM_LICENCE_URL in gradle.properties file.')
+            throw new InvalidUserDataException('You must set POM_LICENCE_URL in gradle.properties file.')
         }
     }
 
@@ -345,7 +351,7 @@ final class MavenPush {
         if (project.hasProperty('POM_DEVELOPER_ID')) {
             return project.POM_DEVELOPER_ID
         } else {
-            throw new Exception('You must set POM_DEVELOPER_ID in gradle.properties file.')
+            throw new InvalidUserDataException('You must set POM_DEVELOPER_ID in gradle.properties file.')
         }
     }
 
@@ -353,7 +359,7 @@ final class MavenPush {
         if (project.hasProperty('POM_DEVELOPER_NAME')) {
             return project.POM_DEVELOPER_NAME
         } else {
-            throw new Exception('You must set POM_DEVELOPER_NAME in gradle.properties file.')
+            throw new InvalidUserDataException('You must set POM_DEVELOPER_NAME in gradle.properties file.')
         }
     }
 
