@@ -40,7 +40,14 @@ final class MavenPush {
         }
         return singleton
     }
-  
+
+    private boolean isAndroid() {
+        return project.getPlugins().hasPlugin('com.android.application') ||
+                project.getPlugins().hasPlugin('com.android.library') ||
+                project.getPlugins().hasPlugin('android') ||
+                project.getPlugins().hasPlugin('android-library')
+    }
+    
     boolean isJCenter() {
         return (project.hasProperty('IS_JCENTER') && 'true'.equalsIgnoreCase(project.IS_JCENTER))
     }
@@ -138,7 +145,7 @@ final class MavenPush {
     String getPomGroupId() {
         if (project.hasProperty('GROUP')) {
             return project.GROUP
-        } else if (MavenPushUtils.with(project).isAndroid() && (project.android.libraryVariants != null) && (project.android.libraryVariants.size() > 0)) {
+        } else if (isAndroid() && (project.android.libraryVariants != null) && (project.android.libraryVariants.size() > 0)) {
             return project.android.libraryVariants[0].applicationId
         } else {
             throw new InvalidUserDataException('You must set GROUP in gradle.properties file.')
@@ -161,7 +168,7 @@ final class MavenPush {
         final String versionNameExtras = (System.getenv().containsKey('VERSION_NAME_EXTRAS')) ? System.getenv('VERSION_NAME_EXTRAS') : ''
         if (project.hasProperty('VERSION_NAME')) {
             return project.VERSION_NAME + versionNameExtras
-        } else if (MavenPushUtils.with(project).isAndroid() && (project.android.defaultConfig.versionName != null)) {
+        } else if (isAndroid() && (project.android.defaultConfig.versionName != null)) {
             return project.android.defaultConfig.versionName + versionNameExtras
         } else {
             throw new InvalidUserDataException('You must set VERSION_NAME in gradle.properties file.')
@@ -172,7 +179,7 @@ final class MavenPush {
         if (project.hasProperty('POM_PACKAGING')) {
             return project.POM_PACKAGING
         } else {
-            return MavenPushUtils.with(project).isAndroid() ? 'aar' : 'jar'
+            return isAndroid() ? 'aar' : 'jar'
         }
     }
 

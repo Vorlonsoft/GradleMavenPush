@@ -17,8 +17,8 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-Class MavenPushUtils = new GroovyClassLoader(getClass().getClassLoader()).parseClass(downloadGroovyClass('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPushUtils.groovy', 'MavenPushUtils.groovy'))
 Class MavenPush = new GroovyClassLoader(getClass().getClassLoader()).parseClass(downloadGroovyClass('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPush.groovy', 'MavenPush.groovy'))
+Class MavenPushUtils = new GroovyClassLoader(getClass().getClassLoader()).parseClass(downloadGroovyClass('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPushUtils.groovy', 'MavenPushUtils.groovy'))
 
 static File downloadGroovyClass(String url, String name) {
     File file = new File("${System.properties['user.home']}/.m2/repository/com/vorlonsoft/GradleMavenPush/${name}")
