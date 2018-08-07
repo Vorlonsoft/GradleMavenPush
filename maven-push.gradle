@@ -533,26 +533,21 @@ afterEvaluate { project ->
             }
         }
 
-        if (kotlinLanguage) {
-            task androidKotlinSourcesJar(type: Jar) {
-                classifier = 'sources'
-                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-                from android.sourceSets.main.java.sourceFiles
+        task androidSourcesJar(type: Jar) {
+            classifier = 'sources'
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            from android.sourceSets.main.java.sourceFiles
+            if (kotlinLanguage) {
                 final String[] sources
                 if (android.sourceSets.main.kotlin.srcDirs != null) {
                     sources = android.sourceSets.main.java.srcDirs + android.sourceSets.main.kotlin.srcDirs
                 } else {
                     sources = android.sourceSets.main.java.srcDirs
                 }
-                final byte srcDirsNumber = sources.size()
+                final byte srcDirsNumber = (sources != null) ? sources.size() : 0
                 for (byte i = 0; i < srcDirsNumber; i++) {
                     from sources[i]
                 }
-            }
-        } else {
-            task androidSourcesJar(type: Jar) {
-                classifier = 'sources'
-                from android.sourceSets.main.java.sourceFiles
             }
         }
     } else {
@@ -684,26 +679,21 @@ afterEvaluate { project ->
             }
         }
 
-        if (kotlinLanguage) {
-            task kotlinSourcesJar(type: Jar, dependsOn: classes) {
-                classifier = 'sources'
-                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-                from sourceSets.main.allSource
+        task sourcesJar(type: Jar, dependsOn: classes) {
+            classifier = 'sources'
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            from sourceSets.main.allSource
+            if (kotlinLanguage) {
                 final String[] sources
                 if (sourceSets.main.kotlin.srcDirs != null) {
                     sources = sourceSets.main.java.srcDirs + sourceSets.main.kotlin.srcDirs
                 } else {
                     sources = sourceSets.main.java.srcDirs
                 }
-                final byte srcDirsNumber = sources.size()
+                final byte srcDirsNumber = (sources != null) ? sources.size() : 0
                 for (byte i = 0; i < srcDirsNumber; i++) {
                     from sources[i]
                 }
-            }
-        } else {
-            task sourcesJar(type: Jar, dependsOn: classes) {
-                classifier = 'sources'
-                from sourceSets.main.allSource
             }
         }
     }
@@ -730,11 +720,7 @@ afterEvaluate { project ->
             } else {
                 archives androidJavadocsJar
             }
-            if (kotlinLanguage) {
-                archives androidKotlinSourcesJar
-            } else {
-                archives androidSourcesJar
-            }
+            archives androidSourcesJar
         } else {
             if (createFatjar) {
                 archives createFatjar
@@ -750,11 +736,7 @@ afterEvaluate { project ->
             } else {
                 archives javadocJar
             }
-            if (kotlinLanguage) {
-                archives kotlinSourcesJar
-            } else {
-                archives sourcesJar
-            }
+            archives sourcesJar
         }
     }
 
