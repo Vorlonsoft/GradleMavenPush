@@ -17,33 +17,38 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-File mavenPushFile = new File("${System.properties['user.home']}/.m2/repository/com/vorlonsoft/GradleMavenPush/MavenPush.groovy")
-mavenPushFile.parentFile.mkdirs()
-if (mavenPushFile.exists()) {
-    mavenPushFile.delete()
-}
-new URL('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPush.groovy').withInputStream { downloadStream ->
-    mavenPushFile.withOutputStream { fileOutputStream ->
-        fileOutputStream << downloadStream
+Class MavenPush = new GroovyClassLoader(getClass().getClassLoader()).parseClass(downloadGroovyClass('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPush.groovy', 'MavenPush.groovy'))
+Class MavenPushUtils = new GroovyClassLoader(getClass().getClassLoader()).parseClass(downloadGroovyClass('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPushUtils.groovy', 'MavenPushUtils.groovy'))
+
+static File downloadGroovyClass(String url, String name) {
+    File file = new File("${System.properties['user.home']}/.m2/repository/com/vorlonsoft/GradleMavenPush/${name}")
+    file.parentFile.mkdirs()
+    if (file.exists()) {
+        file.delete()
     }
+    new URL(url).withInputStream { downloadStream ->
+        file.withOutputStream { fileOutputStream ->
+            fileOutputStream << downloadStream
+        }
+    }
+    return file
 }
-Class MavenPush = new GroovyClassLoader(getClass().getClassLoader()).parseClass(mavenPushFile);
 
 afterEvaluate { project ->
-    final boolean androidOs = MavenPush.with(project).isAndroid()
-    final boolean kotlinLanguage = MavenPush.with(project).isKotlin()
+    final boolean androidOs = MavenPushUtils.with(project).isAndroid()
+    final boolean kotlinLanguage = MavenPushUtils.with(project).isKotlin()
     final boolean androidJarArtifact = MavenPush.with(project).getAndroidJarArtifact()
     final boolean fatjarArtifact = MavenPush.with(project).getFatjarArtifact()
     final boolean apklibArtifact = MavenPush.with(project).getApklibArtifact()
     final boolean pomUniqueVersion = MavenPush.with(project).getPomUniqueVersion()
     final boolean dokkaEngine = MavenPush.with(project).isDokka()
-    final boolean dokkaPlugin = MavenPush.with(project).isDokkaPlugin()
+    final boolean dokkaPlugin = MavenPushUtils.with(project).isDokkaPlugin()
     final String androidJarMainClass = MavenPush.with(project).getAndroidJarMainClass()
     final String[] gradleVersion = gradle.gradleVersion.split('[\\.]')
     final int gradleMajor = Integer.parseInt(gradleVersion[0])
     final String dokkaFatJarVersion = '0.9.17'
     final String dokkaFatJarPath = 'org/jetbrains/dokka/dokka-fatjar'
-    final String javaAPISpecificationLink = MavenPush.getJavaAPISpecificationLink(JavaVersion.current().toString())
+    final String javaAPISpecificationLink = MavenPushUtils.getJavaAPISpecificationLink(JavaVersion.current().toString())
     final String repositoryUsername = MavenPush.with(project).getRepositoryUsername()
     final String repositoryPassword = MavenPush.with(project).getRepositoryPassword()
     final String pomGroupId = MavenPush.with(project).getPomGroupId()
@@ -212,9 +217,9 @@ afterEvaluate { project ->
     }
 
     task dokkaInitializer {
-        MavenPush.downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.pom",
+        MavenPushUtils.downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.pom",
                 dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.pom")
-        MavenPush.downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
+        MavenPushUtils.downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
                 dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.jar")
     }
 
@@ -280,7 +285,7 @@ afterEvaluate { project ->
                     }
                 }
 
-                MavenPush.pomFinalizer(pom, pomPackagingConfig, pomConfig)
+                MavenPushUtils.pomFinalizer(pom, pomPackagingConfig, pomConfig)
             }
         }
     }
@@ -316,7 +321,7 @@ afterEvaluate { project ->
                     }
                 }
 
-                MavenPush.pomFinalizer(pom, pomPackagingConfig, pomConfig)
+                MavenPushUtils.pomFinalizer(pom, pomPackagingConfig, pomConfig)
             }
         }
     }
@@ -349,7 +354,7 @@ afterEvaluate { project ->
                         }
                     }
 
-                    MavenPush.pomFinalizer(pom, pomPackagingConfig, pomConfig)
+                    MavenPushUtils.pomFinalizer(pom, pomPackagingConfig, pomConfig)
                 }
             }
         }
@@ -608,7 +613,7 @@ afterEvaluate { project ->
                         }
                     }
 
-                    MavenPush.pomFinalizer(pom, pomPackagingConfig, pomConfig)
+                    MavenPushUtils.pomFinalizer(pom, pomPackagingConfig, pomConfig)
                 }
             }
         }

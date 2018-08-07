@@ -321,10 +321,11 @@ POM_DIST_DOWNLOAD_URL (default is "")
 
 ## MavenPush Class
 
-**GradleMavenPush** project includes `MavenPush.groovy` Groovy Class. You can use it in your own projects. Class licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+**GradleMavenPush** project includes `MavenPush.groovy` and `MavenPushUtils.groovy` Groovy Classes. You can use them in your own projects. Classes licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
 ```groovy
 'https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPush.groovy'
+'https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPushUtils.groovy'
 ```
 
 ## Already in use in following libraries
