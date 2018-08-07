@@ -138,7 +138,7 @@ final class MavenPush {
     String getPomGroupId() {
         if (project.hasProperty('GROUP')) {
             return project.GROUP
-        } else if (isAndroid() && (project.android.libraryVariants != null) && (project.android.libraryVariants.size() > 0)) {
+        } else if (MavenPushUtils.with(project).isAndroid() && (project.android.libraryVariants != null) && (project.android.libraryVariants.size() > 0)) {
             return project.android.libraryVariants[0].applicationId
         } else {
             throw new InvalidUserDataException('You must set GROUP in gradle.properties file.')
@@ -161,7 +161,7 @@ final class MavenPush {
         final String versionNameExtras = (System.getenv().containsKey('VERSION_NAME_EXTRAS')) ? System.getenv('VERSION_NAME_EXTRAS') : ''
         if (project.hasProperty('VERSION_NAME')) {
             return project.VERSION_NAME + versionNameExtras
-        } else if (isAndroid() && (project.android.defaultConfig.versionName != null)) {
+        } else if (MavenPushUtils.with(project).isAndroid() && (project.android.defaultConfig.versionName != null)) {
             return project.android.defaultConfig.versionName + versionNameExtras
         } else {
             throw new InvalidUserDataException('You must set VERSION_NAME in gradle.properties file.')
@@ -172,7 +172,7 @@ final class MavenPush {
         if (project.hasProperty('POM_PACKAGING')) {
             return project.POM_PACKAGING
         } else {
-            return isAndroid() ? 'aar' : 'jar'
+            return MavenPushUtils.with(project).isAndroid() ? 'aar' : 'jar'
         }
     }
 
