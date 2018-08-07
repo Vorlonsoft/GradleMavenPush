@@ -433,50 +433,34 @@ afterEvaluate { project ->
         }
 
         if (apklibArtifact) {
-            if (kotlinLanguage) {
-                task createKotlinApklib(type: Zip) {
-                    appendix = extension = 'apklib'
+            task createApklib(type: Zip) {
+                appendix = extension = 'apklib'
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-                    from '/src/main/AndroidManifest.xml'
-                    into('assets') {
-                        from '/src/main/assets/'
-                    }
-                    into('libs') {
-                        from '/libs/'
-                    }
-                    into('res') {
-                        from '/src/main/res/'
-                    }
-                    into('src') {
+                from '/src/main/AndroidManifest.xml'
+                into('assets') {
+                    from '/src/main/assets/'
+                }
+                into('libs') {
+                    from '/libs/'
+                }
+                into('res') {
+                    from '/src/main/res/'
+                }
+                into('src') {
+                    from android.sourceSets.main.java.sourceFiles
+                    if (kotlinLanguage) {
                         final String[] sources
                         if (android.sourceSets.main.kotlin.srcDirs != null) {
                             sources = android.sourceSets.main.java.srcDirs + android.sourceSets.main.kotlin.srcDirs
                         } else {
                             sources = android.sourceSets.main.java.srcDirs
                         }
-                        final byte srcDirsNumber = sources.size()
+                        final byte srcDirsNumber = (sources != null) ? sources.size() : 0
                         for (byte i = 0; i < srcDirsNumber; i++) {
                             from sources[i]
                         }
-                    }
-                }
-            } else {
-                task createApklib(type: Zip) {
-                    appendix = extension = 'apklib'
-
-                    from '/src/main/AndroidManifest.xml'
-                    into('assets') {
-                        from '/src/main/assets/'
-                    }
-                    into('libs') {
-                        from '/libs/'
-                    }
-                    into('res') {
-                        from '/src/main/res/'
-                    }
-                    into('src') {
-                        from android.sourceSets.main.java.sourceFiles
-                    }
+                    }                    
                 }
             }
         }
@@ -732,6 +716,9 @@ afterEvaluate { project ->
             if (androidJarArtifact) {
                 archives createJar
             }
+            if (apklibArtifact) {
+                archives createApklib
+            }
             if (dokkaEngine) {
                 if (projectDokkaAndroidJavadocTask != null) {
                     archives projectDokkaAndroidJavadocTaskJar
@@ -744,14 +731,8 @@ afterEvaluate { project ->
                 archives androidJavadocsJar
             }
             if (kotlinLanguage) {
-                if (apklibArtifact) {
-                    archives createKotlinApklib
-                }
                 archives androidKotlinSourcesJar
             } else {
-                if (apklibArtifact) {
-                    archives createApklib
-                }
                 archives androidSourcesJar
             }
         } else {
@@ -807,7 +788,7 @@ afterEvaluate { project ->
 final class MavenPushInitializer {
 
     private MavenPushInitializer() {
-        throw new AssertionError();
+        throw new AssertionError()
     }
 
     static File downloadGroovyClass(String url, String name) {
