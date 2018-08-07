@@ -29,24 +29,6 @@ new URL('https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPush.groo
 }
 Class MavenPush = new GroovyClassLoader(getClass().getClassLoader()).parseClass(mavenPushFile);
 
-static String getJavaAPISpecificationLink() {
-    if (JavaVersion.current().isJava10Compatible()) {
-        return 'https://docs.oracle.com/javase/10/docs/api/overview-summary.html'
-    } else if (JavaVersion.current().isJava9()) {
-        return 'https://docs.oracle.com/javase/9/docs/api/overview-summary.html'
-    } else if (JavaVersion.current().isJava8()) {
-        return 'https://docs.oracle.com/javase/8/docs/api/'
-    } else if (JavaVersion.current().isJava7()) {
-        return 'https://docs.oracle.com/javase/7/docs/api/'
-    } else if (JavaVersion.current().isJava6()) {
-        return 'https://docs.oracle.com/javase/6/docs/api/'
-    } else if (JavaVersion.current().isJava5()) {
-        return 'https://docs.oracle.com/javase/1.5.0/docs/api/'
-    } else {
-        return ''
-    }
-}
-
 afterEvaluate { project ->
     final boolean androidOs = MavenPush.with(project).isAndroid()
     final boolean kotlinLanguage = MavenPush.with(project).isKotlin()
@@ -61,7 +43,7 @@ afterEvaluate { project ->
     final int gradleMajor = Integer.parseInt(gradleVersion[0])
     final String dokkaFatJarVersion = '0.9.17'
     final String dokkaFatJarPath = 'org/jetbrains/dokka/dokka-fatjar'
-    final String javaAPISpecificationLink = getJavaAPISpecificationLink()
+    final String javaAPISpecificationLink = MavenPush.getJavaAPISpecificationLink(JavaVersion.current().toString())
     final String repositoryUsername = MavenPush.with(project).getRepositoryUsername()
     final String repositoryPassword = MavenPush.with(project).getRepositoryPassword()
     final String pomGroupId = MavenPush.with(project).getPomGroupId()

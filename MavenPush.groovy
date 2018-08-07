@@ -35,15 +35,26 @@ final class MavenPush {
         return singleton
     }
 
-    static void downloadLib(String url, String path, String version, String name) {
-        File file = new File("${System.properties['user.home']}/.m2/repository/${path}/${version}/${name}")
-        file.parentFile.mkdirs()
-        if (!file.exists()) {
-            new URL(url).withInputStream { downloadStream ->
-                file.withOutputStream { fileOutputStream ->
-                    fileOutputStream << downloadStream
-                }
-            }
+    static String getJavaAPISpecificationLink(String currentJavaVersion) {
+        switch (currentJavaVersion) {
+            case '1.5':
+                return 'https://docs.oracle.com/javase/1.5.0/docs/api/'
+            case '1.6':
+                return 'https://docs.oracle.com/javase/6/docs/api/'
+            case '1.7':
+                return 'https://docs.oracle.com/javase/7/docs/api/'
+            case '1.8':
+                return 'https://docs.oracle.com/javase/8/docs/api/'
+            case '1.9':
+                return 'https://docs.oracle.com/javase/9/docs/api/overview-summary.html'
+            case '1.10':
+            case '11':
+            case '12':
+            case '13':
+            case '14':
+                return 'https://docs.oracle.com/javase/10/docs/api/overview-summary.html'
+            default:
+                return ''
         }
     }
 
@@ -70,6 +81,18 @@ final class MavenPush {
                 final def repositories = root.repositories
                 root.remove(root.repositories)
                 root.append(repositories)
+            }
+        }
+    }
+
+    static void downloadLib(String url, String path, String version, String name) {
+        File file = new File("${System.properties['user.home']}/.m2/repository/${path}/${version}/${name}")
+        file.parentFile.mkdirs()
+        if (!file.exists()) {
+            new URL(url).withInputStream { downloadStream ->
+                file.withOutputStream { fileOutputStream ->
+                    fileOutputStream << downloadStream
+                }
             }
         }
     }
