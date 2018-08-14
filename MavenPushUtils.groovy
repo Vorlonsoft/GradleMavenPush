@@ -127,7 +127,7 @@ final class MavenPushUtils {
      * @param version library version
      * @param name local repository file name
      */
-    void downloadLib(String url, String path, String version, String name) {
+    static void downloadLib(String url, String path, String version, String name) {
         File file = new File("${System.properties['user.home']}/.m2/repository/${path}/${version}/${name}")
         file.parentFile.mkdirs()
         if (!file.exists()) {
@@ -137,7 +137,6 @@ final class MavenPushUtils {
                 }
             }
         }
-        project.files(file.absolutePath)
     }
 
     boolean isAndroid() {
