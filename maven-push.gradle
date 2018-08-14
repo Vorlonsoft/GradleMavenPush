@@ -202,6 +202,12 @@ afterEvaluate { project ->
         it.name == 'dokkaAndroidJavadoc'
     }
 
+    /**
+     *  Sets the artifacts base file name to match
+     *  the artifact ID in any case
+     */
+    project.archivesBaseName = pomArtifactId
+
     if (projectDokkaJavadocTask == null) {
         projectDokkaJavadocTask = projectDokkaAndroidJavadocTask
     }
@@ -520,6 +526,11 @@ afterEvaluate { project ->
                     source += android.sourceSets.main.kotlin.srcDirs
                 }
                 classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+
+                classpath += files(android.libraryVariants.collect { variant ->
+                    variant.javaCompile.classpath.files
+                })
+
                 options {
                     linksOffline 'https://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference/"
                 }
