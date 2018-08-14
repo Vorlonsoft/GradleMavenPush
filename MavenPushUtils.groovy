@@ -90,18 +90,6 @@ final class MavenPushUtils {
         }
     }
 
-    static void downloadLib(String url, String path, String version, String name) {
-        File file = new File("${System.properties['user.home']}/.m2/repository/${path}/${version}/${name}")
-        file.parentFile.mkdirs()
-        if (!file.exists()) {
-            new URL(url).withInputStream { downloadStream ->
-                file.withOutputStream { fileOutputStream ->
-                    fileOutputStream << downloadStream
-                }
-            }
-        }
-    }
-
     /**
      * Utility method to extract only one entry in a zip file.
      *
@@ -129,6 +117,27 @@ final class MavenPushUtils {
             zip.close()
         }
         return result
+    }
+
+    /**
+     * Downloads library and puts it to local repository.
+     *
+     * @param url library url
+     * @param path local repository path
+     * @param version library version
+     * @param name local repository file name
+     */
+    void downloadLib(String url, String path, String version, String name) {
+        File file = new File("${System.properties['user.home']}/.m2/repository/${path}/${version}/${name}")
+        file.parentFile.mkdirs()
+        if (!file.exists()) {
+            new URL(url).withInputStream { downloadStream ->
+                file.withOutputStream { fileOutputStream ->
+                    fileOutputStream << downloadStream
+                }
+            }
+        }
+        project.files(file.absolutePath)
     }
 
     boolean isAndroid() {
