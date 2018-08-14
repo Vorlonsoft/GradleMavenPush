@@ -36,7 +36,7 @@ export NEXUS_PASSWORD      = $tr0ngP@55w0rd
 
 ### 3. Create project root gradle.properties
 
-You may already have this file, in which case just edit the original. This file should contain the POM values which are common to all of your sub-project (if you have any). For instance, here's [AndroidRate's](https://github.com/Vorlonsoft/AndroidRate):
+You may already have this file, in which case just edit the original. This file should contain the properties values which are common to all of your sub-projects (if you have any). For instance, here's [AndroidRate's](https://github.com/Vorlonsoft/AndroidRate):
 
 ```properties
 # GROUP (default is packageName for Android projects, "" for non-Android)
@@ -178,7 +178,7 @@ task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
 }
 ```
 
-### Other Properties (optional)
+### Other properties (optional)
 
 There are other properties which can be set:
 
