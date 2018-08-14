@@ -521,26 +521,40 @@ afterEvaluate { project ->
             }
         } else {
             task androidJavadocs(type: Javadoc) {
-                source = android.sourceSets.main.java.srcDirs
+                source += files(android.sourceSets.main.java.srcDirs)
                 if (kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) {
-                    source += android.sourceSets.main.kotlin.srcDirs
+                    source += files(android.sourceSets.main.kotlin.srcDirs)
                 }
-                classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-
-                classpath += files(android.libraryVariants.collect { variant ->
-                    variant.javaCompile.classpath.files
-                })
-
                 options {
                     linksOffline 'https://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference/"
                 }
-                failOnError = false
-                exclude '**/*.kt', '**/R.html', '**/R.*.html'
+                exclude '**/*.kt', '**/*.md', '**/R.html', '**/R.*.html'
             }
 
             task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
                 classifier = 'javadoc'
                 from androidJavadocs.destinationDir
+            }
+
+            android.libraryVariants.all { variant ->
+                androidJavadocs.doFirst {
+                    classpath += files(android.bootClasspath)
+                    classpath += files(variant.javaCompile.classpath.files)
+                    // Process AAR dependencies
+                    def aarDependencies = classpath.filter {
+                        it.name.endsWith('.aar')
+                    }
+                    classpath -= aarDependencies
+                    aarDependencies.each { aar ->
+                        // Extract classes.jar from the AAR dependency and add it to the androidJavadocs classpath
+                        final String outputPath = "${buildDir}/tmp/aarJar/${aar.name.replace('.aar', '.jar')}"
+                        classpath += files(outputPath)
+                        // Use a task so the actual extraction only happens before the androidJavadocs task is run
+                        dependsOn task(name: "extract${aar.name}").doLast {
+                            MavenPushUtils.extractEntry(aar, 'classes.jar', outputPath)
+                        }
+                    }
+                }
             }
         }
 
@@ -673,8 +687,7 @@ afterEvaluate { project ->
                 if (kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) {
                     source += sourceSets.main.kotlin.srcDirs
                 }
-                failOnError = false
-                exclude '**/*.kt'
+                exclude '**/*.kt', '**/*.md'
             }
 
             task javadocsJar(type: Jar, dependsOn: coreJavadoc) {
@@ -741,6 +754,7 @@ afterEvaluate { project ->
     }
 
     tasks.withType(Javadoc).all {
+        failOnError = false
         options.encoding = MavenPush.with(project).getJavadocEncoding()
         options.docEncoding = MavenPush.with(project).getJavadocDocEncoding()
         options.charSet = MavenPush.with(project).getJavadocCharSet()

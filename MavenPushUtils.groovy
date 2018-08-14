@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.zip.ZipFile
+
 final class MavenPushUtils {
 
     private static volatile MavenPushUtils singleton = null
@@ -95,6 +100,35 @@ final class MavenPushUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Utility method to extract only one entry in a zip file.
+     *
+     * @param archive zip archive
+     * @param entryPath entry path
+     * @param outputPath output path
+     * @return false if entry doesn't exist in the zip archive, true otherwise.
+     */
+    static boolean extractEntry(File archive, String entryPath, String outputPath) {
+        boolean result = false
+        if (archive.exists()) {
+            ZipFile zip = new ZipFile(archive)
+            zip.entries().each {
+                if (it.name == entryPath) {
+                    Path path = Paths.get(outputPath)
+                    if (Files.exists(path)) {
+                        Files.delete(path)
+                    } else {
+                        Files.createDirectories(path.getParent())
+                    }
+                    Files.copy(zip.getInputStream(it), path)
+                    result = true
+                }
+            }
+            zip.close()
+        }
+        return result
     }
 
     boolean isAndroid() {
