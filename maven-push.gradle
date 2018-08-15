@@ -781,12 +781,28 @@ afterEvaluate { project ->
     }
 }
 
+/**
+ * <p>GradleMavenPush is a helper to upload Gradle Android Artifacts,
+ * Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter,
+ * Maven Central, Corporate staging/snapshot servers and local Maven repositories).</p>
+ * <p>MavenPushInitializer Class - class with GradleMavenPush Gradle Script plugin initializers.</p>
+ *
+ * @author   Alexander Savin
+ * @since    1.6.0 Yokohama
+ */
 final class MavenPushInitializer {
 
     private MavenPushInitializer() {
         throw new AssertionError()
     }
 
+    /**
+     * Downloads Groovy Class source file
+     *
+     * @param url Groovy Class source file url
+     * @param name Groovy Class source file local repository name
+     * @return Groovy Class source file
+     */
     static File downloadGroovyClass(String url, String name) {
         File file = new File("${System.properties['user.home']}/.m2/repository/com/vorlonsoft/GradleMavenPush/${name}")
         file.parentFile.mkdirs()

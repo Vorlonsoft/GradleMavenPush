@@ -1,7 +1,7 @@
 GradleMavenPush
 ===============
 
-Helper to upload Gradle Android Artifacts, Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter, Maven Central, Corporate staging/snapshot servers and local Maven repositories)
+Helper to upload Gradle Android Artifacts, Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter, Maven Central, Corporate staging/snapshot servers and local Maven repositories).
 
 ## Usage
 

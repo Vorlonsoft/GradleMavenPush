@@ -19,6 +19,16 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.zip.ZipFile
 
+/**
+ * <p>GradleMavenPush is a helper to upload Gradle Android Artifacts,
+ * Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter,
+ * Maven Central, Corporate staging/snapshot servers and local Maven repositories).</p>
+ * <p>MavenPushUtils Class - utility class, thread-safe and a fast singleton
+ * implementation.</p>
+ *
+ * @author   Alexander Savin
+ * @since    1.6.0 Yokohama
+ */
 final class MavenPushUtils {
 
     private static volatile MavenPushUtils singleton = null
@@ -29,6 +39,12 @@ final class MavenPushUtils {
         this.project = project
     }
 
+    /**
+     * Only method to get singleton object of MavenPushUtils Class
+     *
+     * @param project project
+     * @return thread-safe singleton
+     */
     static MavenPushUtils with(project) {
         if (singleton == null) {
             synchronized (MavenPushUtils.class) {
@@ -40,6 +56,32 @@ final class MavenPushUtils {
         return singleton
     }
 
+    /**
+     * Downloads library and puts it to local repository.
+     *
+     * @param url library url
+     * @param path local repository path
+     * @param version library version
+     * @param name local repository file name
+     */
+    static void downloadLib(String url, String path, String version, String name) {
+        File file = new File("${System.properties['user.home']}/.m2/repository/${path}/${version}/${name}")
+        file.parentFile.mkdirs()
+        if (!file.exists()) {
+            new URL(url).withInputStream { downloadStream ->
+                file.withOutputStream { fileOutputStream ->
+                    fileOutputStream << downloadStream
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns Java API specification link.
+     *
+     * @param currentJavaVersion current Java version
+     * @return Java API specification link
+     */
     static String getJavaAPISpecificationLink(String currentJavaVersion) {
         switch (currentJavaVersion) {
             case '1.5':
@@ -63,6 +105,13 @@ final class MavenPushUtils {
         }
     }
 
+    /**
+     * Pom file finalizer.
+     *
+     * @param pom pom
+     * @param pomPackagingConfig pom packaging config
+     * @param pomConfig pom config
+     */
     static void pomFinalizer(def pom, def pomPackagingConfig, def pomConfig) {
         pom.withXml {
             final def root = asNode()
@@ -96,7 +145,8 @@ final class MavenPushUtils {
      * @param archive zip archive
      * @param entryPath entry path
      * @param outputPath output path
-     * @return false if entry doesn't exist in the zip archive, true otherwise.
+     * @return false if entry doesn't exist in the zip archive or zip archive doesn't exist,
+     * true otherwise.
      */
     static boolean extractEntry(File archive, String entryPath, String outputPath) {
         boolean result = false
@@ -120,25 +170,10 @@ final class MavenPushUtils {
     }
 
     /**
-     * Downloads library and puts it to local repository.
+     * Checks Android or non-Android project.
      *
-     * @param url library url
-     * @param path local repository path
-     * @param version library version
-     * @param name local repository file name
+     * @return true if Android project, false otherwise
      */
-    static void downloadLib(String url, String path, String version, String name) {
-        File file = new File("${System.properties['user.home']}/.m2/repository/${path}/${version}/${name}")
-        file.parentFile.mkdirs()
-        if (!file.exists()) {
-            new URL(url).withInputStream { downloadStream ->
-                file.withOutputStream { fileOutputStream ->
-                    fileOutputStream << downloadStream
-                }
-            }
-        }
-    }
-
     boolean isAndroid() {
         return project.getPlugins().hasPlugin('com.android.application') ||
                 project.getPlugins().hasPlugin('com.android.library') ||
@@ -146,6 +181,11 @@ final class MavenPushUtils {
                 project.getPlugins().hasPlugin('android-library')
     }
 
+    /**
+     * Checks Kotlin or non-Kotlin project.
+     *
+     * @return true if Kotlin project, false otherwise
+     */
     boolean isKotlin() {
         return project.getPlugins().hasPlugin('kotlin') ||
                 project.getPlugins().hasPlugin('kotlin-platform-common') ||
@@ -159,6 +199,11 @@ final class MavenPushUtils {
                 project.getPlugins().hasPlugin('kotlin-android-extensions')
     }
 
+    /**
+     * Checks DokkaPlugin or non-DokkaPlugin project.
+     *
+     * @return true if project has DokkaPlugin, false otherwise
+     */
     boolean isDokkaPlugin() {
         return project.getPlugins().hasPlugin('org.jetbrains.dokka-android') ||
                 project.getPlugins().hasPlugin('org.jetbrains.dokka')
