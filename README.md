@@ -140,44 +140,6 @@ group   = com.vorlonsoft
 version = 1.2.0
 ```
 
-#### 6.2 Dokka configuration (optional)
-
-If you want to configure Dokka documentation engine by yourself you must add to `build.gradle`:
-
-* For Android projects:
-
-```properties
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:${dokka_version}"
-    }
-}
-apply plugin: 'org.jetbrains.dokka-android'
-task dokkaAndroidJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
-    // Task name is important. Set options here.
-}
-```
-
-* For Other projects:
-
-```properties
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
-    }
-}
-apply plugin: 'org.jetbrains.dokka'
-task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
-    // Task name is important. Set options here.
-}
-```
-
 ### Other properties (optional)
 
 There are other properties which can be set:
@@ -202,6 +164,28 @@ Java 9+. This option assume that the HTML in the document comments is of the sam
 
 ```properties
 JAVADOC_HTML_VERSION (default is "4")
+```
+
+#### Dokka documentation engine
+
+Dokka fatjar version. Latest version is ![Dokka fatjar latest version](https://api.bintray.com/packages/kotlin/dokka/dokka/images/download.svg)
+
+```properties
+DOKKA_FATJAR_VERSION (default is "0.9.17")
+```
+
+Dokka output format. Options are:
+
+  * `html` - minimalistic html format used by default
+  * `javadoc` - Dokka mimic to javadoc
+  * `html-as-java` - as `html` but using java syntax
+  * `markdown` - Markdown structured as `html`
+    * `gfm` - GitHub flavored markdown
+    * `jekyll` - Jekyll compatible markdown
+  * `kotlin-website` - internal format used for documentation on *kotlinlang.org*
+
+```properties
+DOKKA_OUTPUT_FORMAT (default is "javadoc")
 ```
 
 #### Snapshots names
@@ -319,22 +303,11 @@ This is the url of the repository from whence another POM may point to in order 
 POM_DIST_DOWNLOAD_URL (default is "")
 ```
 
-## MavenPush Class
-
-**GradleMavenPush** project includes `MavenPush.groovy` and `MavenPushUtils.groovy` Groovy Classes. You can use them in your own projects. Classes licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
-
-```groovy
-'https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPush.groovy'
-'https://raw.github.com/Vorlonsoft/GradleMavenPush/master/MavenPushUtils.groovy'
-```
-
 ## Already in use in following libraries
 
 * [AndroidRate library](https://github.com/Vorlonsoft/AndroidRate)
 
 * [ExpandableSelector library](https://github.com/Karumi/ExpandableSelector)
-
-* [Helpers](https://github.com/danielgindi/android-helpers)
 
 * ...
 

@@ -205,6 +205,26 @@ final class MavenPush {
     }
 
     /**
+     * Returns Dokka fatjar version
+     *
+     * @return DOKKA_FATJAR_VERSION gradle property value or "0.9.17" if project hasn't
+     * this property
+     */
+    String getDokkaFatJarVersion() {
+        return project.hasProperty('DOKKA_FATJAR_VERSION') ? project.DOKKA_FATJAR_VERSION : '0.9.17'
+    }
+
+    /**
+     * Returns Dokka output format
+     *
+     * @return DOKKA_OUTPUT_FORMAT gradle property value or "javadoc" if project hasn't
+     * this property
+     */
+    String getDokkaOutputFormat() {
+        return project.hasProperty('DOKKA_OUTPUT_FORMAT') ? project.DOKKA_OUTPUT_FORMAT : 'javadoc'
+    }
+
+    /**
      * Checks if doclint check on Javadoc generation must be enable.
      *
      * @return true if DOCLINT_CHECK gradle property value is "true", false otherwise

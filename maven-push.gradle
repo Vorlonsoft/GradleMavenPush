@@ -42,8 +42,9 @@ afterEvaluate { project ->
     final String androidJarMainClass = MavenPush.with(project).getAndroidJarMainClass()
     final String[] gradleVersion = gradle.gradleVersion.split('[\\.]')
     final int gradleMajor = Integer.parseInt(gradleVersion[0])
-    final String dokkaFatJarVersion = '0.9.17'
+    final String dokkaFatJarVersion = MavenPush.with(project).getDokkaFatJarVersion()
     final String dokkaFatJarPath = 'org/jetbrains/dokka/dokka-fatjar'
+    final String dokkaOutputFormat = MavenPush.with(project).getDokkaOutputFormat()
     final String javaAPISpecificationLink = MavenPushUtils.getJavaAPISpecificationLink(JavaVersion.current().toString())
     final String repositoryUsername = MavenPush.with(project).getRepositoryUsername()
     final String repositoryPassword = MavenPush.with(project).getRepositoryPassword()
@@ -205,12 +206,6 @@ afterEvaluate { project ->
             }
         }
     }
-    def projectDokkaJavadocTask = !dokkaPlugin ? null : project.tasks.find {
-        it.name == 'dokkaJavadoc'
-    }
-    def projectDokkaAndroidJavadocTask = !dokkaPlugin ? null : project.tasks.find {
-        it.name == 'dokkaAndroidJavadoc'
-    }
 
     /**
      *  Sets the artifacts base file name to match
@@ -218,14 +213,7 @@ afterEvaluate { project ->
      */
     project.archivesBaseName = pomArtifactId
 
-    if (projectDokkaJavadocTask == null) {
-        projectDokkaJavadocTask = projectDokkaAndroidJavadocTask
-    }
-    if (projectDokkaAndroidJavadocTask == null) {
-        projectDokkaAndroidJavadocTask = projectDokkaJavadocTask
-    }
-
-    task dokkaInitializer {
+    task dokkaEngineInitializer {
         MavenPushUtils.downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.pom",
                 dokkaFatJarPath, dokkaFatJarVersion, "dokka-fatjar-${dokkaFatJarVersion}.pom")
         MavenPushUtils.downloadLib("https://jcenter.bintray.com/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
@@ -332,6 +320,73 @@ afterEvaluate { project ->
 
                 MavenPushUtils.pomFinalizer(pom, pomPackagingConfig, pomConfig)
             }
+        }
+    }
+
+    if (dokkaEngine) {
+        task dokkaEngine(type: Exec, dependsOn: dokkaEngineInitializer) {
+            description 'Generates the documentation by Dokka.'
+            final byte srcDirsJavaNumber
+            final byte srcDirsKotlinNumber
+            final byte classpathNumber
+            final String classpath
+            final String srcDirOne
+            final String srcDirTwo
+            final String srcDirThree
+            final String links
+            if (androidOs) {
+                srcDirsJavaNumber = (byte) ((android.sourceSets.main.java.srcDirs != null) ? android.sourceSets.main.java.srcDirs.size() : 0)
+                srcDirsKotlinNumber = (byte) ((kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) ? android.sourceSets.main.kotlin.srcDirs.size() : 0)
+                classpathNumber = (byte) ((android.getBootClasspath() != null) ? android.getBootClasspath().size() : 0)
+                classpath = (classpathNumber > 0) ? android.getBootClasspath()[0] : ''
+                srcDirOne = (srcDirsJavaNumber > 0) ? android.sourceSets.main.java.srcDirs[0] : ''
+                srcDirTwo = (srcDirsJavaNumber > 1) ? android.sourceSets.main.java.srcDirs[1] : ''
+                srcDirThree = (srcDirsKotlinNumber > 0) ? android.sourceSets.main.kotlin.srcDirs[0] : ''
+                links = "https://developer.android.com/reference/^${android.sdkDirectory}/docs/reference/^${javaAPISpecificationLink}"
+                if (srcDirsJavaNumber > 0) {
+                    mkdir android.sourceSets.main.java.srcDirs[0]
+                    if (srcDirsJavaNumber > 1) {
+                        mkdir android.sourceSets.main.java.srcDirs[1]
+                    }
+                }
+                if (srcDirsKotlinNumber > 0) {
+                    mkdir android.sourceSets.main.kotlin.srcDirs[0]
+                }
+            } else {
+                srcDirsJavaNumber = (byte) ((sourceSets.main.java.srcDirs != null) ? sourceSets.main.java.srcDirs.size() : 0)
+                srcDirsKotlinNumber = (byte) ((kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) ? sourceSets.main.kotlin.srcDirs.size() : 0)
+                classpathNumber = 0
+                classpath = ''
+                srcDirOne = (srcDirsJavaNumber > 0) ? sourceSets.main.java.srcDirs[0] : ''
+                srcDirTwo = (srcDirsJavaNumber > 1) ? sourceSets.main.java.srcDirs[1] : ''
+                srcDirThree = (srcDirsKotlinNumber > 0) ? sourceSets.main.kotlin.srcDirs[0] : ''
+                links = javaAPISpecificationLink
+                if (srcDirsJavaNumber > 0) {
+                    mkdir sourceSets.main.java.srcDirs[0]
+                    if (srcDirsJavaNumber > 1) {
+                        mkdir sourceSets.main.java.srcDirs[1]
+                    }
+                }
+                if (srcDirsKotlinNumber > 0) {
+                    mkdir sourceSets.main.kotlin.srcDirs[0]
+                }
+            }
+            if (srcDirsJavaNumber + srcDirsKotlinNumber > 0) {
+                commandLine 'java', '-jar',
+                        "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
+                        srcDirOne, srcDirTwo, srcDirThree, '-output', "${buildDir}/${dokkaOutputFormat}", '-format', dokkaOutputFormat, '-links', links,
+                        (classpathNumber > 0) ? '-classpath' : '', (classpathNumber > 0) ? classpath : ''
+            } else {
+                commandLine 'java', '-jar',
+                        "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
+            }
+        }
+
+        task dokkaEngineJar(type: Jar, dependsOn: dokkaEngine) {
+            description 'Archives the documentation created by Dokka.'
+            classifier = dokkaOutputFormat
+            destinationDir = buildDir
+            from "${buildDir}/${dokkaOutputFormat}"
         }
     }
 
@@ -488,48 +543,7 @@ afterEvaluate { project ->
             }
         }
 
-        if (dokkaEngine) {
-            if (projectDokkaAndroidJavadocTask != null) {
-                task projectDokkaAndroidJavadocTaskJar(type: Jar, dependsOn: projectDokkaAndroidJavadocTask) {
-                    classifier = 'javadoc'
-                    from projectDokkaAndroidJavadocTask.outputDirectory
-                }
-            } else {
-                task androidDokka(type: Exec, dependsOn: dokkaInitializer) {
-                    final byte srcDirsJavaNumber = (byte) ((android.sourceSets.main.java.srcDirs != null) ? android.sourceSets.main.java.srcDirs.size() : 0)
-                    final byte srcDirsKotlinNumber = (byte) ((kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) ? android.sourceSets.main.kotlin.srcDirs.size() : 0)
-                    final byte classpathNumber = (byte) ((android.getBootClasspath() != null) ? android.getBootClasspath().size() : 0)
-                    final String classpath = (classpathNumber > 0) ? android.getBootClasspath()[0] : ''
-                    if (srcDirsJavaNumber > 0) {
-                        mkdir android.sourceSets.main.java.srcDirs[0]
-                        if (srcDirsJavaNumber > 1) {
-                            mkdir android.sourceSets.main.java.srcDirs[1]
-                        }
-                    }
-                    if (srcDirsKotlinNumber > 0) {
-                        mkdir android.sourceSets.main.kotlin.srcDirs[0]
-                    }
-                    if (srcDirsJavaNumber + srcDirsKotlinNumber > 0) {
-                        commandLine 'java', '-jar',
-                                "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
-                                (srcDirsJavaNumber > 0) ? android.sourceSets.main.java.srcDirs[0] : '',
-                                (srcDirsJavaNumber > 1) ? android.sourceSets.main.java.srcDirs[1] : '',
-                                (srcDirsKotlinNumber > 0) ? android.sourceSets.main.kotlin.srcDirs[0] : '',
-                                '-output', "${buildDir}/javadoc", '-format', 'javadoc',
-                                (classpathNumber > 0) ? '-classpath' : '', (classpathNumber > 0) ? classpath : '',
-                                '-links', "https://developer.android.com/reference/^${android.sdkDirectory}/docs/reference/^${javaAPISpecificationLink}"
-                    } else {
-                        commandLine 'java', '-jar',
-                                "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
-                    }
-                }
-
-                task androidDokkaJar(type: Jar, dependsOn: androidDokka) {
-                    classifier = 'javadoc'
-                    from "${buildDir}/javadoc"
-                }
-            }
-        } else {
+        if (!dokkaEngine) {
             task androidJavadocs(type: Javadoc) {
                 source += files(android.sourceSets.main.java.srcDirs)
                 if (kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) {
@@ -653,45 +667,7 @@ afterEvaluate { project ->
             }
         }
 
-        if (dokkaEngine) {
-            if (projectDokkaJavadocTask != null) {
-                task projectDokkaJavadocTaskJar(type: Jar, dependsOn: projectDokkaJavadocTask) {
-                    classifier = 'javadoc'
-                    from projectDokkaJavadocTask.outputDirectory
-                }
-            } else {
-                task coreDokka(type: Exec, dependsOn: dokkaInitializer) {
-                    final byte srcDirsJavaNumber = (byte) ((sourceSets.main.java.srcDirs != null) ? sourceSets.main.java.srcDirs.size() : 0)
-                    final byte srcDirsKotlinNumber = (byte) ((kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) ? sourceSets.main.kotlin.srcDirs.size() : 0)
-                    if (srcDirsJavaNumber > 0) {
-                        mkdir sourceSets.main.java.srcDirs[0]
-                        if (srcDirsJavaNumber > 1) {
-                            mkdir sourceSets.main.java.srcDirs[1]
-                        }
-                    }
-                    if (srcDirsKotlinNumber > 0) {
-                        mkdir sourceSets.main.kotlin.srcDirs[0]
-                    }
-                    if (srcDirsJavaNumber + srcDirsKotlinNumber > 0) {
-                        commandLine 'java', '-jar',
-                                "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar",
-                                (srcDirsJavaNumber > 0) ? sourceSets.main.java.srcDirs[0] : '',
-                                (srcDirsJavaNumber > 1) ? sourceSets.main.java.srcDirs[1] : '',
-                                (srcDirsKotlinNumber > 0) ? sourceSets.main.kotlin.srcDirs[0] : '',
-                                '-output', "${buildDir}/javadoc", '-format', 'javadoc',
-                                '-links', javaAPISpecificationLink
-                    } else {
-                        commandLine 'java', '-jar',
-                                "${System.properties['user.home']}/.m2/repository/${dokkaFatJarPath}/${dokkaFatJarVersion}/dokka-fatjar-${dokkaFatJarVersion}.jar"
-                    }
-                }
-
-                task dokkaJar(type: Jar, dependsOn: coreDokka) {
-                    classifier = 'javadoc'
-                    from "${buildDir}/javadoc"
-                }
-            }
-        } else {
+        if (!dokkaEngine) {
             task coreJavadoc(type: Javadoc) {
                 source = sourceSets.main.java.srcDirs
                 if (kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) {
@@ -726,6 +702,9 @@ afterEvaluate { project ->
     }
 
     artifacts {
+        if (dokkaEngine) {
+            archives dokkaEngineJar
+        }
         if (androidOs) {
             if (fatjarArtifact) {
                 archives createAndroidFatjar
@@ -736,13 +715,7 @@ afterEvaluate { project ->
             if (apklibArtifact) {
                 archives createAndroidApklib
             }
-            if (dokkaEngine) {
-                if (projectDokkaAndroidJavadocTask != null) {
-                    archives projectDokkaAndroidJavadocTaskJar
-                } else {
-                    archives androidDokkaJar
-                }
-            } else {
+            if (!dokkaEngine) {
                 archives androidJavadocsJar
             }
             archives androidSourcesJar
@@ -750,13 +723,7 @@ afterEvaluate { project ->
             if (createFatjar) {
                 archives createFatjar
             }
-            if (dokkaEngine) {
-                if (projectDokkaJavadocTask != null) {
-                    archives projectDokkaJavadocTaskJar
-                } else {
-                    archives dokkaJar
-                }
-            } else {
+            if (!dokkaEngine) {
                 archives javadocsJar
             }
             archives sourcesJar
