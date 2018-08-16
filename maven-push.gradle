@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 
+/**
+ * <p>GradleMavenPush is a helper to upload Gradle Android Artifacts,
+ * Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter,
+ * Maven Central, Corporate staging/snapshot servers and local Maven repositories).</p>
+ *
+ * @author Alexander Savin
+ * @version 1.6.0 Yokohama
+ * @since 1.0.0
+ */
+
 apply plugin: 'maven'
 apply plugin: 'signing'
 
@@ -364,7 +374,7 @@ afterEvaluate { project ->
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
                 if (androidJarMainClass != '') {
                     manifest {
-                        attributes 'Main-Class' : androidJarMainClass
+                        attributes 'Main-Class': androidJarMainClass
                     }
                 }
                 configurations.implementation.setCanBeResolved(true)
@@ -434,7 +444,7 @@ afterEvaluate { project ->
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
                 if (androidJarMainClass != '') {
                     manifest {
-                        attributes 'Main-Class' : androidJarMainClass
+                        attributes 'Main-Class': androidJarMainClass
                     }
                 }
                 from "${buildDir}/tmp/kotlin-classes/release/"
@@ -473,7 +483,7 @@ afterEvaluate { project ->
                         for (byte i = 0; i < srcDirsNumber; i++) {
                             from sources[i]
                         }
-                    }                    
+                    }
                 }
             }
         }
@@ -787,8 +797,9 @@ afterEvaluate { project ->
  * Maven Central, Corporate staging/snapshot servers and local Maven repositories).</p>
  * <p>MavenPushInitializer Class - class with GradleMavenPush Gradle Script plugin initializers.</p>
  *
- * @author   Alexander Savin
- * @since    1.6.0 Yokohama
+ * @author Alexander Savin
+ * @version 1.6.0 Yokohama
+ * @since 1.6.0 Yokohama
  */
 final class MavenPushInitializer {
 

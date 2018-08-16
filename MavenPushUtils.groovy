@@ -26,8 +26,9 @@ import java.util.zip.ZipFile
  * <p>MavenPushUtils Class - utility class, thread-safe and a fast singleton
  * implementation.</p>
  *
- * @author   Alexander Savin
- * @since    1.6.0 Yokohama
+ * @author Alexander Savin
+ * @version 1.6.0 Yokohama
+ * @since 1.6.0 Yokohama
  */
 final class MavenPushUtils {
 

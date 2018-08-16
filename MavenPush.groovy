@@ -21,8 +21,9 @@
  * <p>MavenPush Class - class with gradle properties getters, thread-safe and
  * a fast singleton implementation.</p>
  *
- * @author   Alexander Savin
- * @since    1.5.0 Tokyo
+ * @author Alexander Savin
+ * @version 1.6.0 Yokohama
+ * @since 1.5.0 Tokyo
  */
 final class MavenPush {
 
@@ -361,7 +362,13 @@ final class MavenPush {
         return project.hasProperty('POM_GENERATE_UNIQUE_SNAPSHOTS') ? 'true'.equalsIgnoreCase(project.POM_GENERATE_UNIQUE_SNAPSHOTS) : true
     }
 
-    String getPomUrl() {
+    /**
+     * Returns library url.
+     *
+     * @return POM_URL gradle property value
+     * @throws InvalidUserDataException If library url can't be return
+     */
+    String getPomUrl() throws InvalidUserDataException {
         if (project.hasProperty('POM_URL')) {
             return project.POM_URL
         } else {
@@ -369,15 +376,34 @@ final class MavenPush {
         }
     }
 
+    /**
+     * Returns inception year.
+     *
+     * @return POM_INCEPTION_YEAR gradle property value or "" if project hasn't
+     * POM_INCEPTION_YEAR gradle property
+     */
     String getPomInceptionYear() {
         return project.hasProperty('POM_INCEPTION_YEAR') ? project.POM_INCEPTION_YEAR : ''
     }
 
-    String getPomScmUrl() {
+    /**
+     * Returns library publicly browsable repository url.
+     *
+     * @return POM_SCM_URL gradle property value or POM_URL gradle property value if project hasn't
+     * POM_SCM_URL gradle property
+     * @throws InvalidUserDataException If library publicly browsable repository url can't be return
+     */
+    String getPomScmUrl() throws InvalidUserDataException {
         return project.hasProperty('POM_SCM_URL') ? project.POM_SCM_URL : getPomUrl()
     }
 
-    String getPomScmConnection() {
+    /**
+     * Returns connection element convey to how one is to connect to the version control system through Maven.
+     *
+     * @return POM_SCM_CONNECTION gradle property value
+     * @throws InvalidUserDataException If connection element can't be return
+     */
+    String getPomScmConnection() throws InvalidUserDataException {
         if (project.hasProperty('POM_SCM_CONNECTION')) {
             return project.POM_SCM_CONNECTION
         } else {
@@ -385,15 +411,34 @@ final class MavenPush {
         }
     }
 
-    String getPomScmDevConnection() {
+    /**
+     * Returns connection element convey to how one is to connect to the version control system through Maven.
+     *
+     * @return POM_SCM_DEV_CONNECTION gradle property value or POM_SCM_CONNECTION gradle property value if project hasn't
+     * POM_SCM_DEV_CONNECTION gradle property
+     * @throws InvalidUserDataException If connection element can't be return
+     */
+    String getPomScmDevConnection() throws InvalidUserDataException {
         return project.hasProperty('POM_SCM_DEV_CONNECTION') ? project.POM_SCM_DEV_CONNECTION : getPomScmConnection()
     }
 
+    /**
+     * Returns the tag that your project lives under.
+     *
+     * @return POM_SCM_TAG gradle property value or "HEAD" (meaning, the Software Configuration Management (SCM) root)
+     * if project hasn't POM_SCM_TAG gradle property
+     */
     String getPomScmTag() {
         return project.hasProperty('POM_SCM_TAG') ? project.POM_SCM_TAG : 'HEAD'
     }
 
-    String getPomLicenseName() {
+    /**
+     * Returns licence name.
+     *
+     * @return POM_LICENCE_NAME gradle property value
+     * @throws InvalidUserDataException If licence name can't be return
+     */
+    String getPomLicenseName() throws InvalidUserDataException {
         if (project.hasProperty('POM_LICENCE_NAME')) {
             return project.POM_LICENCE_NAME
         } else {
@@ -401,7 +446,13 @@ final class MavenPush {
         }
     }
 
-    String getPomLicenseUrl() {
+    /**
+     * Returns licence url.
+     *
+     * @return POM_LICENCE_URL gradle property value
+     * @throws InvalidUserDataException If licence url can't be return
+     */
+    String getPomLicenseUrl() throws InvalidUserDataException {
         if (project.hasProperty('POM_LICENCE_URL')) {
             return project.POM_LICENCE_URL
         } else {
@@ -409,23 +460,53 @@ final class MavenPush {
         }
     }
 
+    /**
+     * Returns licence dist.
+     *
+     * @return POM_LICENCE_DIST gradle property value or "repo"
+     * if project hasn't POM_LICENCE_DIST gradle property
+     */
     String getPomLicenseDist() {
         return project.hasProperty('POM_LICENCE_DIST') ? project.POM_LICENCE_DIST : 'repo'
     }
 
+    /**
+     * Returns licence comments.
+     *
+     * @return POM_LICENCE_COMMENTS gradle property value or ""
+     * if project hasn't POM_LICENCE_COMMENTS gradle property
+     */
     String getPomLicenseComments() {
         return project.hasProperty('POM_LICENCE_COMMENTS') ? project.POM_LICENCE_COMMENTS : ''
     }
 
+    /**
+     * Returns organization.
+     *
+     * @return POM_ORG gradle property value or ""
+     * if project hasn't POM_ORG gradle property
+     */
     String getOrg() {
         return project.hasProperty('POM_ORG') ? project.POM_ORG : ''
     }
 
+    /**
+     * Returns organization url.
+     *
+     * @return POM_ORG_URL gradle property value or ""
+     * if project hasn't POM_ORG_URL gradle property
+     */
     String getOrgUrl() {
         return project.hasProperty('POM_ORG_URL') ? project.POM_ORG_URL : ''
     }
 
-    String getDeveloperId() {
+    /**
+     * Returns developer ID.
+     *
+     * @return POM_DEVELOPER_ID gradle property value
+     * @throws InvalidUserDataException If developer ID can't be return
+     */
+    String getDeveloperId() throws InvalidUserDataException {
         if (project.hasProperty('POM_DEVELOPER_ID')) {
             return project.POM_DEVELOPER_ID
         } else {
@@ -433,7 +514,13 @@ final class MavenPush {
         }
     }
 
-    String getDeveloperName() {
+    /**
+     * Returns developer name.
+     *
+     * @return POM_DEVELOPER_NAME gradle property value
+     * @throws InvalidUserDataException If developer name can't be return
+     */
+    String getDeveloperName() throws InvalidUserDataException {
         if (project.hasProperty('POM_DEVELOPER_NAME')) {
             return project.POM_DEVELOPER_NAME
         } else {
@@ -441,22 +528,54 @@ final class MavenPush {
         }
     }
 
+    /**
+     * Returns developer email.
+     *
+     * @return POM_DEVELOPER_EMAIL gradle property value or "lazy-developer-who-does-not-read-readme@example.com"
+     * if project hasn't POM_DEVELOPER_EMAIL gradle property
+     */
     String getDeveloperEmail() {
         return project.hasProperty('POM_DEVELOPER_EMAIL') ? project.POM_DEVELOPER_EMAIL : 'lazy-developer-who-does-not-read-readme@example.com'
     }
 
+    /**
+     * Returns developer url.
+     *
+     * @return POM_DEVELOPER_URL gradle property value or ""
+     * if project hasn't POM_DEVELOPER_URL gradle property
+     */
     String getDeveloperUrl() {
         return project.hasProperty('POM_DEVELOPER_URL') ? project.POM_DEVELOPER_URL : ''
     }
 
+    /**
+     * Returns developer organization.
+     *
+     * @return POM_DEVELOPER_ORG gradle property value or ""
+     * if project hasn't POM_DEVELOPER_ORG gradle property
+     */
     String getDeveloperOrg() {
         return project.hasProperty('POM_DEVELOPER_ORG') ? project.POM_DEVELOPER_ORG : getOrg()
     }
 
+    /**
+     * Returns developer organization url.
+     *
+     * @return POM_DEVELOPER_ORG_URL gradle property value or POM_ORG_URL gradle property value if project hasn't
+     * POM_DEVELOPER_ORG_URL gradle property or "" if project hasn't POM_DEVELOPER_ORG_URL gradle property and
+     * POM_ORG_URL gradle property
+     */
     String getDeveloperOrgUrl() {
         return project.hasProperty('POM_DEVELOPER_ORG_URL') ? project.POM_DEVELOPER_ORG_URL : getOrgUrl()
     }
 
+    /**
+     * Returns array of developer roles.
+     *
+     * @return developer roles from POM_DEVELOPER_ROLE gradle property and POM_DEVELOPER_ROLES gradle property
+     * or ['Software Developer'] if project hasn't POM_DEVELOPER_ROLE gradle property and
+     * POM_DEVELOPER_ROLES gradle property
+     */
     String[] getDeveloperRoles() {
         if (project.hasProperty('POM_DEVELOPER_ROLES')) {
             if (project.hasProperty('POM_DEVELOPER_ROLE')) {
@@ -470,38 +589,100 @@ final class MavenPush {
         }
     }
 
+    /**
+     * Returns developer timezone.
+     *
+     * @return POM_DEVELOPER_TIMEZONE gradle property value or ""
+     * if project hasn't POM_DEVELOPER_TIMEZONE gradle property
+     */
     String getDeveloperTimezone() {
         return project.hasProperty('POM_DEVELOPER_TIMEZONE') ? project.POM_DEVELOPER_TIMEZONE : ''
     }
 
+    /**
+     * Returns array of developers (id, name and email for each developer). Example:
+     * {@code [ ' B i l l G ' , 'Bill Gates' , 'bill@example.com' , 'SteveJ' , 'Steve Jobs' , 'steve@example.com']}
+     *
+     * @return developers from POM_DEVELOPERS gradle property or ['']
+     * if project hasn't POM_DEVELOPERS gradle property
+     */
     String[] getDevelopers() {
         return project.hasProperty('POM_DEVELOPERS') ? project.getProperty('POM_DEVELOPERS').split(',') : ['']
     }
 
+    /**
+     * Returns array of contributors (name and email for each contributor). Example:
+     * {@code ['Bill Gates' , 'bill@example.com' , 'Steve Jobs' , 'steve@example.com']}
+     *
+     * @return contributors from POM_CONTRIBUTORS gradle property or ['']
+     * if project hasn't POM_CONTRIBUTORS gradle property
+     */
     String[] getContributors() {
         return project.hasProperty('POM_CONTRIBUTORS') ? project.getProperty('POM_CONTRIBUTORS').split(',') : ['']
     }
 
+    /**
+     * Returns issue tracking system.
+     *
+     * @return POM_ISSUE_SYSTEM gradle property value or ""
+     * if project hasn't POM_ISSUE_SYSTEM gradle property
+     */
     String getIssueSystem() {
         return project.hasProperty('POM_ISSUE_SYSTEM') ? project.POM_ISSUE_SYSTEM : ''
     }
 
+    /**
+     * Returns issue tracking system url.
+     *
+     * @return POM_ISSUE_SYSTEM_URL gradle property value or ""
+     * if project hasn't POM_ISSUE_SYSTEM_URL gradle property
+     */
     String getIssueSystemUrl() {
         return project.hasProperty('POM_ISSUE_SYSTEM_URL') ? project.POM_ISSUE_SYSTEM_URL : ''
     }
 
+    /**
+     * Returns continuous integration system.
+     *
+     * @return POM_CI_SYSTEM gradle property value or ""
+     * if project hasn't POM_CI_SYSTEM gradle property
+     */
     String getCiSystem() {
         return project.hasProperty('POM_CI_SYSTEM') ? project.POM_CI_SYSTEM : ''
     }
 
+    /**
+     * Returns continuous integration system url.
+     *
+     * @return POM_CI_SYSTEM_URL gradle property value or ""
+     * if project hasn't POM_CI_SYSTEM_URL gradle property
+     */
     String getCiSystemUrl() {
         return project.hasProperty('POM_CI_SYSTEM_URL') ? project.POM_CI_SYSTEM_URL : ''
     }
 
+    /**
+     * Returns array of mailing lists (name, subscribe email and unsubscribe email for each mailing list). Example:
+     * {@code ['Main' , 's@example.com' , 'u@example.com' , 'Support' , 'ss@example.com' , 'us@example.com']}
+     *
+     * @return mailing lists from POM_MAILING_LISTS gradle property or ['']
+     * if project hasn't POM_MAILING_LISTS gradle property
+     */
     String[] getMailingLists() {
         return project.hasProperty('POM_MAILING_LISTS') ? project.getProperty('POM_MAILING_LISTS').split(',') : ['']
     }
 
+    /**
+     * Returns array of repositories (id and url for each repository). Example:
+     * {@code ['mavenCentral' , 'https://repo1.maven.org/maven2/' , 'jCenter' , 'https://jcenter.bintray.com/']}
+     *
+     * @return repositories from POM_REPOSITORIES gradle property or ['']
+     * if project hasn't POM_REPOSITORIES gradle property if release build;
+     * repositories from POM_SNAPSHOT_REPOSITORIES gradle property or
+     * repositories from POM_REPOSITORIES gradle property
+     * if project hasn't POM_SNAPSHOT_REPOSITORIES gradle property or ['']
+     * if project hasn't POM_SNAPSHOT_REPOSITORIES and POM_REPOSITORIES gradle properties if non-release build
+     */
     String[] getRepositories() {
         if (isReleaseBuild()) {
             return project.hasProperty('POM_REPOSITORIES') ? project.getProperty('POM_REPOSITORIES').split(',') : ['']
@@ -514,6 +695,13 @@ final class MavenPush {
         }
     }
 
+    /**
+     * Returns the url of the repository from whence another POM
+     * may point to in order to grab this POM's artifact.
+     *
+     * @return POM_DIST_DOWNLOAD_URL gradle property value or ""
+     * if project hasn't POM_DIST_DOWNLOAD_URL gradle property
+     */
     String getDistDownloadUrl() {
         return project.hasProperty('POM_DIST_DOWNLOAD_URL') ? project.POM_DIST_DOWNLOAD_URL : ''
     }

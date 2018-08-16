@@ -279,7 +279,7 @@ POM_MAILING_LISTS (example "Main,s@example.com,u@example.com,Support,ss@example.
 
 #### Software Configuration Management
 
-Connection elements convey to how one is to connect to the version control system through Maven.
+Connection element convey to how one is to connect to the version control system through Maven.
 
 ```properties
 POM_SCM_DEV_CONNECTION (default is POM_SCM_CONNECTION value)
