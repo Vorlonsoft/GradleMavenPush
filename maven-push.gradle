@@ -37,8 +37,7 @@ afterEvaluate { project ->
     final boolean fatjarArtifact = MavenPush.with(project).getFatjarArtifact()
     final boolean apklibArtifact = MavenPush.with(project).getApklibArtifact()
     final boolean pomUniqueVersion = MavenPush.with(project).getPomUniqueVersion()
-    final boolean dokkaEngine = MavenPush.with(project).isDokka()
-    final boolean dokkaPlugin = MavenPushUtils.with(project).isDokkaPlugin()
+    final boolean dokka = MavenPush.with(project).isDokka()
     final String androidJarMainClass = MavenPush.with(project).getAndroidJarMainClass()
     final String[] gradleVersion = gradle.gradleVersion.split('[\\.]')
     final int gradleMajor = Integer.parseInt(gradleVersion[0])
@@ -323,7 +322,7 @@ afterEvaluate { project ->
         }
     }
 
-    if (dokkaEngine) {
+    if (dokka) {
         task dokkaEngine(type: Exec, dependsOn: dokkaEngineInitializer) {
             description 'Generates the documentation by Dokka.'
             final byte srcDirsJavaNumber
@@ -384,8 +383,7 @@ afterEvaluate { project ->
 
         task dokkaEngineJar(type: Jar, dependsOn: dokkaEngine) {
             description 'Archives the documentation created by Dokka.'
-            classifier = dokkaOutputFormat
-            destinationDir = buildDir
+            classifier = 'javadoc'
             from "${buildDir}/${dokkaOutputFormat}"
         }
     }
@@ -543,7 +541,7 @@ afterEvaluate { project ->
             }
         }
 
-        if (!dokkaEngine) {
+        if (!dokka) {
             task androidJavadocs(type: Javadoc) {
                 source += files(android.sourceSets.main.java.srcDirs)
                 if (kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) {
@@ -667,7 +665,7 @@ afterEvaluate { project ->
             }
         }
 
-        if (!dokkaEngine) {
+        if (!dokka) {
             task coreJavadoc(type: Javadoc) {
                 source = sourceSets.main.java.srcDirs
                 if (kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) {
@@ -678,7 +676,7 @@ afterEvaluate { project ->
 
             task javadocsJar(type: Jar, dependsOn: coreJavadoc) {
                 classifier = 'javadoc'
-                from javadoc.destinationDir
+                from coreJavadoc.destinationDir
             }
         }
 
@@ -702,7 +700,7 @@ afterEvaluate { project ->
     }
 
     artifacts {
-        if (dokkaEngine) {
+        if (dokka) {
             archives dokkaEngineJar
         }
         if (androidOs) {
@@ -715,7 +713,7 @@ afterEvaluate { project ->
             if (apklibArtifact) {
                 archives createAndroidApklib
             }
-            if (!dokkaEngine) {
+            if (!dokka) {
                 archives androidJavadocsJar
             }
             archives androidSourcesJar
@@ -723,7 +721,7 @@ afterEvaluate { project ->
             if (createFatjar) {
                 archives createFatjar
             }
-            if (!dokkaEngine) {
+            if (!dokka) {
                 archives javadocsJar
             }
             archives sourcesJar

@@ -199,14 +199,4 @@ final class MavenPushUtils {
                 project.getPlugins().hasPlugin('kotlin-android') ||
                 project.getPlugins().hasPlugin('kotlin-android-extensions')
     }
-
-    /**
-     * Checks DokkaPlugin or non-DokkaPlugin project.
-     *
-     * @return true if project has DokkaPlugin, false otherwise
-     */
-    boolean isDokkaPlugin() {
-        return project.getPlugins().hasPlugin('org.jetbrains.dokka-android') ||
-                project.getPlugins().hasPlugin('org.jetbrains.dokka')
-    }
 }
