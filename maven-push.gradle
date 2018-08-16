@@ -479,7 +479,7 @@ afterEvaluate { project ->
                         } else {
                             sources = android.sourceSets.main.java.srcDirs
                         }
-                        final byte srcDirsNumber = (sources != null) ? sources.size() : 0
+                        final byte srcDirsNumber = (byte) ((sources != null) ? sources.size() : 0)
                         for (byte i = 0; i < srcDirsNumber; i++) {
                             from sources[i]
                         }
@@ -496,9 +496,9 @@ afterEvaluate { project ->
                 }
             } else {
                 task androidDokka(type: Exec, dependsOn: dokkaInitializer) {
-                    final byte srcDirsJavaNumber = (android.sourceSets.main.java.srcDirs != null) ? android.sourceSets.main.java.srcDirs.size() : 0
-                    final byte srcDirsKotlinNumber = (kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) ? android.sourceSets.main.kotlin.srcDirs.size() : 0
-                    final byte classpathNumber = (android.getBootClasspath() != null) ? android.getBootClasspath().size() : 0
+                    final byte srcDirsJavaNumber = (byte) ((android.sourceSets.main.java.srcDirs != null) ? android.sourceSets.main.java.srcDirs.size() : 0)
+                    final byte srcDirsKotlinNumber = (byte) ((kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) ? android.sourceSets.main.kotlin.srcDirs.size() : 0)
+                    final byte classpathNumber = (byte) ((android.getBootClasspath() != null) ? android.getBootClasspath().size() : 0)
                     final String classpath = (classpathNumber > 0) ? android.getBootClasspath()[0] : ''
                     if (srcDirsJavaNumber > 0) {
                         mkdir android.sourceSets.main.java.srcDirs[0]
@@ -579,7 +579,7 @@ afterEvaluate { project ->
                 } else {
                     sources = android.sourceSets.main.java.srcDirs
                 }
-                final byte srcDirsNumber = (sources != null) ? sources.size() : 0
+                final byte srcDirsNumber = (byte) ((sources != null) ? sources.size() : 0)
                 for (byte i = 0; i < srcDirsNumber; i++) {
                     from sources[i]
                 }
@@ -661,8 +661,8 @@ afterEvaluate { project ->
                 }
             } else {
                 task coreDokka(type: Exec, dependsOn: dokkaInitializer) {
-                    final byte srcDirsJavaNumber = (sourceSets.main.java.srcDirs != null) ? sourceSets.main.java.srcDirs.size() : 0
-                    final byte srcDirsKotlinNumber = (kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) ? sourceSets.main.kotlin.srcDirs.size() : 0
+                    final byte srcDirsJavaNumber = (byte) ((sourceSets.main.java.srcDirs != null) ? sourceSets.main.java.srcDirs.size() : 0)
+                    final byte srcDirsKotlinNumber = (byte) ((kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) ? sourceSets.main.kotlin.srcDirs.size() : 0)
                     if (srcDirsJavaNumber > 0) {
                         mkdir sourceSets.main.java.srcDirs[0]
                         if (srcDirsJavaNumber > 1) {
@@ -717,7 +717,7 @@ afterEvaluate { project ->
                 } else {
                     sources = sourceSets.main.java.srcDirs
                 }
-                final byte srcDirsNumber = (sources != null) ? sources.size() : 0
+                final byte srcDirsNumber = (byte) ((sources != null) ? sources.size() : 0)
                 for (byte i = 0; i < srcDirsNumber; i++) {
                     from sources[i]
                 }
