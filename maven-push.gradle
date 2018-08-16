@@ -523,8 +523,12 @@ afterEvaluate { project ->
                 into('res') {
                     from '/src/main/res/'
                 }
+                into('src/cpp') {
+                    from '/src/main/cpp/'
+                }
                 into('src') {
                     from android.sourceSets.main.java.sourceFiles
+                    from '/src/main/groovy/'
                     if (kotlinLanguage) {
                         final String[] sources
                         if (android.sourceSets.main.kotlin.srcDirs != null) {
@@ -550,7 +554,7 @@ afterEvaluate { project ->
                 options {
                     linksOffline 'https://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference/"
                 }
-                exclude '**/*.kt', '**/*.md', '**/R.html', '**/R.*.html'
+                exclude '**/*.cpp', '**/*.groovy', '**/*.kt', '**/*.md', '**/R.html', '**/R.*.html'
             }
 
             task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
@@ -584,6 +588,10 @@ afterEvaluate { project ->
             classifier = 'sources'
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             from android.sourceSets.main.java.sourceFiles
+            into('cpp') {
+                from '/src/main/cpp/'
+            }
+            from '/src/main/groovy/'
             if (kotlinLanguage) {
                 final String[] sources
                 if (android.sourceSets.main.kotlin.srcDirs != null) {
@@ -671,7 +679,7 @@ afterEvaluate { project ->
                 if (kotlinLanguage && (sourceSets.main.kotlin.srcDirs != null)) {
                     source += sourceSets.main.kotlin.srcDirs
                 }
-                exclude '**/*.kt', '**/*.md'
+                exclude '**/*.cpp', '**/*.groovy', '**/*.kt', '**/*.md'
             }
 
             task javadocsJar(type: Jar, dependsOn: coreJavadoc) {
@@ -684,6 +692,10 @@ afterEvaluate { project ->
             classifier = 'sources'
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             from sourceSets.main.allSource
+            into('cpp') {
+                from '/src/main/cpp/'
+            }
+            from '/src/main/groovy/'
             if (kotlinLanguage) {
                 final String[] sources
                 if (sourceSets.main.kotlin.srcDirs != null) {
