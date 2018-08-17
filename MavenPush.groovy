@@ -169,6 +169,15 @@ final class MavenPush {
     }
 
     /**
+     * Checks if fatjar artifact must be generated.
+     *
+     * @return true if FATJAR_ARTIFACT gradle property value is "true", false otherwise
+     */
+    boolean getFatjarArtifact() {
+        return project.hasProperty('FATJAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.FATJAR_ARTIFACT) : false
+    }
+
+    /**
      * Checks if Android jar artifact must be generated.
      *
      * @return true if ANDROID_JAR_ARTIFACT gradle property value is "true", false otherwise
@@ -187,12 +196,12 @@ final class MavenPush {
     }
 
     /**
-     * Checks if fatjar artifact must be generated.
+     * Checks if var artifact must be generated.
      *
-     * @return true if FATJAR_ARTIFACT gradle property value is "true", false otherwise
+     * @return true if VAR_ARTIFACT gradle property value is "true" or project hasn't this property, false otherwise
      */
-    boolean getFatjarArtifact() {
-        return project.hasProperty('FATJAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.FATJAR_ARTIFACT) : false
+    boolean getVarArtifact() {
+        return project.hasProperty('VAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.VAR_ARTIFACT) : true
     }
 
     /**

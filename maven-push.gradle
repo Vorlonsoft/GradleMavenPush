@@ -33,6 +33,7 @@ Class MavenPushUtils = new GroovyClassLoader(getClass().getClassLoader()).parseC
 afterEvaluate { project ->
     final boolean androidOs = MavenPushUtils.with(project).isAndroid()
     final boolean kotlinLanguage = MavenPushUtils.with(project).isKotlin()
+    final boolean varArtifact = MavenPush.with(project).getVarArtifact()
     final boolean androidJarArtifact = MavenPush.with(project).getAndroidJarArtifact()
     final boolean fatjarArtifact = MavenPush.with(project).getFatjarArtifact()
     final boolean apklibArtifact = MavenPush.with(project).getApklibArtifact()
@@ -422,7 +423,7 @@ afterEvaluate { project ->
         }
 
         if (fatjarArtifact) {
-            task createAndroidFatjar(type: Jar, dependsOn: 'check') {
+            task createAndroidFatjar(type: Jar, dependsOn: ['check', 'bundleReleaseAar']) {
                 classifier = 'fatjar'
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
                 if (androidJarMainClass != '') {
@@ -448,6 +449,10 @@ afterEvaluate { project ->
                             zipTree(it)
                         }
                     }
+                } {
+                    exclude "META-INF/*.SF"
+                    exclude "META-INF/*.DSA"
+                    exclude "META-INF/*.RSA"
                 }
                 from {
                     configurations.implementation.findAll {
@@ -465,6 +470,10 @@ afterEvaluate { project ->
                             zipTree(it)
                         }
                     }
+                } {
+                    exclude "META-INF/*.SF"
+                    exclude "META-INF/*.DSA"
+                    exclude "META-INF/*.RSA"
                 }
                 from {
                     configurations.api.findAll {
@@ -482,17 +491,63 @@ afterEvaluate { project ->
                             zipTree(it)
                         }
                     }
+                } {
+                    exclude "META-INF/*.SF"
+                    exclude "META-INF/*.DSA"
+                    exclude "META-INF/*.RSA"
+                }
+
+                if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
+                    from {
+                        zipTree(file("${buildDir}/outputs/aar/${project.name}-release.aar")).findAll {
+                            it.getName() == 'classes.jar'
+                        }.collect {
+                            zipTree(it)
+                        }
+                    }
                 }
                 from "${buildDir}/tmp/kotlin-classes/release/"
                 from "${buildDir}/intermediates/javac/release/compileReleaseJavaWithJavac/classes/"
-                from zipTree("${buildDir}/intermediates/packaged-classes/release/classes.jar")
+                if (file("${buildDir}/intermediates/packaged-classes/release/classes.jar").exists()) {
+                    from zipTree(file("${buildDir}/intermediates/packaged-classes/release/classes.jar"))
+                }
                 from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
-                from zipTree("${buildDir}/intermediates/intermediate-jars/release/classes.jar")
+                if (file("${buildDir}/intermediates/intermediate-jars/release/classes.jar").exists()) {
+                    from zipTree(file("${buildDir}/intermediates/intermediate-jars/release/classes.jar"))
+                }
+            }
+        }
+
+        if (varArtifact) {
+            task androidVar(type: Jar, dependsOn: ['androidApklib', 'androidJar']) {
+                classifier = ''
+                extension = 'var'
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+                if (androidJarMainClass != '') {
+                    manifest {
+                        attributes 'Main-Class': androidJarMainClass
+                    }
+                }
+                if (file("${buildDir}/libs/${pomArtifactId}-${pomVersionName}.jar").exists()) {
+                    from zipTree(file("${buildDir}/libs/${pomArtifactId}-${pomVersionName}.jar"))
+                }
+                if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
+                    from {
+                        zipTree(file("${buildDir}/outputs/aar/${project.name}-release.aar")).findAll {
+                            it.getName() == 'classes.jar'
+                        }.collect {
+                            it
+                        }
+                    }
+                }
+                if (file("${buildDir}/distributions/${pomArtifactId}-${pomVersionName}.apklib").exists()) {
+                    from zipTree(file("${buildDir}/distributions/${pomArtifactId}-${pomVersionName}.apklib"))
+                }
             }
         }
 
         if (androidJarArtifact) {
-            task createAndroidJar(type: Jar, dependsOn: 'check') {
+            task androidJar(type: Jar, dependsOn: ['check', 'bundleReleaseAar']) {
                 classifier = ''
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
                 if (androidJarMainClass != '') {
@@ -500,19 +555,42 @@ afterEvaluate { project ->
                         attributes 'Main-Class': androidJarMainClass
                     }
                 }
+                if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
+                    from {
+                        zipTree(file("${buildDir}/outputs/aar/${project.name}-release.aar")).findAll {
+                            it.getName() == 'classes.jar'
+                        }.collect {
+                            zipTree(it)
+                        }
+                    }
+                }
                 from "${buildDir}/tmp/kotlin-classes/release/"
                 from "${buildDir}/intermediates/javac/release/compileReleaseJavaWithJavac/classes/"
-                from zipTree("${buildDir}/intermediates/packaged-classes/release/classes.jar")
+                if (file("${buildDir}/intermediates/packaged-classes/release/classes.jar").exists()) {
+                    from zipTree(file("${buildDir}/intermediates/packaged-classes/release/classes.jar"))
+                }
                 from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
-                from zipTree("${buildDir}/intermediates/intermediate-jars/release/classes.jar")
+                if (file("${buildDir}/intermediates/intermediate-jars/release/classes.jar").exists()) {
+                    from zipTree(file("${buildDir}/intermediates/intermediate-jars/release/classes.jar"))
+                }
             }
         }
 
         if (apklibArtifact) {
-            task createAndroidApklib(type: Zip) {
-                appendix = extension = 'apklib'
+            task androidApklib(type: Zip, dependsOn: 'bundleReleaseAar') {
+                classifier = ''
+                extension = 'apklib'
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
+                if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
+                    from {
+                        zipTree(file("${buildDir}/outputs/aar/${project.name}-release.aar")).findAll {
+                            it.getName() == 'AndroidManifest.xml'
+                        }.collect {
+                            it
+                        }
+                    }
+                }
                 from '/src/main/AndroidManifest.xml'
                 into('assets') {
                     from '/src/main/assets/'
@@ -645,9 +723,7 @@ afterEvaluate { project ->
                 configurations {
                     exclude compileOnly
                 }
-                manifest {
-                    attributes project.jar.manifest.attributes
-                }
+                manifest.from project.jar.manifest
                 from {
                     configurations.compileClasspath.findAll {
                         it.getName() != 'android.jar' && !it.getName().startsWith('junit') && !it.getName().startsWith('hamcrest')
@@ -664,12 +740,17 @@ afterEvaluate { project ->
                             zipTree(it)
                         }
                     }
+                } {
+                    exclude "META-INF/*.SF"
+                    exclude "META-INF/*.DSA"
+                    exclude "META-INF/*.RSA"
                 }
                 if (gradleMajor < 4) {
                     from sourceSets.main.output.classesDir
                 } else {
                     from sourceSets.main.output.classesDirs
                 }
+                with jar
             }
         }
 
@@ -719,11 +800,14 @@ afterEvaluate { project ->
             if (fatjarArtifact) {
                 archives createAndroidFatjar
             }
+            if (varArtifact) {
+                archives androidVar
+            }
             if (androidJarArtifact) {
-                archives createAndroidJar
+                archives androidJar
             }
             if (apklibArtifact) {
-                archives createAndroidApklib
+                archives androidApklib
             }
             if (!dokka) {
                 archives androidJavadocsJar
