@@ -162,10 +162,10 @@ final class MavenPush {
     /**
      * Checks if apklib artifact must be generated.
      *
-     * @return true if APKLIB_ARTIFACT gradle property value is "true", false otherwise
+     * @return true if it's Android project and APKLIB_ARTIFACT gradle property value is "true", false otherwise
      */
     boolean getApklibArtifact() {
-        return project.hasProperty('APKLIB_ARTIFACT') ? 'true'.equalsIgnoreCase(project.APKLIB_ARTIFACT) : false
+        return (isAndroid() && project.hasProperty('APKLIB_ARTIFACT')) ? 'true'.equalsIgnoreCase(project.APKLIB_ARTIFACT) : false
     }
 
     /**
@@ -180,10 +180,10 @@ final class MavenPush {
     /**
      * Checks if Android jar artifact must be generated.
      *
-     * @return true if ANDROID_JAR_ARTIFACT gradle property value is "true", false otherwise
+     * @return true if it's Android project and ANDROID_JAR_ARTIFACT gradle property value is "true", false otherwise
      */
     boolean getAndroidJarArtifact() {
-        return project.hasProperty('ANDROID_JAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.ANDROID_JAR_ARTIFACT) : false
+        return (isAndroid() && project.hasProperty('ANDROID_JAR_ARTIFACT')) ? 'true'.equalsIgnoreCase(project.ANDROID_JAR_ARTIFACT) : false
     }
 
     /**
@@ -198,10 +198,10 @@ final class MavenPush {
     /**
      * Checks if var artifact must be generated.
      *
-     * @return true if VAR_ARTIFACT gradle property value is "true" or project hasn't this property, false otherwise
+     * @return true if it's Android project and VAR_ARTIFACT gradle property value is "true" or project hasn't this property, false otherwise
      */
     boolean getVarArtifact() {
-        return project.hasProperty('VAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.VAR_ARTIFACT) : true
+        return (isAndroid() && project.hasProperty('VAR_ARTIFACT')) ? 'true'.equalsIgnoreCase(project.VAR_ARTIFACT) : true
     }
 
     /**

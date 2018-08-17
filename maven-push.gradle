@@ -389,6 +389,111 @@ afterEvaluate { project ->
         }
     }
 
+    if (varArtifact) {
+        task androidVar(type: Jar, dependsOn: ['androidApklib', 'androidJar']) {
+            classifier = ''
+            extension = 'var'
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            if (androidJarMainClass != '') {
+                manifest {
+                    attributes 'Main-Class': androidJarMainClass
+                }
+            }
+            if (file("${buildDir}/libs/${pomArtifactId}-${pomVersionName}.jar").exists()) {
+                from zipTree(file("${buildDir}/libs/${pomArtifactId}-${pomVersionName}.jar"))
+            }
+            if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
+                from {
+                    zipTree(file("${buildDir}/outputs/aar/${project.name}-release.aar")).findAll {
+                        it.getName() == 'classes.jar'
+                    }.collect {
+                        it
+                    }
+                }
+            }
+            if (file("${buildDir}/distributions/${pomArtifactId}-${pomVersionName}.apklib").exists()) {
+                from zipTree(file("${buildDir}/distributions/${pomArtifactId}-${pomVersionName}.apklib"))
+            }
+        }
+    }
+
+    if (androidJarArtifact) {
+        task androidJar(type: Jar, dependsOn: ['check', 'bundleReleaseAar']) {
+            classifier = ''
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            if (androidJarMainClass != '') {
+                manifest {
+                    attributes 'Main-Class': androidJarMainClass
+                }
+            }
+            if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
+                from {
+                    zipTree(file("${buildDir}/outputs/aar/${project.name}-release.aar")).findAll {
+                        it.getName() == 'classes.jar'
+                    }.collect {
+                        zipTree(it)
+                    }
+                }
+            }
+            from "${buildDir}/tmp/kotlin-classes/release/"
+            from "${buildDir}/intermediates/javac/release/compileReleaseJavaWithJavac/classes/"
+            if (file("${buildDir}/intermediates/packaged-classes/release/classes.jar").exists()) {
+                from zipTree(file("${buildDir}/intermediates/packaged-classes/release/classes.jar"))
+            }
+            from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
+            if (file("${buildDir}/intermediates/intermediate-jars/release/classes.jar").exists()) {
+                from zipTree(file("${buildDir}/intermediates/intermediate-jars/release/classes.jar"))
+            }
+        }
+    }
+
+    if (apklibArtifact) {
+        task androidApklib(type: Zip, dependsOn: 'bundleReleaseAar') {
+            classifier = ''
+            extension = 'apklib'
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+            if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
+                from {
+                    zipTree(file("${buildDir}/outputs/aar/${project.name}-release.aar")).findAll {
+                        it.getName() == 'AndroidManifest.xml'
+                    }.collect {
+                        it
+                    }
+                }
+            }
+            from '/src/main/AndroidManifest.xml'
+            into('assets') {
+                from '/src/main/assets/'
+            }
+            into('libs') {
+                from '/libs/'
+            }
+            into('res') {
+                from '/src/main/res/'
+            }
+            into('src/cpp') {
+                from '/src/main/cpp/'
+            }
+            into('src') {
+                from android.sourceSets.main.java.sourceFiles
+                from '/src/main/groovy/'
+                if (kotlinLanguage) {
+                    final String[] sources
+                    if (android.sourceSets.main.kotlin.srcDirs != null) {
+                        sources = android.sourceSets.main.java.srcDirs + android.sourceSets.main.kotlin.srcDirs
+                    } else {
+                        sources = android.sourceSets.main.java.srcDirs
+                    }
+                    final byte srcDirsNumber = (byte) ((sources != null) ? sources.size() : 0)
+                    for (byte i = 0; i < srcDirsNumber; i++) {
+                        from sources[i]
+                    }
+                }
+            }
+        }
+    }
+
     if (androidOs) {
         task install(type: Upload, dependsOn: assemble) {
             description 'Installs the artifacts to the local repository.'
@@ -514,111 +619,6 @@ afterEvaluate { project ->
                 from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
                 if (file("${buildDir}/intermediates/intermediate-jars/release/classes.jar").exists()) {
                     from zipTree(file("${buildDir}/intermediates/intermediate-jars/release/classes.jar"))
-                }
-            }
-        }
-
-        if (varArtifact) {
-            task androidVar(type: Jar, dependsOn: ['androidApklib', 'androidJar']) {
-                classifier = ''
-                extension = 'var'
-                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-                if (androidJarMainClass != '') {
-                    manifest {
-                        attributes 'Main-Class': androidJarMainClass
-                    }
-                }
-                if (file("${buildDir}/libs/${pomArtifactId}-${pomVersionName}.jar").exists()) {
-                    from zipTree(file("${buildDir}/libs/${pomArtifactId}-${pomVersionName}.jar"))
-                }
-                if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
-                    from {
-                        zipTree(file("${buildDir}/outputs/aar/${project.name}-release.aar")).findAll {
-                            it.getName() == 'classes.jar'
-                        }.collect {
-                            it
-                        }
-                    }
-                }
-                if (file("${buildDir}/distributions/${pomArtifactId}-${pomVersionName}.apklib").exists()) {
-                    from zipTree(file("${buildDir}/distributions/${pomArtifactId}-${pomVersionName}.apklib"))
-                }
-            }
-        }
-
-        if (androidJarArtifact) {
-            task androidJar(type: Jar, dependsOn: ['check', 'bundleReleaseAar']) {
-                classifier = ''
-                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-                if (androidJarMainClass != '') {
-                    manifest {
-                        attributes 'Main-Class': androidJarMainClass
-                    }
-                }
-                if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
-                    from {
-                        zipTree(file("${buildDir}/outputs/aar/${project.name}-release.aar")).findAll {
-                            it.getName() == 'classes.jar'
-                        }.collect {
-                            zipTree(it)
-                        }
-                    }
-                }
-                from "${buildDir}/tmp/kotlin-classes/release/"
-                from "${buildDir}/intermediates/javac/release/compileReleaseJavaWithJavac/classes/"
-                if (file("${buildDir}/intermediates/packaged-classes/release/classes.jar").exists()) {
-                    from zipTree(file("${buildDir}/intermediates/packaged-classes/release/classes.jar"))
-                }
-                from "${buildDir}/intermediates/intermediate-jars/release/classes/dir/"
-                if (file("${buildDir}/intermediates/intermediate-jars/release/classes.jar").exists()) {
-                    from zipTree(file("${buildDir}/intermediates/intermediate-jars/release/classes.jar"))
-                }
-            }
-        }
-
-        if (apklibArtifact) {
-            task androidApklib(type: Zip, dependsOn: 'bundleReleaseAar') {
-                classifier = ''
-                extension = 'apklib'
-                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-                if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
-                    from {
-                        zipTree(file("${buildDir}/outputs/aar/${project.name}-release.aar")).findAll {
-                            it.getName() == 'AndroidManifest.xml'
-                        }.collect {
-                            it
-                        }
-                    }
-                }
-                from '/src/main/AndroidManifest.xml'
-                into('assets') {
-                    from '/src/main/assets/'
-                }
-                into('libs') {
-                    from '/libs/'
-                }
-                into('res') {
-                    from '/src/main/res/'
-                }
-                into('src/cpp') {
-                    from '/src/main/cpp/'
-                }
-                into('src') {
-                    from android.sourceSets.main.java.sourceFiles
-                    from '/src/main/groovy/'
-                    if (kotlinLanguage) {
-                        final String[] sources
-                        if (android.sourceSets.main.kotlin.srcDirs != null) {
-                            sources = android.sourceSets.main.java.srcDirs + android.sourceSets.main.kotlin.srcDirs
-                        } else {
-                            sources = android.sourceSets.main.java.srcDirs
-                        }
-                        final byte srcDirsNumber = (byte) ((sources != null) ? sources.size() : 0)
-                        for (byte i = 0; i < srcDirsNumber; i++) {
-                            from sources[i]
-                        }
-                    }
                 }
             }
         }
@@ -796,18 +796,18 @@ afterEvaluate { project ->
         if (dokka) {
             archives dokkaEngineJar
         }
+        if (varArtifact) {
+            archives androidVar
+        }
+        if (androidJarArtifact) {
+            archives androidJar
+        }
+        if (apklibArtifact) {
+            archives androidApklib
+        }
         if (androidOs) {
             if (fatjarArtifact) {
                 archives createAndroidFatjar
-            }
-            if (varArtifact) {
-                archives androidVar
-            }
-            if (androidJarArtifact) {
-                archives androidJar
-            }
-            if (apklibArtifact) {
-                archives androidApklib
             }
             if (!dokka) {
                 archives androidJavadocsJar
