@@ -1,1 +1,2 @@
 groovydoc/* linguist-documentation
+maven-push.gradle linguist-detectable=true
