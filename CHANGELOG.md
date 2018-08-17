@@ -1,5 +1,43 @@
 # CHANGELOG
 
+## 1.6.0 Yokohama (released 17.08.2018)
+
+- LIBff60817 maven-push.gradle detectable by GitHub Linguist library
+- LIBff50817 .gitattributes file for GitHub Linguist library added
+- LIBff40817 Groovydocs added
+- LIBff30817 Ant Build file for groovydoc added
+- LIBcc20817 isAndroid() check added to MavenPush Class methods
+- LIBff20817 "var" Gradle Android Artifact support
+- LIBff10817 *.cpp and *.groovy files support
+- LIBcc10817 Cleaning
+- LIBff10816 Pull request from [EasyDokkaPlugin](https://github.com/Vorlonsoft/EasyDokkaPlugin)
+- LIBcc30816 Inspection
+- LIBcc20816 Documenting
+- LIBcc10815 Documenting
+- LIBcc50814 README.md update
+- LIBcc40814 downloadLib(...) method update
+- LIBcc10814 downloadLib(...) method update
+- LIBff10814 Process AAR dependencies
+- LIBbb10814 Sets the artifacts base file name to match the artifact ID in any case
+- LIBff10808 dokka tasks merged
+- LIBff90807 sources tasks merged
+- LIBff80807 apklib tasks merged
+- LIBff60807 MavenPushInitializer Class added
+- LIBcc20807 isAndroid() added
+- LIBbb10807 Can't find isAndroid()
+- LIBff50807 MavenPushUtils Class added
+- LIBff40807 InvalidUserDataException class added
+- LIBff30807 Move getJavaAPISpecificationLink(...) to MavenPush Class
+- LIBff20807 Move MavenPush Class out
+- LIBff10807 Refactoring
+- LIBff40806 compileOnly excluded from fatjar
+- LIBbb30806 `GROUP` and `VERSION_NAME` default values updated
+- LIBcc30806 static pomFinalizer(...) added
+- LIBff30806 `ANDROID_JAR_MAIN_CLASS` added to add "Main-Class" attribute to Android's "var", "jar" and "fatjar" `MANIFEST.MF` files.
+- LIBff20806 non-Android fatjar manifest update
+- LIBcc10805 "Our other pligins" section added
+- LIBbb10805 isAndroid() checks added
+
 ## 1.5.0 Tokyo (released 03.08.2018)
 
 - LIBcc30803 "Already in use in following libraries" section update
