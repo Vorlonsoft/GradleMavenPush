@@ -15,13 +15,14 @@
  */
 
 /**
- * <p>GradleMavenPush is a helper to upload Gradle Android Artifacts,
- * Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter,
- * Maven Central, Corporate staging/snapshot servers and local Maven repositories).</p>
+ * <p>GradleMavenPush Gradle Script plugin</p>
+ * <p>Helper to upload Gradle Android Artifacts, Gradle Java Artifacts and
+ * Gradle Kotlin Artifacts to Maven repositories (JCenter, Maven Central,
+ * Corporate staging/snapshot servers and local Maven repositories).</p>
  *
- * @author Alexander Savin
- * @version 1.6.0 Yokohama
  * @since 1.0.0
+ * @version 1.6.0 Yokohama
+ * @author Alexander Savin
  */
 
 apply plugin: 'maven'
@@ -860,14 +861,11 @@ afterEvaluate { project ->
 }
 
 /**
- * <p>GradleMavenPush is a helper to upload Gradle Android Artifacts,
- * Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter,
- * Maven Central, Corporate staging/snapshot servers and local Maven repositories).</p>
  * <p>MavenPushInitializer Class - class with GradleMavenPush Gradle Script plugin initializers.</p>
  *
- * @author Alexander Savin
- * @version 1.6.0 Yokohama
  * @since 1.6.0 Yokohama
+ * @version 1.6.0 Yokohama
+ * @author Alexander Savin
  */
 final class MavenPushInitializer {
 

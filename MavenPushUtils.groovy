@@ -20,15 +20,12 @@ import java.nio.file.Paths
 import java.util.zip.ZipFile
 
 /**
- * <p>GradleMavenPush is a helper to upload Gradle Android Artifacts,
- * Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter,
- * Maven Central, Corporate staging/snapshot servers and local Maven repositories).</p>
  * <p>MavenPushUtils Class - utility class, thread-safe and a fast singleton
  * implementation.</p>
  *
- * @author Alexander Savin
- * @version 1.6.0 Yokohama
  * @since 1.6.0 Yokohama
+ * @version 1.6.0 Yokohama
+ * @author Alexander Savin
  */
 final class MavenPushUtils {
 

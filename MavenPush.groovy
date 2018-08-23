@@ -15,15 +15,12 @@
  */
 
 /**
- * <p>GradleMavenPush is a helper to upload Gradle Android Artifacts,
- * Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter,
- * Maven Central, Corporate staging/snapshot servers and local Maven repositories).</p>
  * <p>MavenPush Class - class with gradle properties getters, thread-safe and
  * a fast singleton implementation.</p>
  *
- * @author Alexander Savin
- * @version 1.6.0 Yokohama
  * @since 1.5.0 Tokyo
+ * @version 1.6.0 Yokohama
+ * @author Alexander Savin
  */
 final class MavenPush {
 
@@ -98,6 +95,7 @@ final class MavenPush {
      * "https://bintray.com/api/v1/maven/{project.NEXUS_USERNAME}/maven/{project.POM_ARTIFACT_ID}/;publish=1"
      * for JCenter and "https://oss.sonatype.org/service/local/staging/deploy/maven2/" for Maven Central
      * if project hasn't this property
+     * @see #getSnapshotRepositoryUrl()
      */
     String getReleaseRepositoryUrl() {
         if (project.hasProperty('RELEASE_REPOSITORY_URL')) {
@@ -121,6 +119,7 @@ final class MavenPush {
      * "https://oss.jfrog.org/artifactory/oss-snapshot-local/" for JCenter and
      * "https://oss.sonatype.org/content/repositories/snapshots/" for Maven Central
      * if project hasn't this property
+     * @see #getReleaseRepositoryUrl()
      */
     String getSnapshotRepositoryUrl() {
         if (project.hasProperty('SNAPSHOT_REPOSITORY_URL')) {
@@ -140,6 +139,7 @@ final class MavenPush {
      * returns NEXUS_USERNAME environment variable value or NEXUS_USERNAME gradle property value
      * if System hasn't this environment variable or "" if System hasn't this environment variable
      * and project hasn't this property
+     * @see #getRepositoryPassword()
      */
     String getRepositoryUsername() {
         if (isJCenter()) {
@@ -164,6 +164,7 @@ final class MavenPush {
      * returns NEXUS_PASSWORD environment variable value or NEXUS_PASSWORD gradle property value
      * if System hasn't this environment variable or "" if System hasn't this environment variable
      * and project hasn't this property
+     * @see #getRepositoryUsername()
      */
     String getRepositoryPassword() {
         if (isJCenter()) {
@@ -184,6 +185,7 @@ final class MavenPush {
      * Checks if apklib artifact must be generated.
      *
      * @return true if it's Android project and APKLIB_ARTIFACT gradle property value is "true", false otherwise
+     * @see #getVarArtifact()
      */
     boolean getApklibArtifact() {
         return (isAndroid() && project.hasProperty('APKLIB_ARTIFACT')) ? 'true'.equalsIgnoreCase(project.APKLIB_ARTIFACT) : false
@@ -193,6 +195,7 @@ final class MavenPush {
      * Checks if fatjar artifact must be generated.
      *
      * @return true if FATJAR_ARTIFACT gradle property value is "true", false otherwise
+     * @see #getAndroidJarMainClass()
      */
     boolean getFatjarArtifact() {
         return project.hasProperty('FATJAR_ARTIFACT') ? 'true'.equalsIgnoreCase(project.FATJAR_ARTIFACT) : false
@@ -202,13 +205,15 @@ final class MavenPush {
      * Checks if Android jar artifact must be generated.
      *
      * @return true if it's Android project and ANDROID_JAR_ARTIFACT gradle property value is "true", false otherwise
+     * @see #getAndroidJarMainClass()
+     * @see #getVarArtifact()
      */
     boolean getAndroidJarArtifact() {
         return (isAndroid() && project.hasProperty('ANDROID_JAR_ARTIFACT')) ? 'true'.equalsIgnoreCase(project.ANDROID_JAR_ARTIFACT) : false
     }
 
     /**
-     * Returns "Main-Class" attribute for Android's "jar" and "fatjar" MANIFEST.MF files.
+     * Returns "Main-Class" attribute for Android's "var", "jar" and "fatjar" MANIFEST.MF files.
      *
      * @return ANDROID_JAR_MAIN_CLASS gradle property value or "" if project hasn't this property
      */
@@ -220,6 +225,7 @@ final class MavenPush {
      * Checks if var artifact must be generated.
      *
      * @return true if it's Android project and VAR_ARTIFACT gradle property value is "true" or project hasn't this property, false otherwise
+     * @see #getAndroidJarMainClass()
      */
     boolean getVarArtifact() {
         return (isAndroid() && project.hasProperty('VAR_ARTIFACT')) ? 'true'.equalsIgnoreCase(project.VAR_ARTIFACT) : true
@@ -267,6 +273,8 @@ final class MavenPush {
      * Returns Javadoc encoding.
      *
      * @return JAVADOC_ENCODING gradle property value or "UTF-8" if project hasn't this property
+     * @see #getJavadocDocEncoding()
+     * @see #getJavadocCharSet()
      */
     String getJavadocEncoding() {
         return project.hasProperty('JAVADOC_ENCODING') ? project.JAVADOC_ENCODING : 'UTF-8'
@@ -276,6 +284,8 @@ final class MavenPush {
      * Returns Javadoc doc encoding.
      *
      * @return JAVADOC_DOC_ENCODING gradle property value or "UTF-8" if project hasn't this property
+     * @see #getJavadocEncoding()
+     * @see #getJavadocCharSet()
      */
     String getJavadocDocEncoding() {
         return project.hasProperty('JAVADOC_DOC_ENCODING') ? project.JAVADOC_DOC_ENCODING : 'UTF-8'
@@ -285,6 +295,8 @@ final class MavenPush {
      * Returns Javadoc charset.
      *
      * @return JAVADOC_CHARSET gradle property value or "UTF-8" if project hasn't this property
+     * @see #getJavadocEncoding()
+     * @see #getJavadocDocEncoding()
      */
     String getJavadocCharSet() {
         return project.hasProperty('JAVADOC_CHARSET') ? project.JAVADOC_CHARSET : 'UTF-8'
@@ -321,6 +333,7 @@ final class MavenPush {
      *
      * @return POM_ARTIFACT_ID gradle property value
      * @throws InvalidUserDataException If Artifact ID can't be return
+     * @see #getPomArtifactUrl()
      */
     String getPomArtifactId() throws InvalidUserDataException {
         if (project.hasProperty('POM_ARTIFACT_ID')) {
@@ -336,6 +349,7 @@ final class MavenPush {
      * @return POM_ARTIFACT_URL gradle property value or POM_ARTIFACT_ID gradle property value
      * if project hasn't this property
      * @throws InvalidUserDataException If Artifact URL can't be return
+     * @see #getPomArtifactId()
      */
     String getPomArtifactUrl() throws InvalidUserDataException {
         return project.hasProperty('POM_ARTIFACT_URL') ? project.POM_ARTIFACT_URL : getPomArtifactId()
@@ -442,6 +456,7 @@ final class MavenPush {
      * @return POM_SCM_URL gradle property value or POM_URL gradle property value if project hasn't
      * POM_SCM_URL gradle property
      * @throws InvalidUserDataException If library publicly browsable repository url can't be return
+     * @see #getPomUrl()
      */
     String getPomScmUrl() throws InvalidUserDataException {
         return project.hasProperty('POM_SCM_URL') ? project.POM_SCM_URL : getPomUrl()
@@ -467,6 +482,7 @@ final class MavenPush {
      * @return POM_SCM_DEV_CONNECTION gradle property value or POM_SCM_CONNECTION gradle property value if project hasn't
      * POM_SCM_DEV_CONNECTION gradle property
      * @throws InvalidUserDataException If connection element can't be return
+     * @see #getPomScmConnection()
      */
     String getPomScmDevConnection() throws InvalidUserDataException {
         return project.hasProperty('POM_SCM_DEV_CONNECTION') ? project.POM_SCM_DEV_CONNECTION : getPomScmConnection()
@@ -555,6 +571,7 @@ final class MavenPush {
      *
      * @return POM_DEVELOPER_ID gradle property value
      * @throws InvalidUserDataException If developer ID can't be return
+     * @see #getDevelopers()
      */
     String getDeveloperId() throws InvalidUserDataException {
         if (project.hasProperty('POM_DEVELOPER_ID')) {
@@ -569,6 +586,7 @@ final class MavenPush {
      *
      * @return POM_DEVELOPER_NAME gradle property value
      * @throws InvalidUserDataException If developer name can't be return
+     * @see #getDevelopers()
      */
     String getDeveloperName() throws InvalidUserDataException {
         if (project.hasProperty('POM_DEVELOPER_NAME')) {
@@ -583,6 +601,7 @@ final class MavenPush {
      *
      * @return POM_DEVELOPER_EMAIL gradle property value or "lazy-developer-who-does-not-read-readme@example.com"
      * if project hasn't POM_DEVELOPER_EMAIL gradle property
+     * @see #getDevelopers()
      */
     String getDeveloperEmail() {
         return project.hasProperty('POM_DEVELOPER_EMAIL') ? project.POM_DEVELOPER_EMAIL : 'lazy-developer-who-does-not-read-readme@example.com'
@@ -603,6 +622,7 @@ final class MavenPush {
      *
      * @return POM_DEVELOPER_ORG gradle property value or ""
      * if project hasn't POM_DEVELOPER_ORG gradle property
+     * @see #getOrg()
      */
     String getDeveloperOrg() {
         return project.hasProperty('POM_DEVELOPER_ORG') ? project.POM_DEVELOPER_ORG : getOrg()
@@ -614,6 +634,7 @@ final class MavenPush {
      * @return POM_DEVELOPER_ORG_URL gradle property value or POM_ORG_URL gradle property value if project hasn't
      * POM_DEVELOPER_ORG_URL gradle property or "" if project hasn't POM_DEVELOPER_ORG_URL gradle property and
      * POM_ORG_URL gradle property
+     * @see #getOrgUrl()
      */
     String getDeveloperOrgUrl() {
         return project.hasProperty('POM_DEVELOPER_ORG_URL') ? project.POM_DEVELOPER_ORG_URL : getOrgUrl()
@@ -655,6 +676,7 @@ final class MavenPush {
      *
      * @return developers from POM_DEVELOPERS gradle property or ['']
      * if project hasn't POM_DEVELOPERS gradle property
+     * @see #getContributors()
      */
     String[] getDevelopers() {
         return project.hasProperty('POM_DEVELOPERS') ? project.getProperty('POM_DEVELOPERS').split(',') : ['']
@@ -666,6 +688,7 @@ final class MavenPush {
      *
      * @return contributors from POM_CONTRIBUTORS gradle property or ['']
      * if project hasn't POM_CONTRIBUTORS gradle property
+     * @see #getDevelopers()
      */
     String[] getContributors() {
         return project.hasProperty('POM_CONTRIBUTORS') ? project.getProperty('POM_CONTRIBUTORS').split(',') : ['']
