@@ -94,13 +94,13 @@ final class MavenPushUtils {
             case '1.8':
                 return 'https://docs.oracle.com/javase/8/docs/api/'
             case '1.9':
-                return 'https://docs.oracle.com/javase/9/docs/api/overview-summary.html'
+                return 'https://docs.oracle.com/javase/9/docs/api/'
             case '1.10':
             case '11':
             case '12':
             case '13':
             case '14':
-                return 'https://docs.oracle.com/javase/10/docs/api/overview-summary.html'
+                return 'https://docs.oracle.com/javase/10/docs/api/'
             default:
                 return ''
         }

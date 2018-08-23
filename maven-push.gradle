@@ -298,7 +298,7 @@ afterEvaluate { project ->
                 pom.version = pomVersionName
                 pom.packaging = pomPackaging
 
-                repository url: "file://${System.properties['user.home']}/.m2/repository"
+                repository url: "file:///${System.properties['user.home']}/.m2/repository"
 
                 pom.project {
                     uniqueVersion = pomUniqueVersion
@@ -333,7 +333,7 @@ afterEvaluate { project ->
             final String srcDirOne
             final String srcDirTwo
             final String srcDirThree
-            final String links
+            String links
             if (androidOs) {
                 srcDirsJavaNumber = (byte) ((android.sourceSets.main.java.srcDirs != null) ? android.sourceSets.main.java.srcDirs.size() : 0)
                 srcDirsKotlinNumber = (byte) ((kotlinLanguage && (android.sourceSets.main.kotlin.srcDirs != null)) ? android.sourceSets.main.kotlin.srcDirs.size() : 0)
@@ -342,7 +342,14 @@ afterEvaluate { project ->
                 srcDirOne = (srcDirsJavaNumber > 0) ? android.sourceSets.main.java.srcDirs[0] : ''
                 srcDirTwo = (srcDirsJavaNumber > 1) ? android.sourceSets.main.java.srcDirs[1] : ''
                 srcDirThree = (srcDirsKotlinNumber > 0) ? android.sourceSets.main.kotlin.srcDirs[0] : ''
-                links = "https://developer.android.com/reference/^${android.sdkDirectory}/docs/reference/^${javaAPISpecificationLink}"
+                links = 'https://developer.android.com/reference/^https://developer.android.com/reference/package-list^^' +
+                        "file:///${android.sdkDirectory}/docs/reference/^file:///${android.sdkDirectory}/docs/reference/package-list^^" +
+                        "${javaAPISpecificationLink}^${javaAPISpecificationLink}"
+                if (javaAPISpecificationLink == 'https://docs.oracle.com/javase/10/docs/api/') {
+                    links += 'element-list'
+                } else {
+                    links += 'package-list'
+                }
                 if (srcDirsJavaNumber > 0) {
                     mkdir android.sourceSets.main.java.srcDirs[0]
                     if (srcDirsJavaNumber > 1) {
@@ -630,7 +637,7 @@ afterEvaluate { project ->
                     source += files(android.sourceSets.main.kotlin.srcDirs)
                 }
                 options {
-                    linksOffline 'https://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference/"
+                    linksOffline 'https://developer.android.com/reference/', "file:///${android.sdkDirectory}/docs/reference/"
                 }
                 exclude '**/*.cpp', '**/*.groovy', '**/*.kt', '**/*.md', '**/R.html', '**/R.*.html'
             }
