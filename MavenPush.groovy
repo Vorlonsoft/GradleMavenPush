@@ -135,11 +135,20 @@ final class MavenPush {
     /**
      * Returns repository username.
      *
-     * @return NEXUS_USERNAME environment variable value or NEXUS_USERNAME gradle property value
+     * @return if IS_JCENTER gradle property value equals "true" returns JCENTER_USERNAME system environment variable
+     * or JCENTER_USERNAME gradle property value if System hasn't this environment variable,
+     * returns NEXUS_USERNAME environment variable value or NEXUS_USERNAME gradle property value
      * if System hasn't this environment variable or "" if System hasn't this environment variable
      * and project hasn't this property
      */
     String getRepositoryUsername() {
+        if (isJCenter()) {
+            if (System.getenv().containsKey('JCENTER_USERNAME')) {
+                return System.getenv('JCENTER_USERNAME')
+            } else if (project.hasProperty('JCENTER_USERNAME')) {
+                return project.JCENTER_USERNAME
+            }
+        }
         if (System.getenv().containsKey('NEXUS_USERNAME')) {
             return System.getenv('NEXUS_USERNAME')
         } else {
@@ -148,13 +157,22 @@ final class MavenPush {
     }
 
     /**
-     * Returns repository password.
+     * Returns repository password (API Key for JCenter).
      *
-     * @return NEXUS_PASSWORD environment variable value or NEXUS_PASSWORD gradle property value
+     * @return if IS_JCENTER gradle property value equals "true" returns JCENTER_API_KEY system environment variable
+     * or JCENTER_API_KEY gradle property value if System hasn't this environment variable,
+     * returns NEXUS_PASSWORD environment variable value or NEXUS_PASSWORD gradle property value
      * if System hasn't this environment variable or "" if System hasn't this environment variable
      * and project hasn't this property
      */
     String getRepositoryPassword() {
+        if (isJCenter()) {
+            if (System.getenv().containsKey('JCENTER_API_KEY')) {
+                return System.getenv('JCENTER_API_KEY')
+            } else if (project.hasProperty('JCENTER_API_KEY')) {
+                return project.JCENTER_API_KEY
+            }
+        }
         if (System.getenv().containsKey('NEXUS_PASSWORD')) {
             return System.getenv('NEXUS_PASSWORD')
         } else {

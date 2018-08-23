@@ -36,6 +36,15 @@ export NEXUS_USERNAME      = vorlonsoft
 export NEXUS_PASSWORD      = $tr0ngP@55w0rd
 ```
 
+#### 2.2. Other home gradle.properties (optional)
+
+This will include `JCENTER_USERNAME` (default is `NEXUS_USERNAME` value) and `JCENTER_API_KEY` (default is `NEXUS_PASSWORD` value) to upload to the JCentor. Also you can modify `JCENTER_USERNAME` and `JCENTER_API_KEY` from environment variables (useful for CI).
+
+```properties
+JCENTER_USERNAME          = vorlonsoft
+JCENTER_API_KEY           = $tr0ngJCenter@P!Key
+```
+
 ### 3. Create project root gradle.properties
 
 You may already have this file, in which case just edit the original. This file should contain the properties values which are common to all of your sub-projects (if you have any). For instance, here's [AndroidRate's](https://github.com/Vorlonsoft/AndroidRate):
