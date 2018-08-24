@@ -1,6 +1,6 @@
 GradleMavenPush
-![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GradleMavenPush-brightgreen.svg?style=flat)
-![Latest Version](https://api.bintray.com/packages/vorlonsoft/VorlonsoftCentral/GradleMavenPush/images/download.svg)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GradleMavenPush-brightgreen.svg?style=flat)](#)
+[![Latest Version](https://api.bintray.com/packages/vorlonsoft/VorlonsoftCentral/GradleMavenPush/images/download.svg)](https://github.com/Vorlonsoft/GradleMavenPush/releases)
 ===============
 
 Helper to upload Gradle Android Artifacts, Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter, Maven Central, Corporate staging/snapshot servers and local Maven repositories).
