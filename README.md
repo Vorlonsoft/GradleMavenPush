@@ -181,7 +181,7 @@ JAVADOC_HTML_VERSION (default is "4")
 
 #### Dokka documentation engine
 
-Dokka fatjar version. Latest version is ![Dokka fatjar latest version](https://api.bintray.com/packages/kotlin/dokka/dokka/images/download.svg)
+Dokka fatjar version. Latest version is [![Dokka fatjar latest version](https://api.bintray.com/packages/kotlin/dokka/dokka/images/download.svg)](#)
 
 ```properties
 DOKKA_FATJAR_VERSION (default is "0.9.17")
