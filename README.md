@@ -1,7 +1,4 @@
-GradleMavenPush
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GradleMavenPush-brightgreen.svg?style=flat)](#)
-[![Latest Version](https://api.bintray.com/packages/vorlonsoft/VorlonsoftCentral/GradleMavenPush/images/download.svg)](https://github.com/Vorlonsoft/GradleMavenPush/releases)
-===============
+# GradleMavenPush [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GradleMavenPush-brightgreen.svg?style=flat)](#) [![Latest Version](https://api.bintray.com/packages/vorlonsoft/VorlonsoftCentral/GradleMavenPush/images/download.svg)](https://github.com/Vorlonsoft/GradleMavenPush/releases)
 
 Helper to upload Gradle Android Artifacts, Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter, Maven Central, Corporate staging/snapshot servers and local Maven repositories).
 
@@ -315,6 +312,10 @@ This is the url of the repository from whence another POM may point to in order 
 ```properties
 POM_DIST_DOWNLOAD_URL (default is "")
 ```
+
+## Groovydoc documentation
+
+See [GradleMavenPush GitHub Pages](https://vorlonsoft.github.io/GradleMavenPush/groovydoc/)
 
 ## Already in use in following libraries
 
