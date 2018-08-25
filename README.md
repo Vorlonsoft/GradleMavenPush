@@ -315,7 +315,7 @@ POM_DIST_DOWNLOAD_URL (default is "")
 
 ## Groovydoc documentation
 
-See [GradleMavenPush GitHub Pages](https://vorlonsoft.github.io/GradleMavenPush/groovydoc/)
+See [GradleMavenPush documentation](https://vorlonsoft.github.io/GradleMavenPush/groovydoc/)
 
 ## Already in use in following libraries
 
