@@ -2,6 +2,22 @@
 
 Helper to upload Gradle Android Artifacts, Gradle Java Artifacts and Gradle Kotlin Artifacts to Maven repositories (JCenter, Maven Central, Corporate staging/snapshot servers and local Maven repositories).
 
+## Contents
+
+* [Usage](#usage)
+  * [1. Have a working Gradle build](#1-have-a-working-gradle-build)
+  * [2. Update your home gradle.properties](#2-update-your-home-gradleproperties)
+  * [3. Create project root gradle.properties](#3-create-project-root-gradleproperties)
+  * [4. Create gradle.properties in each module](#4-create-gradleproperties-in-each-module)
+  * [5. Call the script from each module's build.gradle](#5-call-the-script-from-each-modules-buildgradle)
+  * [6. Build and Deploy/Install](#6-build-and-deployinstall)
+* [Other properties](#other-properties-optional)
+* [Groovydoc documentation](#groovydoc-documentation)
+* [Already in use](#already-in-use-in-following-libraries)
+* [Other pligins](#our-other-pligins)
+* [Contribute](#contribute)
+* [License](#license)
+
 ## Usage
 
 ### 1. Have a working Gradle build
@@ -74,7 +90,7 @@ export VERSION_NAME_EXTRAS = -master-SNAPSHOT
 ```
 in this case it will be uploaded to the snapshot server and indicates it's from the master branch.
 
-### 4. Create gradle.properties in each sub-project
+### 4. Create gradle.properties in each module
 
 The values in this file are specific to the sub-project (and override those in the root `gradle.properties`). In this example, this is just the name, artifactId and `JAVADOC_BY_DOKKA` (default is "false"):
 
@@ -86,7 +102,7 @@ JAVADOC_BY_DOKKA = false
 
 Set `JAVADOC_BY_DOKKA` to "true" to generate documentation by Dokka. Dokka is a documentation engine for Kotlin, it fully supports mixed-language Java/Kotlin projects.
 
-#### 4.1 Other gradle.properties in each sub-project (optional)
+#### 4.1 Other gradle.properties in each module (optional)
 
 You can add `POM_PACKAGING` (default is "aar" for Gradle Android Artifacts and "jar" for Gradle Java Artifacts and Gradle Kotlin Artifacts) and change it's value. Depends on Gradle/Plugins versions this option: 1. Changes `<packaging>` tag in the generated pom file only; 2. Changes main artifact file extension and `<packaging>` tag in the generated pom file; 3. Changes main artifact and it's asc file extensions and change `<packaging>` tag in the generated pom file;
 
@@ -102,7 +118,7 @@ Add `APKLIB_ARTIFACT` (default is "false") and set it to "true" to generate Grad
 
 Also you can set `POM_ARTIFACT_URL` (default is `POM_ARTIFACT_ID` value), this is makes to easier to have an artifact with one artifactId but the name on JCenter something else.
 
-### 5. Call the script from each sub-modules build.gradle
+### 5. Call the script from each module's build.gradle
 
 Add the following at the end of each `build.gradle` that you wish to upload:
 
