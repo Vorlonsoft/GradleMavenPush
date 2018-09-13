@@ -444,7 +444,6 @@ afterEvaluate { project ->
                 }
             }
             from "${buildDir}/tmp/kotlin-classes/release/"
-            from "${buildDir}/intermediates/javac/release/compileReleaseJavaWithJavac/classes/"
             if (file("${buildDir}/intermediates/packaged-classes/release/classes.jar").exists()) {
                 from zipTree(file("${buildDir}/intermediates/packaged-classes/release/classes.jar"))
             }
