@@ -316,7 +316,7 @@ final class MavenPush {
      *
      * @return GROUP gradle property value or libraryVariants[0].applicationId value
      * if project hasn't this property and it's Android project
-     * @throws InvalidUserDataException If Group ID can't be return.
+     * @throws InvalidUserDataException if Group ID can't be return.
      */
     String getPomGroupId() throws InvalidUserDataException {
         if (project.hasProperty('GROUP')) {
@@ -332,7 +332,7 @@ final class MavenPush {
      * Returns Artifact ID.
      *
      * @return POM_ARTIFACT_ID gradle property value
-     * @throws InvalidUserDataException If Artifact ID can't be return
+     * @throws InvalidUserDataException if Artifact ID can't be return
      * @see #getPomArtifactUrl()
      */
     String getPomArtifactId() throws InvalidUserDataException {
@@ -348,7 +348,7 @@ final class MavenPush {
      *
      * @return POM_ARTIFACT_URL gradle property value or POM_ARTIFACT_ID gradle property value
      * if project hasn't this property
-     * @throws InvalidUserDataException If Artifact URL can't be return
+     * @throws InvalidUserDataException if Artifact URL can't be return
      * @see #getPomArtifactId()
      */
     String getPomArtifactUrl() throws InvalidUserDataException {
@@ -361,7 +361,7 @@ final class MavenPush {
      * @return VERSION_NAME gradle property value + VERSION_NAME_EXTRAS environment variable value
      * or defaultConfig.versionName value + VERSION_NAME_EXTRAS environment variable value
      * if project hasn't VERSION_NAME gradle property and it's Android project
-     * @throws InvalidUserDataException If version name can't be return
+     * @throws InvalidUserDataException if version name can't be return
      */
     String getPomVersionName() throws InvalidUserDataException {
         final String versionNameExtras = (System.getenv().containsKey('VERSION_NAME_EXTRAS')) ? System.getenv('VERSION_NAME_EXTRAS') : ''
@@ -392,7 +392,7 @@ final class MavenPush {
      * Returns library name.
      *
      * @return POM_NAME gradle property value
-     * @throws InvalidUserDataException If library name can't be return
+     * @throws InvalidUserDataException if library name can't be return
      */
     String getPomName() throws InvalidUserDataException {
         if (project.hasProperty('POM_NAME')) {
@@ -406,7 +406,7 @@ final class MavenPush {
      * Returns library description.
      *
      * @return POM_DESCRIPTION gradle property value
-     * @throws InvalidUserDataException If library description can't be return
+     * @throws InvalidUserDataException if library description can't be return
      */
     String getPomDescription() throws InvalidUserDataException {
         if (project.hasProperty('POM_DESCRIPTION')) {
@@ -430,7 +430,7 @@ final class MavenPush {
      * Returns library url.
      *
      * @return POM_URL gradle property value
-     * @throws InvalidUserDataException If library url can't be return
+     * @throws InvalidUserDataException if library url can't be return
      */
     String getPomUrl() throws InvalidUserDataException {
         if (project.hasProperty('POM_URL')) {
@@ -455,7 +455,7 @@ final class MavenPush {
      *
      * @return POM_SCM_URL gradle property value or POM_URL gradle property value if project hasn't
      * POM_SCM_URL gradle property
-     * @throws InvalidUserDataException If library publicly browsable repository url can't be return
+     * @throws InvalidUserDataException if library publicly browsable repository url can't be return
      * @see #getPomUrl()
      */
     String getPomScmUrl() throws InvalidUserDataException {
@@ -466,7 +466,7 @@ final class MavenPush {
      * Returns connection element convey to how one is to connect to the version control system through Maven.
      *
      * @return POM_SCM_CONNECTION gradle property value
-     * @throws InvalidUserDataException If connection element can't be return
+     * @throws InvalidUserDataException if connection element can't be return
      */
     String getPomScmConnection() throws InvalidUserDataException {
         if (project.hasProperty('POM_SCM_CONNECTION')) {
@@ -481,7 +481,7 @@ final class MavenPush {
      *
      * @return POM_SCM_DEV_CONNECTION gradle property value or POM_SCM_CONNECTION gradle property value if project hasn't
      * POM_SCM_DEV_CONNECTION gradle property
-     * @throws InvalidUserDataException If connection element can't be return
+     * @throws InvalidUserDataException if connection element can't be return
      * @see #getPomScmConnection()
      */
     String getPomScmDevConnection() throws InvalidUserDataException {
@@ -502,7 +502,7 @@ final class MavenPush {
      * Returns licence name.
      *
      * @return POM_LICENCE_NAME gradle property value
-     * @throws InvalidUserDataException If licence name can't be return
+     * @throws InvalidUserDataException if licence name can't be return
      */
     String getPomLicenseName() throws InvalidUserDataException {
         if (project.hasProperty('POM_LICENCE_NAME')) {
@@ -516,7 +516,7 @@ final class MavenPush {
      * Returns licence url.
      *
      * @return POM_LICENCE_URL gradle property value
-     * @throws InvalidUserDataException If licence url can't be return
+     * @throws InvalidUserDataException if licence url can't be return
      */
     String getPomLicenseUrl() throws InvalidUserDataException {
         if (project.hasProperty('POM_LICENCE_URL')) {
@@ -570,7 +570,7 @@ final class MavenPush {
      * Returns developer ID.
      *
      * @return POM_DEVELOPER_ID gradle property value
-     * @throws InvalidUserDataException If developer ID can't be return
+     * @throws InvalidUserDataException if developer ID can't be return
      * @see #getDevelopers()
      */
     String getDeveloperId() throws InvalidUserDataException {
@@ -585,7 +585,7 @@ final class MavenPush {
      * Returns developer name.
      *
      * @return POM_DEVELOPER_NAME gradle property value
-     * @throws InvalidUserDataException If developer name can't be return
+     * @throws InvalidUserDataException if developer name can't be return
      * @see #getDevelopers()
      */
     String getDeveloperName() throws InvalidUserDataException {
