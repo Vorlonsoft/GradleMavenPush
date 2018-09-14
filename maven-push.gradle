@@ -409,6 +409,8 @@ afterEvaluate { project ->
             }
             if (file("${buildDir}/libs/${pomArtifactId}-${pomVersionName}.jar").exists()) {
                 from zipTree(file("${buildDir}/libs/${pomArtifactId}-${pomVersionName}.jar"))
+            } else if (file("${buildDir}/libs/${pomArtifactId}.jar").exists()) {
+                from zipTree(file("${buildDir}/libs/${pomArtifactId}.jar"))
             }
             if (file("${buildDir}/outputs/aar/${project.name}-release.aar").exists()) {
                 from {
@@ -421,6 +423,8 @@ afterEvaluate { project ->
             }
             if (file("${buildDir}/distributions/${pomArtifactId}-${pomVersionName}.apklib").exists()) {
                 from zipTree(file("${buildDir}/distributions/${pomArtifactId}-${pomVersionName}.apklib"))
+            } else if (file("${buildDir}/distributions/${pomArtifactId}.apklib").exists()) {
+                from zipTree(file("${buildDir}/distributions/${pomArtifactId}.apklib"))
             }
         }
     }
