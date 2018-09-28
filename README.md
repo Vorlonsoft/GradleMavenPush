@@ -14,7 +14,7 @@ Helper to upload Gradle Android Artifacts, Gradle Java Artifacts and Gradle Kotl
 * [Other properties](#other-properties-optional)
 * [Groovydoc documentation](#groovydoc-documentation)
 * [Already in use](#already-in-use-in-following-libraries)
-* [Other pligins](#our-other-pligins)
+* [Other plugins](#our-other-plugins)
 * [Contribute](#contribute)
 * [License](#license)
 
@@ -341,7 +341,7 @@ See [GradleMavenPush documentation](https://vorlonsoft.github.io/GradleMavenPush
 
 * ...
 
-## Our other pligins
+## Our other plugins
 
 [EasyDokkaPlugin](https://github.com/Vorlonsoft/EasyDokkaPlugin) - Gradle script plugin to generate documentation by Dokka documentation engine in Javadoc format for Java, Kotlin, Android and non-Android projects. It's very easy, you don't need to add to `dependencies` section additional `classpath` or think about compatibility issues, you don't need additional repositories also.
 
