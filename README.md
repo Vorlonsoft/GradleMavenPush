@@ -69,13 +69,13 @@ GROUP                  = com.vorlonsoft
 VERSION_NAME           = 1.2.0-SNAPSHOT
 
 POM_DESCRIPTION        = Library for Android applications, which provides rating dialog.
-POM_URL                = https://github.com/Vorlonsoft/AndroidRate
+POM_URL                = https\://github.com/Vorlonsoft/AndroidRate
 POM_LICENCE_NAME       = The MIT License (MIT)
-POM_LICENCE_URL        = https://opensource.org/licenses/MIT
+POM_LICENCE_URL        = https\://opensource.org/licenses/MIT
 POM_DEVELOPER_ID       = AlexanderLS
 POM_DEVELOPER_NAME     = Alexander Savin
 POM_DEVELOPER_EMAIL    = info@vorlonsoft.com
-POM_SCM_CONNECTION     = scm:git@github.com:Vorlonsoft/AndroidRate.git
+POM_SCM_CONNECTION     = scm\:git@github.com\:Vorlonsoft/AndroidRate.git
 ```
 
 The `VERSION_NAME` value is important. If it contains the keyword `SNAPSHOT` then the build will upload to the snapshot server, if not then to the release server.
@@ -312,13 +312,13 @@ POM_SCM_URL (default is POM_URL value)
 Repositories in the Release pom file, only id and url separated by comma.
 
 ```properties
-POM_REPOSITORIES (example "mavenCentral,https://repo1.maven.org/maven2/,jCenter,https://jcenter.bintray.com/", default is "")
+POM_REPOSITORIES (example "mavenCentral,https\://repo1.maven.org/maven2/,jCenter,https\://jcenter.bintray.com/", default is "")
 ```
 
 Repositories in the Snapshot pom file, only id and url separated by comma.
 
 ```properties
-POM_SNAPSHOT_REPOSITORIES (example "mavenCentral,https://oss.sonatype.org/content/repositories/snapshots/,jCenter,https://oss.jfrog.org/artifactory/oss-snapshot-local/", default is POM_REPOSITORIES value)
+POM_SNAPSHOT_REPOSITORIES (example "mavenCentral,https\://oss.sonatype.org/content/repositories/snapshots/,jCenter,https\://oss.jfrog.org/artifactory/oss-snapshot-local/", default is POM_REPOSITORIES value)
 ```
 
 #### Distribution Management
@@ -343,7 +343,7 @@ See [GradleMavenPush documentation](https://vorlonsoft.github.io/GradleMavenPush
 
 ## Our other plugins
 
-[EasyDokkaPlugin](https://github.com/Vorlonsoft/EasyDokkaPlugin) - Gradle script plugin to generate documentation by Dokka documentation engine in Javadoc format for Java, Kotlin, Android and non-Android projects. It's very easy, you don't need to add to `dependencies` section additional `classpath` or think about compatibility issues, you don't need additional repositories also.
+[EasyDokkaPlugin](https://github.com/Vorlonsoft/EasyDokkaPlugin) - Gradle Script plugin to generate documentation by Dokka documentation engine in Javadoc or other formats for Java, Kotlin, Android and non-Android projects. It's very easy, you don't need to add to `dependencies` section additional `classpath` or think about compatibility issues, you don't need additional repositories also.
 
 ## Contribute
 
