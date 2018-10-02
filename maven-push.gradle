@@ -654,7 +654,13 @@ afterEvaluate { project ->
             android.libraryVariants.all { variant ->
                 androidJavadocs.doFirst {
                     classpath += files(android.bootClasspath)
-                    classpath += files(variant.javaCompileProvider.get().classpath.files)
+                    if (variant.hasProperty('javaCompileProvider')) {
+                        classpath += files(variant.javaCompileProvider.get().classpath.files)
+                    } else if (variant.hasProperty('javaCompiler')) {
+                        classpath += files(variant.javaCompiler.classpath.files)
+                    } else {
+                        classpath += files(variant.javaCompile.classpath.files)
+                    }
                     // Process AAR dependencies
                     def aarDependencies = classpath.filter {
                         it.name.endsWith('.aar')
